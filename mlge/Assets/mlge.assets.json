@@ -1,0 +1,23 @@
+{
+
+	"resources": [
+		{
+			"type": "TTFFont",
+			"name": "fonts/VeraMono",
+			"file": "ttf-bitstream-vera-1.10/VeraMono.ttf",
+			"defaultPtSize" :  12,
+			"renderMethod": "blended",
+			"bold" : true
+
+		},
+		{
+			"type": "TTFFont",
+			"name": "fonts/Vera",
+			"file": "ttf-bitstream-vera-1.10/Vera.ttf",
+			"defaultPtSize" :  12,
+			"renderMethod" : "blended",
+			"bold" : true
+		}
+	]
+}
+

@@ -1,0 +1,57 @@
+{
+	"resources": [
+		{
+			"type": "Image",
+			"name": "Bomber",
+			"file": "Ships/Bomber/Attack_2.png",
+			"x": 1,
+			"y": 2
+		},
+		{
+			"type": "Texture",
+			"name": "Fighter",
+			"file": "Ships/Fighter/Attack_2.png"
+		},
+		{
+			"type": "Texture",
+			"name": "Charge_1",
+			"file": "Ships/Fighter/Charge_1.png"
+		},
+		{
+			"type": "Image",
+			"name": "Bomber",
+			"file": "Ships/Fighter/Attack_2.png",
+			"x": 1,
+			"y": 2
+		},
+
+		{
+			"type": "SpriteSheet",
+			"name": "SpriteSheet/Fighter_Move",
+			"file": "Ships/Fighter/Move.png",
+			"cellWidth": 192,
+			"cellHeight": 192
+		},
+		{
+			"type": "SpriteSheet",
+			"name": "SpriteSheet/Fighter_Destroyed",
+			"file": "Ships/Fighter/Destroyed.png",
+			"cellWidth": 192,
+			"cellHeight": 192
+		},
+		{
+			"type": "Flipbook",
+			"name": "Flipbook/Fighter_Move",
+			"spriteSheet": "SpriteSheet/Fighter_Move",
+			"fps":  10
+		},
+		{
+			"type": "Flipbook",
+			"name": "Flipbook/Fighter_Destroyed",
+			"spriteSheet": "SpriteSheet/Fighter_Destroyed",
+			"fps":  10
+		}
+
+	]
+}
+

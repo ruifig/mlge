@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<!--
+
+!-->
+
+<AutoVisualizer xmlns="http://schemas.microsoft.com/vstudio/debugger/natvis/2010">
+
+  <Type Name="mlge::ObjectPtr&lt;*&gt;">
+      <DisplayString Condition="m_control == 0">empty</DisplayString>
+      <DisplayString Condition="(m_control != 0)">ObjectPtr {*($T1*)(m_control+1)} [{m_control-&gt;strong} strong ref, {m_control-&gt;weak} weak refs] [{*m_control}]</DisplayString>
+      <Expand>
+          <Item Condition="m_control != 0" Name="[ptr]">*($T1*)(m_control+1)</Item>
+          <Item Condition="m_control != 0" Name="[control block]">*m_control</Item>
+      </Expand>
+  </Type>
+
+  <Type Name="mlge::WeakObjectPtr&lt;*&gt;">
+      <DisplayString Condition="m_control == 0">empty</DisplayString>
+      <DisplayString Condition="(m_control != 0) &amp;&amp; (m_control-&gt;strong == 0)"> WeakObjectPtr expired [{m_control-&gt;strong} strong ref, {m_control-&gt;weak} weak refs] [{*m_control}]</DisplayString>
+      <DisplayString Condition="(m_control != 0) &amp;&amp; (m_control-&gt;strong > 0)"> WeakObjectPtr {*($T1*)(m_control+1)} [{m_control-&gt;strong} strong ref, {m_control-&gt;weak} weak refs] [{*m_control}]</DisplayString>
+      <Expand>
+          <Item Condition="m_control != 0" Name="[ptr]">*($T1*)(m_control+1)</Item>
+          <Item Condition="m_control != 0" Name="[control block]">*m_control</Item>
+      </Expand>
+  </Type>
+
+  <Type Name="cz::SharedPtr&lt;*&gt;">
+      <DisplayString Condition="m_control == 0">empty</DisplayString>
+      <DisplayString Condition="(m_control != 0)">SharedPtr {*($T1*)(m_control+1)} [{m_control-&gt;strong} strong ref, {m_control-&gt;weak} weak refs] [{*m_control}]</DisplayString>
+      <Expand>
+          <Item Condition="m_control != 0" Name="[ptr]">*($T1*)(m_control+1)</Item>
+          <Item Condition="m_control != 0" Name="[control block]">*m_control</Item>
+      </Expand>
+  </Type>
+
+  <Type Name="cz::WeakPtr&lt;*&gt;">
+      <DisplayString Condition="m_control == 0">empty</DisplayString>
+      <DisplayString Condition="(m_control != 0) &amp;&amp; (m_control-&gt;strong == 0)"> WeakPtr expired [{m_control-&gt;strong} strong ref, {m_control-&gt;weak} weak refs] [{*m_control}]</DisplayString>
+      <DisplayString Condition="(m_control != 0) &amp;&amp; (m_control-&gt;strong > 0)"> WeakPtr {*($T1*)(m_control+1)} [{m_control-&gt;strong} strong ref, {m_control-&gt;weak} weak refs] [{*m_control}]</DisplayString>
+      <Expand>
+          <Item Condition="m_control != 0" Name="[ptr]">*($T1*)(m_control+1)</Item>
+          <Item Condition="m_control != 0" Name="[control block]">*m_control</Item>
+      </Expand>
+  </Type>
+
+</AutoVisualizer>
+
