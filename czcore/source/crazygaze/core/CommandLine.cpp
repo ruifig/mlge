@@ -33,7 +33,7 @@ bool CommandLine::init(int argc, char* argv[])
 			const char* end = findNext(ptr, '=');
 			auto paramName = std::string_view(ptr, end);
 
-			if (has(paramName))
+			if (getParam(paramName))
 			{
 				errorCount++;
 				CZ_LOG(Error, "Duplicated parameter : '-{}'", paramName);
@@ -85,7 +85,12 @@ bool CommandLine::init(int argc, char* argv[])
 	return errorCount == 0 ? true : false;
 }
 
-const CommandLine::Param* CommandLine::has(std::string_view name, bool ignoreCase) const
+bool CommandLine::has(std::string_view name, bool ignoreCase) const
+{
+	return getParam(name, ignoreCase) == nullptr ? false : true;
+}
+
+const CommandLine::Param* CommandLine::getParam(std::string_view name, bool ignoreCase) const
 {
 	if (ignoreCase)
 	{

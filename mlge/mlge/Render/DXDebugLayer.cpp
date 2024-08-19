@@ -15,7 +15,7 @@ DXDebugLayer::~DXDebugLayer()
 
 bool DXDebugLayer::init()
 {
-	bool enable = CommandLine::get().has("d3ddebug") == nullptr ? false : true;
+	bool enable = CommandLine::get().has("d3ddebug");
 
 	if (!enable)
 	{

@@ -45,10 +45,32 @@ class CommandLine : public Singleton<CommandLine>
 	bool init(int argc, char* argv[]);
 
 	/**
+	 * Returns the first parameter. Makes it possible to use range based for loops
+	 * If there are no parameters, dereferencing this is undefined behavior.
+	 */
+	const Param* begin() const
+	{
+		return m_params.data();
+	}
+
+	/**
+	 * Returns one past the last parameter. Makes it possible to use range based for loops
+	 * WARNING: Do not dereference this. It points to invalid memory.
+	 */
+	const Param* end() const
+	{
+		return m_params.data() + m_params.size();
+	}
+
+	/**
+	 * Checks if the specified parameter exists, regardless if it has values or not.
+	 */
+	bool has(std::string_view name, bool ignoreCase = true) const;
+
+	/**
 	 * Returns a parameter, or nullptr if not found
 	 */
-	const Param* has(std::string_view name, bool ignoreCase = true) const;
-
+	const Param* getParam(std::string_view name, bool ignoreCase = true) const;
 
 	/**
 	 * Retrieves a parameter's first value.
@@ -60,7 +82,7 @@ class CommandLine : public Singleton<CommandLine>
 	template<typename T>
 	bool getValue(const char* name, T& dst) const
 	{
-		const Param* p = has(name);
+		const Param* p = getParam(name);
 		if (!p || p->values.size() == 0)
 		{
 			return false;
@@ -108,7 +130,7 @@ class CommandLine : public Singleton<CommandLine>
 	 */
 	bool getValue(const char* name, std::string& dst)
 	{
-		const Param* p = has(name);
+		const Param* p = getParam(name);
 		if (!p || p->values.size() == 0)
 		{
 			return false;

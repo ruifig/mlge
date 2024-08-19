@@ -62,7 +62,7 @@ struct RootImpl : public Root
 		}
 
 #if MLGE_EDITOR
-		gIsGame = CommandLine::get().has("game") == nullptr ? false : true;
+		gIsGame = CommandLine::get().has("game");
 		if (!gIsGame)
 		{
 			editor = std::make_unique<editor::Editor>();
