@@ -26,7 +26,7 @@ bool Renderer::init()
 {
 	// Create SDL window
 	{
-		bool fullscreen = CommandLine::get().has("fullscreen") == nullptr ? false : true;
+		bool fullscreen = CommandLine::get().has("fullscreen");
 		SDL_WindowFlags windowFlags;
 		if (fullscreen)
 		{

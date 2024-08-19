@@ -97,8 +97,6 @@ fs::path getProcessPath()
 	while(true)
 	{
 		auto buffer = std::make_unique<wchar_t[]>(size);
-		auto buffer2 = std::make_unique<wchar_t[]>(size);
-		DWORD res2 = GetModuleFileNameW(NULL, buffer2.get(), size);
 		HANDLE processHandle = ::GetCurrentProcess();
 		DWORD res = GetProcessImageFileNameW(processHandle, buffer.get(), size);
 

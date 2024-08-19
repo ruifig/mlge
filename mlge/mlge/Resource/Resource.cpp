@@ -260,7 +260,7 @@ bool ResourceManager::loadDefinitions()
 	}
 
 	int errorCount = 0;
-	bool testResources = CommandLine::get().has("TestResources") != nullptr;
+	bool testResources = CommandLine::get().has("TestResources");
 
 	if (testResources)
 	{
