@@ -36,9 +36,19 @@ class AActor : public MObject
 		return m_rotation;
 	}
 
+	/**
+	 *  Sets the actor's rotation, ignoring multiple revolutions. As-in, the saved rotation will stay within [-360...360]
+	 */
 	void setRotation(float degrees)
 	{
-		m_rotation = degrees;
+		if (degrees >= -360 && degrees <= 360)
+		{
+			m_rotation = degrees;
+		}
+		else
+		{
+			m_rotation = static_cast<float>(fmod(degrees, 360));
+		}
 	}
 
 	/**
