@@ -78,7 +78,14 @@ bool Renderer::init()
 		CZ_LOG(Log, "    {}", info.name);
 	}
 
-	uint32_t rendererFlags = SDL_RENDERER_ACCELERATED | SDL_RENDERER_PRESENTVSYNC;
+	uint32_t rendererFlags = SDL_RENDERER_ACCELERATED;
+
+	bool vsync = Config::get().getValueOrDefault<bool>("Engine", "vsync", true);
+	if (vsync)
+	{
+		rendererFlags |= SDL_RENDERER_PRESENTVSYNC;
+	}
+
 	SDL_SetHint(SDL_HINT_RENDER_DIRECT3D_THREADSAFE, "1");
 	m_sdlRenderer.reset(SDL_CreateRenderer(m_sdlWindow.get(), rendererIndex, rendererFlags));
 	if (!m_sdlRenderer)
