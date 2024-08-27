@@ -23,7 +23,7 @@ bool Config::init()
 	{
 		auto inifile = std::make_unique<IniFile>();
 		fs::path path = getProcessPath() / "mlge.ini";
-		if (!inifile->open(path))
+		if (!inifile->try_open(path))
 		{
 			// set to empty inifile
 			inifile = std::make_unique<IniFile>();
@@ -53,7 +53,7 @@ bool Config::loadGameConfig()
 		auto inifile = std::make_unique<IniFile>();
 		fs::path path = getProcessPath() / (std::string(getGameFolderName()) + ".ini");
 
-		if (!inifile->open(path))
+		if (!inifile->try_open(path))
 		{
 			// set to empty inifile
 			inifile = std::make_unique<IniFile>();
