@@ -60,7 +60,7 @@ struct SharedPtrTests
 		}
 		else
 		{
-			return MakeShared<T>(std::forward<Args>(args)...);
+			return makeShared<T>(std::forward<Args>(args)...);
 		}
 	}
 
