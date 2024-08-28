@@ -9,11 +9,6 @@
 namespace mlge::editor
 {
 
-namespace 
-{
-	const char* items[] = {"320x240", "640x480", "1024x768"};
-}
-
 static bool p_open = true;
 
 GameControlBar::GameControlBar()
@@ -29,11 +24,11 @@ GameControlBar::GameControlBar()
 
 	std::string cfgRes = std::format("{}x{}", s.w, s.h);
 
-	for (int n = 0; n < IM_ARRAYSIZE(items); n++)
+	for (size_t n = 0; n < m_resolutions.size(); n++)
 	{
-		if (cfgRes == items[n])
+		if (cfgRes == m_resolutions[n])
 		{
-			m_resolutionIdx = n;
+			m_resolutionIdx = static_cast<int>(n);
 			break;
 		}
 	}
@@ -47,7 +42,7 @@ GameControlBar::GameControlBar()
 
 void GameControlBar::show()
 {
-	auto getSize = [](std::string str)
+	auto getSize = [](const std::string& str)
 	{
 		return Size{
 			atoi(std::string(str, 0, str.find('x')).c_str()),
@@ -57,16 +52,17 @@ void GameControlBar::show()
 	// Resolution selection
 	{
 		const char* combo_preview_value =
-			items[m_resolutionIdx];  // Pass in the preview value visible before opening the combo (it could be anything)
+			m_resolutions[static_cast<size_t>(m_resolutionIdx)].c_str();  // Pass in the preview value visible before opening the combo (it could be anything)
+
 		if (ImGui::BeginCombo("Resolution", combo_preview_value, 0))
 		{
-			for (int n = 0; n < IM_ARRAYSIZE(items); n++)
+			for (size_t n = 0; n < m_resolutions.size(); n++)
 			{
-				const bool isSelected = (m_resolutionIdx == n);
-				if (ImGui::Selectable(items[n], isSelected))
+				const bool isSelected = (m_resolutionIdx == static_cast<int>(n));
+				if (ImGui::Selectable(m_resolutions[n].c_str(), isSelected))
 				{
-					int newIdx = n;
-					auto newResolution = getSize(items[newIdx]);
+					int newIdx = static_cast<int>(n);
+					auto newResolution = getSize(m_resolutions[static_cast<size_t>(newIdx)]);
 
 					Config::get().setGameValue("Engine", "resx", newResolution.w);
 					Config::get().setGameValue("Engine", "resy", newResolution.h);
