@@ -442,7 +442,7 @@ class WeakPtr
 
 
 template <typename T, typename... Args>
-SharedPtr<T> MakeShared(Args&& ... args)
+SharedPtr<T> makeShared(Args&& ... args)
 {
 	static_assert(!std::is_abstract_v<T>, "Type is abstract.");
 	void* ptr = details::BaseSharedPtrControlBlock::allocBlock<T>();

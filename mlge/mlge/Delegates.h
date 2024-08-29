@@ -146,7 +146,7 @@ public:
 	template<typename TargetType>
 	[[nodiscard]] DelegateHandle bind(TargetType* target, void (TargetType::*memberFunction)(Ts... args))
 	{
-		auto control = MakeShared<DelegateHandle::ControlBlock>();
+		auto control = makeShared<DelegateHandle::ControlBlock>();
 		control->source = this;
 		m_targets.emplace_back(control, Target(target, memberFunction));
 		return DelegateHandle(control);
