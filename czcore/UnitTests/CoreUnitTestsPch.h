@@ -4,6 +4,10 @@
 
 #include "crazygaze/core/SharedPtr.h"
 
+#include <future>
+#include <chrono>
+#include <type_traits>
+
 CZ_THIRD_PARTY_INCLUDES_START
 #include <catch2/catch_all.hpp>
 //#include <catch2/catch_session.hpp>

@@ -28,6 +28,14 @@ set(ALL_FILES
 	"crazygaze/core/StringUtils.h"
 )
 
+if(WIN32)
+	list(APPEND ALL_FILES
+		"crazygaze/core/Windows/Win32Event.cpp"
+		"crazygaze/core/Windows/Win32Event.h"
+	)
+endif()
+
+
 add_library(czcore STATIC ${ALL_FILES})
 
 target_link_libraries(czcore PUBLIC

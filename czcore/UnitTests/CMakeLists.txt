@@ -6,6 +6,12 @@ set(ALL_FILES
 	"SharedPtrTests.cpp"
 )
 
+if (WIN32)
+	list(APPEND ALL_FILES
+		"Win32EventTests.cpp"
+	)
+endif()
+
 add_executable(CoreUnitTests ${ALL_FILES})
 
 source_group(
