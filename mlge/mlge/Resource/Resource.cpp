@@ -8,10 +8,18 @@
 namespace mlge
 {
 
-bool MResource::construct(const MResourceDefinition& definition)
+//////////////////////////////////////////////////////////////////////////
+//		MResourceDefinition
+//////////////////////////////////////////////////////////////////////////
+
+MResourceDefinition::BaseRef::BaseRef()
 {
-	m_definition = &definition;
-	return Super::defaultConstruct();
+	ResourceManager::get().addDefinitionRef(this);
+}
+
+MResourceDefinition::BaseRef::~BaseRef()
+{
+	ResourceManager::get().removeDefinitionRef(this);
 }
 
 MResourceDefinition::~MResourceDefinition()
@@ -24,6 +32,12 @@ bool MResourceDefinition::construct(const ResourceRoot& root)
 {
 	m_root = &root;
 	return Super::defaultConstruct();
+}
+
+const std::string_view MResourceDefinition::getTypeName() const
+{
+	std::string_view className = m_class->getName();
+	return std::string_view(className.begin(), className.end() - (int)strlen("Definition"));
 }
 
 ObjectPtr<MResource> MResourceDefinition::getResource() const
@@ -49,14 +63,38 @@ ObjectPtr<MResource> MResourceDefinition::getResource() const
 	}
 }
 
-MResourceDefinition::BaseRef::BaseRef()
+void MResourceDefinition::to_json(nlohmann::json& j) const
 {
-	ResourceManager::get().addDefinitionRef(this);
+	j["type"] = getTypeName();
+	j["name"] = name;
+	j["description"] = description;
+	if (file.native().size())
+	{
+		j["file"] = file;
+	}
 }
 
-MResourceDefinition::BaseRef::~BaseRef()
+void MResourceDefinition::from_json(const nlohmann::json& j)
 {
-	ResourceManager::get().removeDefinitionRef(this);
+	j.at("name").get_to(name);
+	if (j.count("description") != 0)
+	{
+		j.at("description").get_to(description);
+	}
+	if (j.count("file") != 0)
+	{
+		j.at("file").get_to(file);
+	}
+}
+
+//////////////////////////////////////////////////////////////////////////
+//		MResource
+//////////////////////////////////////////////////////////////////////////
+
+bool MResource::construct(const MResourceDefinition& definition)
+{
+	m_definition = &definition;
+	return Super::defaultConstruct();
 }
 
 
@@ -293,6 +331,18 @@ const MResourceDefinition* ResourceManager::findDefinition(std::string_view name
 	return m_all.find(name);
 }
 
+
+std::vector<mlge::ObjectPtr<mlge::MResourceDefinition>> ResourceManager::getAllDefinitions()
+{
+	std::vector<ObjectPtr<MResourceDefinition>> res;
+	res.reserve(m_all.definitions.size());
+	for (auto&& p : m_all.definitions)
+	{
+		res.push_back(p.second);
+	}
+
+	return res;
+}
 
 void ResourceManager::addDefinitionRef(MResourceDefinition::BaseRef* ref)
 {

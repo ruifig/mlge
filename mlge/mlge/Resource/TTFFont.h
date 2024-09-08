@@ -29,6 +29,11 @@ class MTTFFontDefinition : public MResourceDefinition
 		return m_bold;
 	}
 
+	int getDefaultSize() const
+	{
+		return m_defaultPtSize;
+	}
+
   protected:
 
 	virtual void to_json(nlohmann::json& j) const override;

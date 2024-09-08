@@ -130,15 +130,16 @@ class MResourceDefinition : public MObject
 	std::string name;
 
 	/**
+	 * Optional: Dev (or user) friendly description.
+	 */
+	std::string description;
+
+	/**
 	 * The resource's filename. This is the file the resource will be loaded from
 	 */
 	fs::path file;
 
-	const std::string_view getTypeName() const
-	{
-		std::string_view className = m_class->getName();
-		return std::string_view(className.begin(), className.end() - (int)strlen("Definition"));
-	}
+	const std::string_view getTypeName() const;
 
 	/**
 	 * Tells if the resource this definition refers to is currently loaded
@@ -163,24 +164,9 @@ class MResourceDefinition : public MObject
 
 	friend ResourceManager;
 
-	virtual void to_json(nlohmann::json& j) const
-	{
-		j["type"] = getTypeName();
-		j["name"] = name;
-		if (file.native().size())
-		{
-			j["file"] = file;
-		}
-	}
+	virtual void to_json(nlohmann::json& j) const;
 
-	virtual void from_json(const nlohmann::json& j)
-	{
-		j.at("name").get_to(name);
-		if (j.count("file") !=0)
-		{
-			j.at("file").get_to(file);
-		}
-	}
+	virtual void from_json(const nlohmann::json& j);
 
 	/**
 	 * Creates the resource from the definition
@@ -256,18 +242,32 @@ class ResourceManager : public Singleton<ResourceManager>
 	 */
 	const MResourceDefinition* findDefinition(std::string_view name) const;
 
+	std::vector<ObjectPtr<MResourceDefinition>> getAllDefinitions();
 
-	std::vector<ObjectPtr<MResourceDefinition>> getAllDefinitions()
+
+	/**
+	 * Returns a vector with all the resource definitions of type T.
+	 * T must derive from MResourceDefinition
+	 */
+	template<typename T>
+	std::vector<ObjectPtr<T>> getDefinitions()
 	{
-		std::vector<ObjectPtr<MResourceDefinition>> res;
+		static_assert(std::is_base_of_v<MResourceDefinition, T>, "T must derive from MResourceDefinition");
+		std::vector<ObjectPtr<T>> res;
 		res.reserve(m_all.definitions.size());
-		for(auto&& p : m_all.definitions)
-		{
-			res.push_back(p.second);
-		}
-		return res;
-	}
 
+		for (auto&& p : m_all.definitions)
+		{
+			ObjectPtr<MResourceDefinition>& defFrom = p.second;
+			if (ObjectPtr<T> defTo = dynamic_pointer_cast<T>(defFrom))
+			{
+				res.push_back(std::move(defTo));
+			}
+		}
+
+	return res;
+
+	}
 
   protected:
 

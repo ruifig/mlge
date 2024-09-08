@@ -99,6 +99,11 @@ struct TextRenderer : public TextRendererBase<CacheText>
 		return *this;
 	}
 
+	int getPtSize() const
+	{
+		return m_settings.ptsize;
+	}
+
 	int getFontHeight()
 	{
 		if (!m_settings.prepareFont())
@@ -153,6 +158,15 @@ struct TextRenderer : public TextRendererBase<CacheText>
 		return m_settings.calcTextSize(str);
 	}
 
+	/**
+	 * Returns the text that will be displayed
+	 * This is function is only available when CacheText == true
+	 */
+	template<typename R = const std::string&>
+	auto getText() const -> std::enable_if_t<CacheText==true, R>
+	{
+		return this->m_text;
+	}
 
 	/**
 	 * Calculates the text dimensions of the cached text.
@@ -260,9 +274,22 @@ class MTextRenderComponent : public MRenderComponent,  public RenderOperation
 	void setFont(ObjectPtr<MTTFFont> font);
 
 	/**
+	 * Gets the font that is being used
+	 */
+	const ObjectPtr<MTTFFont>& getFont() const
+	{
+		return m_font;
+	}
+
+	/**
 	 * Sets the font size to use
 	 */
 	void setPtSize(int ptsize);
+
+	/**
+	 * Gets the font size being used
+	 */
+	int getPtSize() const;
 
 	/**
 	 * Returns the height in pixels for the selected font and ptsize

@@ -266,7 +266,7 @@ bool MTTFFont::Instance::loadGlyphs(const MTTFFontDefinition& def, std::string_v
 	if (!font)
 	{
 		CZ_LOG(
-			Error, "Failed to load point size {} for font {}, from file{}. ec={}", ptsize, def.name, narrow(def.file.native()),
+			Error, "Failed to load point size {} for font '{}', from file '{}'. ec={}", ptsize, def.name, narrow(def.file.native()),
 			SDL_GetError());
 		return false;
 	}

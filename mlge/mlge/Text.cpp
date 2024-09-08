@@ -207,6 +207,11 @@ void MTextRenderComponent::setPtSize(int ptsize)
 	m_textRenderer.setPtSize(ptsize);
 }
 
+int MTextRenderComponent::getPtSize() const
+{
+	return m_textRenderer.getPtSize();
+}
+
 int MTextRenderComponent::getFontHeight()
 {
 	return m_textRenderer.getFontHeight();
@@ -229,7 +234,7 @@ void MTextRenderComponent::setColor(const Color& color)
 
 void MTextRenderComponent::updateRenderQueue()
 {
-	if (!m_font)
+	if (!m_font || m_textRenderer.getText().size()==0)
 	{
 		return;
 	}
