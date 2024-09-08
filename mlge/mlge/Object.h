@@ -153,17 +153,28 @@ class Class;
  *
  * Lifetime of any MObject derived class needs to be controlled with ObjectPtr<T> and WeakObjectPtr<T>.
  *
- * Object creation is done in two steps:
+ * Object creation is done with createObject<T> and the following happens:
  *	- C++ constructor is called
- *	- The "bool construct(...)" method is called. If it returns false, object creation is considered as failed.
+ *	- The "virtual bool defaultConstruct()" is called.
+ *		- If it returns false, object creation is considered as failed.
+ *	- If any parameters are passed to createObject<T>, then a "bool construct(...)" that method is called with those parameters.
+ *		- If it returns false, object creation is considered as failed.
+ *		- createObject<T> will forward any parameters to T::construct, so construct can take any parameters T wants, and thus you
+ *		  can think of T::construct as the actual C++ constructor.
+ *		- Note that "construct" is typically NOT virtual, because the list of parameters depends on T itself.
  *
- * Object destruction is done in two steps:
- *	- The virtual "void destruct()" method is called. Derived classes that want to have their own "destruct" method should call "Super::destruct" at end.
- *	- The C++ destructor is called
+ * Object destruction happens as:
+ *	- The virtual "void destruct()" method is called.
+ *		- Derived classes can override this and should call "Super::destruct" at end.
+ *	- The C++ destructor is called.
  *
  * Derived classes must:
- *	- Implement a non-virtual "bool construct(...)" method.
- *	- Override the virtual "void destruct()" if required, and if so, call "Super::destruct()" at the end
+ *	- Implement a defaultConstruct() and/or construct(...) if necessary.
+		- Call Super::defaultConstruct Super::construct if required.
+ *		- Depending on the class hierarchy, this might be virtual or not. The reason it might not be virtual is that 
+ *		- The reason it needs to be non-virtual is because the list of parameters is up to the class itself, so the signature can
+ *		  be different from the one in the base class.
+ *	- Override "virtual void destruct()" if required, and if so, call "Super::destruct()" at the end.
  */
 class MObject
 {

@@ -239,18 +239,36 @@ void MTextRenderComponent::updateRenderQueue()
 	#endif
 }
 
+void drawTextDebugOverlay(const Rect& area)
+{
+	SDL_Renderer* sdlRenderer = Renderer::get().getSDLRenderer();
+
+	// SDL_SetRenderDrawBlendMode(sdlRenderer, SDL_BLENDMODE_BLEND);
+	SDL_SetRenderDrawColor(sdlRenderer, Color::Pink.r, Color::Pink.g, Color::Pink.b, 255);
+	SDL_RenderDrawRect(sdlRenderer, &area);
+	SDL_SetRenderDrawColor(sdlRenderer, Color::Pink.r/2, Color::Pink.g/2, Color::Pink.b/2, 255);
+	SDL_RenderDrawLine(sdlRenderer, area.x, area.y + area.h / 2, area.x + area.w, area.y + area.h / 2);
+	SDL_RenderDrawLine(sdlRenderer, area.x + area.w / 2, area.y, area.x + area.w / 2, area.y + area.h);
+}
+
 void MTextRenderComponent::render(RenderGroup group)
 {
 	// Calculate the position relative to the actor
 	Point pos = calcFinalPosition();
 
 	//
-	// Calculate the text alignment
-	// What we do is we calculate the text size, and then set the text render area centered at that point, with double the text's
-	// width and height.
-	// This allows the TextRenderer to then align the text according to the specified halign and valign
+	// Calculate the text alignment.
+	// The component position is the point the text should be relatively aligned to, therefore we do the following:
+	// * Calculate the text size
+	// * Set the rendering area as double the text area, centered on the component position
+	// * The text renderer then used the HAlign/VAlign and the text ends up being aligned relative to the component position.
 	Size textSize = m_textRenderer.calcTextSize();
 	Rect rect = pos.createRect(textSize.w * 2, textSize.h * 2);
+	// If no text to display, then do nothing
+	if (rect.isEmpty())
+	{
+		return;
+	}
 
 	if (group == m_renderGroup)
 	{
@@ -259,13 +277,7 @@ void MTextRenderComponent::render(RenderGroup group)
 	#if MLGE_DEBUG
 	else if (group == m_debugRenderGroup)
 	{
-		SDL_Renderer* sdlRenderer = Renderer::get().getSDLRenderer();
-
-		// SDL_SetRenderDrawBlendMode(sdlRenderer, SDL_BLENDMODE_BLEND);
-		SDL_SetRenderDrawColor(sdlRenderer, Color::Pink.r, Color::Pink.g, Color::Pink.b, 255);
-
-		SDL_RenderDrawRect(sdlRenderer, &rect);
-		SDL_RenderDrawLine(sdlRenderer, rect.x, rect.y + rect.h / 2, rect.x + rect.w, rect.y + rect.h / 2);
+		drawTextDebugOverlay(rect);
 	}
 	#endif
 

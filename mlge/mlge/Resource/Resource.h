@@ -73,11 +73,7 @@ class MResourceDefinition : public MObject
 
 	~MResourceDefinition();
 
-	virtual bool construct(const ResourceRoot& root)
-	{
-		m_root = &root;
-		return Super::defaultConstruct();
-	}
+	virtual bool construct(const ResourceRoot& root);
 
 	#if MLGE_EDITOR
 	virtual std::unique_ptr<editor::BaseResourceWindow> createEditWindow() = 0;

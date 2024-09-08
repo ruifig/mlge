@@ -20,6 +20,12 @@ MResourceDefinition::~MResourceDefinition()
 	CZ_CHECK(m_resource.expired());
 }
 
+bool MResourceDefinition::construct(const ResourceRoot& root)
+{
+	m_root = &root;
+	return Super::defaultConstruct();
+}
+
 ObjectPtr<MResource> MResourceDefinition::getResource() const
 {
 	// If it's already loaded, return it

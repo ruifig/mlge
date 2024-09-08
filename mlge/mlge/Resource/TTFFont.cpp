@@ -4,6 +4,10 @@
 #include "utf8.h"
 #include "utf8/unchecked.h"
 
+
+// If 1, it will log each loaded glyph
+#define LOG_LOADED_GLYPH 0
+
 namespace mlge
 {
 
@@ -368,9 +372,11 @@ bool MTTFFont::Instance::loadGlyphs(const MTTFFontDefinition& def, std::string_v
 						glyph.advance *= tabWidth;
 					}
 
+					#if LOG_LOADED_GLYPH
 					CZ_LOG(
 						VeryVerbose, "ch '{}' : minx={}, maxx={}, miny={}, maxy={}, advance={}", char(codepoint),
 						glyph.minx, glyph.maxx, glyph.miny, glyph.maxy, glyph.advance);
+					#endif
 
 				}
 
