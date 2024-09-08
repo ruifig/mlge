@@ -46,6 +46,8 @@ set(ALL_FILES
 	"mlge/nlohmann/json_fwd.hpp"
 	"mlge/nlohmann/nlohmann_json.natvis"
 
+	"mlge/Render/DebugUtils.cpp"
+	"mlge/Render/DebugUtils.h"
 	"mlge/Render/DXDebugLayer.cpp"
 	"mlge/Render/DXDebugLayer.h"
 	"mlge/Render/Renderer.cpp"

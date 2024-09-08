@@ -1,6 +1,7 @@
 #include "mlge/Text.h"
 #include "mlge/Math.h"
 #include "mlge/Render/Renderer.h"
+#include "mlge/Render/DebugUtils.h"
 
 #include "utf8.h"
 #include "utf8/unchecked.h"
@@ -239,17 +240,6 @@ void MTextRenderComponent::updateRenderQueue()
 	#endif
 }
 
-void drawTextDebugOverlay(const Rect& area)
-{
-	SDL_Renderer* sdlRenderer = Renderer::get().getSDLRenderer();
-
-	// SDL_SetRenderDrawBlendMode(sdlRenderer, SDL_BLENDMODE_BLEND);
-	SDL_SetRenderDrawColor(sdlRenderer, Color::Pink.r, Color::Pink.g, Color::Pink.b, 255);
-	SDL_RenderDrawRect(sdlRenderer, &area);
-	SDL_SetRenderDrawColor(sdlRenderer, Color::Pink.r/2, Color::Pink.g/2, Color::Pink.b/2, 255);
-	SDL_RenderDrawLine(sdlRenderer, area.x, area.y + area.h / 2, area.x + area.w, area.y + area.h / 2);
-	SDL_RenderDrawLine(sdlRenderer, area.x + area.w / 2, area.y, area.x + area.w / 2, area.y + area.h);
-}
 
 void MTextRenderComponent::render(RenderGroup group)
 {
@@ -277,10 +267,9 @@ void MTextRenderComponent::render(RenderGroup group)
 	#if MLGE_DEBUG
 	else if (group == m_debugRenderGroup)
 	{
-		drawTextDebugOverlay(rect);
+		drawDebugOverlayRect(rect);
 	}
 	#endif
-
 }
 
 } // namespace mlge
