@@ -3,6 +3,57 @@
 #include "Common.h"
 #include "Logging.h"
 
+
+/*
+This controls if memory should be cleared when the last strong reference is gone and the object destroyed.
+Since the way SharedPtr is implemented allocated memory for Control Block + Object in one go, it means the object's memory
+will only be deallocated once the Control Block is also gone.
+
+This means that any code holding a raw pointer for an object that was already destroyed but still has WeakPtrs will likely still
+point to the partially correct data (depending on the object's destructor).
+
+For example, this cod is a bug, but will still work correctly:
+
+```
+struct MyFoo
+{
+	explicit MyFoo(const char* str) : str(str) {}
+	const char* str = nullptr;
+};
+
+struct Logger
+{
+	Logger(MyFoo* ptr) : ptr(ptr) { }
+	void log()
+	{
+		printf("%s\n", ptr->str);
+	}
+
+	MyFoo* ptr;
+};
+
+auto foo = makeShared<MyFoo>("Hello");
+// Keep a WeakPtr means once the MyFoo object is destroyed, the memory is not actually deallocated
+WeakPtr<MyFoo> wfoo = foo;
+// Passing a raw pointer to Logger
+Logger logger(foo.get());
+// This destroys MyFoo, but doesn't deallocated the memory, because of the WeakPtr.
+foo.reset();
+
+// BUG: "logger.ptr->str" still points "Hello", because MyFoo's destructor doesn't actually clear anything.
+logger.log();
+```
+
+By setting this to 1, the memory will be cleared to `0xDD` (like MS's CRT Debug Heap) when the object is destroyed, making it
+easier to spot these kind of bugs.
+*/
+#if CZ_DEBUG || CZ_DEVELOPMENT
+	#define CZ_SHAREDPTR_CLEARMEM 1
+#else
+	#define CZ_SHAREDPTR_CLEARMEM 0
+#endif
+
+
 namespace cz
 {
 
@@ -18,6 +69,12 @@ namespace details
 	class BaseSharedPtrControlBlock
 	{
 	  public:
+
+#if CZ_SHAREDPTR_CLEARMEM
+		BaseSharedPtrControlBlock(size_t size) : size(size) {}
+#else
+		BaseSharedPtrControlBlock(size_t) {}
+#endif
 
 		template<typename T>
 		T* toObject()
@@ -65,13 +122,18 @@ namespace details
 		{
 			size_t allocSize = sizeof(BaseSharedPtrControlBlock) + sizeof(T);
 			void* basePtr = malloc(allocSize);
-			BaseSharedPtrControlBlock* control = new (basePtr) BaseSharedPtrControlBlock;
+			BaseSharedPtrControlBlock* control = new (basePtr) BaseSharedPtrControlBlock(sizeof(T));
 			return control + 1;
 		}
 
 	  protected:
 		unsigned int weak = 0;
 		unsigned int strong = 0;
+
+#if CZ_SHAREDPTR_CLEARMEM
+		// Size of the object, in bytes.
+		size_t size;
+#endif
 	};
 
 	struct SharedPtrDefaultDeleter
@@ -90,7 +152,7 @@ namespace details
 
 		SharedPtrControlBlock()
 		{
-			// The only difference between the base object and a specialized one is that that specialized one adds some more methods.
+			// The only difference between the base object and a specialized one is that the specialized one adds some more methods.
 			static_assert(sizeof(*this) == sizeof(BaseSharedPtrControlBlock));
 		}
 
@@ -111,16 +173,17 @@ namespace details
 			assert(strong > 0);
 			if (strong == 1)
 			{
-				Deleter{}(obj());
+				auto ptr = obj();
+				Deleter{}(ptr);
+				#if CZ_SHAREDPTR_CLEARMEM
+					memset(ptr, 0xDD, size);
+				#endif
 			}
 
 			--strong;
-			if (strong == 0)
+			if (strong == 0 && weak == 0)
 			{
-				if (weak == 0)
-				{
-					free(this);
-				}
+				free(this);
 			}
 		}
 
@@ -135,9 +198,9 @@ namespace details
  * - Might not provide all the functions and/or operators std::shared_ptr provides
  * - IMPORTANT: Assumes memory for the object was allocated with BaseSharedPtrControlBlock::allocBlock. this means that when using
  *   the SharedPtr<T>::SharedPtr(U* ptr) constructor, care must be taken that "ptr" was allocated properly. You can do this by:
- *		- Using MakeShared<T>. E.g: SharedPtr<Foo> foo = MakeShared<Foo>();
- *		- Using BaseSharedControl::allocBlock and placement new. e.g:
- *			SharedPtr<Foo> foo(new(details::BaseObjectControlBlock::allocBlock<Foo>()) Foo);
+ *		- Using sakeShared<T>. E.g: SharedPtr<Foo> foo = makeShared<Foo>();
+ *		- Using BaseSharedPtrControlBlock::allocBlock and placement new. e.g:
+ *			SharedPtr<Foo> foo(new(details::BaseSharedPtrControlBlock::allocBlock<Foo>()) Foo);
  *	 The reason this constructor is provided is so that SharedPtr can be used with classes whose constructors are private/protected.
  * 
  */
@@ -155,7 +218,6 @@ class SharedPtr
 	using ControlBlock = details::SharedPtrControlBlock<T, Deleter>;	
 
 	SharedPtr() noexcept {}
-
 
 	SharedPtr(std::nullptr_t) noexcept
 	{
@@ -277,7 +339,6 @@ class SharedPtr
 	void reset() noexcept
 	{
 		releaseBlock();
-		m_control = nullptr;
 	}
 
 	void swap(SharedPtr& other) noexcept
@@ -292,6 +353,7 @@ class SharedPtr
 		if (m_control)
 		{
 			m_control->decStrong();
+			m_control = nullptr;
 		}
 	}
 
@@ -344,6 +406,11 @@ class WeakPtr
 	{
 		m_control = other.m_control;
 		other.m_control = nullptr;
+	}
+
+	~WeakPtr()
+	{
+		releaseBlock();
 	}
 
 	template<typename U>
@@ -401,7 +468,7 @@ class WeakPtr
 
 	bool expired() const
 	{
-		return use_count()==0 ? true : false;
+		return use_count() == 0 ? true : false;
 	}
 
 	SharedPtr<T, Deleter> lock() const
@@ -423,6 +490,7 @@ class WeakPtr
 		if (m_control)
 		{
 			m_control->decWeak();
+			m_control = nullptr;
 		}
 	}
 
