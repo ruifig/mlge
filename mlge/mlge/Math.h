@@ -147,6 +147,14 @@ struct Rect : public SDL_Rect
 		return {w, h};
 	}
 
+	/**
+	 * Returns true if the rectangle has no area
+	 */
+	bool isEmpty() const
+	{
+		return w <= 0 && h <= 0;
+	}
+
 	constexpr int left() const
 	{
 		return x;
