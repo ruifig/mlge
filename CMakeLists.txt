@@ -31,6 +31,7 @@ add_subdirectory(./mlge)
 
 if (MLGE_SAMPLES)
 	add_subdirectory(./mlgeSample)
+	add_subdirectory(./ScratchpadGame)
 endif()
 
 
