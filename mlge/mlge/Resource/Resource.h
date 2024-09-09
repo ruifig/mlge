@@ -136,6 +136,7 @@ class MResourceDefinition : public MObject
 
 	/**
 	 * The resource's filename. This is the file the resource will be loaded from
+	 * Note: Not all resource types make use of this.
 	 */
 	fs::path file;
 
