@@ -87,6 +87,9 @@ set(ALL_FILES
 	"mlge/Editor/Window.cpp"
 	"mlge/Editor/Window.h"
 
+	"mlge/Experimental/DebugText.cpp"
+	"mlge/Experimental/DebugText.h"
+
 	"mlge/mlge.natvis"
 )
 
