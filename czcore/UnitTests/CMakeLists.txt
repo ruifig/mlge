@@ -3,6 +3,7 @@ cmake_minimum_required(VERSION 3.27)
 set(ALL_FILES
 	"CoreUnitTests.cpp"
 	"CoreUnitTestsPch.h"
+	"FNVHashTests.cpp"
 	"SharedPtrTests.cpp"
 )
 

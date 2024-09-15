@@ -9,6 +9,7 @@ set(ALL_FILES
 	"crazygaze/core/CorePreSetup.h"
 	"crazygaze/core/File.cpp"
 	"crazygaze/core/File.h"
+	"crazygaze/core/FNVHash.h"
 	"crazygaze/core/IniFile.cpp"
 	"crazygaze/core/IniFile.h"
 	"crazygaze/core/Logging.cpp"

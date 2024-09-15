@@ -3,6 +3,7 @@
 #include "crazygaze/core/CorePch.h" 
 
 #include "crazygaze/core/SharedPtr.h"
+#include "crazygaze/core/FNVHash.h"
 
 #include <future>
 #include <chrono>

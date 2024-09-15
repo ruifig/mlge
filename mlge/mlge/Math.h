@@ -313,6 +313,7 @@ struct Color : public SDL_Color
 
 	static Color Red;
 	static Color Green;
+	static Color DarkGreen;
 	static Color Blue;
 	static Color White;
 	static Color Black;
