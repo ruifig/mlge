@@ -90,6 +90,14 @@ set(ALL_FILES
 	"mlge/Experimental/DebugText.cpp"
 	"mlge/Experimental/DebugText.h"
 
+	"mlge/UI/Label.cpp"
+	"mlge/UI/Label.h"
+	"mlge/UI/UIEvent.h"
+	"mlge/UI/UIScene.cpp"
+	"mlge/UI/UIScene.h"
+	"mlge/UI/Widget.cpp"
+	"mlge/UI/Widget.h"
+
 	"mlge/mlge.natvis"
 )
 
