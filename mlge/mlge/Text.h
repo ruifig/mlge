@@ -1,7 +1,7 @@
 #pragma once
 
 #include "mlge/Resource/TTFFont.h"
-#include "mlge/Render/RenderQueue.h"
+#include "mlge/RenderComponent.h"
 
 namespace mlge
 {

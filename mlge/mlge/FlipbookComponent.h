@@ -1,6 +1,6 @@
 #pragma once
 
-#include "mlge/Render/RenderQueue.h"
+#include "mlge/RenderComponent.h"
 #include "mlge/Resource/Flipbook.h"
 
 namespace mlge

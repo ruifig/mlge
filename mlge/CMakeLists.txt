@@ -32,6 +32,8 @@ set(ALL_FILES
 	"mlge/PreSetup.h"
 	"mlge/Profiler.cpp"
 	"mlge/Profiler.h"
+	"mlge/RenderComponent.cpp"
+	"mlge/RenderComponent.h"
 	"mlge/Root.cpp"
 	"mlge/Root.h"
 	"mlge/Text.cpp"

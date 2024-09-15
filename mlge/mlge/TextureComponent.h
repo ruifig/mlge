@@ -1,7 +1,7 @@
 #pragma once
 
 #include "mlge/Common.h"
-#include "mlge/Render/RenderQueue.h"
+#include "mlge/RenderComponent.h"
 #include "mlge/Resource/Texture.h"
 
 namespace mlge
