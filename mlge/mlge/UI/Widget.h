@@ -105,7 +105,7 @@ WidgetRect toAbsolute(const WidgetRect& r, const WidgetRect& parentAbsolute);
 
 
 MLGE_OBJECT_START(MWidget, MObject, "Base class for all UI widgets")
-class MWidget : public MObject, public RenderOperation
+class MWidget : public MObject, public Renderable
 {
 	MLGE_OBJECT_INTERNALS(MWidget, MObject)
 
@@ -116,9 +116,9 @@ class MWidget : public MObject, public RenderOperation
   protected:
 
 	//
-	// RenderOperation interface
+	// Renderable interface
 	//
-	virtual void render(RenderGroup group);
+	virtual void updateRenderQueue() override;
 
 	void updateAbsolutePos() const;
 
@@ -128,6 +128,10 @@ class MWidget : public MObject, public RenderOperation
 
 	mutable bool m_posChanged = false;
 	mutable WidgetRect m_screenPos;
+
+#if MLGE_DEBUG
+	RenderGroup m_debugRenderGroup = RenderGroup::OverlayDebug;
+#endif
 
 };
 MLGE_OBJECT_END(MWidget)

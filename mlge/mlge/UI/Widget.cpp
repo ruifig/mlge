@@ -77,5 +77,10 @@ void MWidget::updateAbsolutePos() const
 	m_posChanged = false;
 }
 
+void MWidget::updateRenderQueue()
+{
+
+}
+
 } // namespace mlge
 

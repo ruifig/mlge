@@ -32,6 +32,15 @@ void MShipMoveComponent::onProcessEvent(SDL_Event& evt)
 		return;
 	}
 
+	if (evt.type == SDL_MOUSEMOTION)
+	{
+		CZ_LOG(Log, "mousemotion: timestamp={}, state={}, x={}, y={}, xrel={}, yrel={}",
+			evt.motion.timestamp,
+			evt.motion.state,
+			evt.motion.x, evt.motion.y,
+			evt.motion.xrel, evt.motion.yrel);
+	}
+
 	if (evt.type == SDL_KEYDOWN)
 	{
 		if (evt.key.keysym.scancode == SDL_SCANCODE_LEFT)
