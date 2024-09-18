@@ -69,14 +69,14 @@ namespace details
 	if (!(expr))                         \
 	{                                    \
 		CZ_LOG(Fatal, "Assert :" #expr); \
-		exit(0);                         \
+		exit(1);                         \
 	}
 
 #define CZ_CHECK_F_IMPL(expr, format, ...)                           \
 	if (!(expr))                                                     \
 	{                                                                \
 		CZ_LOG(Fatal, "Assert '" #expr "': " format, ##__VA_ARGS__); \
-		exit(0);                                                     \
+		exit(1);                                                     \
 	}
 
 #if CZ_DEBUG
