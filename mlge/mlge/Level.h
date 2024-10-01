@@ -22,7 +22,7 @@ class MLevel : public MObject
 	ObjectPtr<ActorType> addNewActor(Args&& ... args)
 	{
 		static_assert(!std::is_abstract_v<ActorType>, "Actor type is abstract.");
-		ObjectPtr<ActorType> actor = mlge::createObject<ActorType>();
+		ObjectPtr<ActorType> actor = mlge::createObject<ActorType>(std::forward<Args>(args)...);
 		if (actor)
 		{
 			m_actors.insert(actor);
@@ -31,6 +31,7 @@ class MLevel : public MObject
 	}
 
 	void removeActor(AActor* actor);
+	void removeAllActors();
 
 	virtual void tick(float deltaSeconds);
 

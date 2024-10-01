@@ -302,6 +302,14 @@ class MTextRenderComponent : public MRenderComponent,  public RenderOperation
 	void setText(std::string_view text);
 
 	/**
+	 * Returns the text
+	 */
+	const std::string& getText() const
+	{
+		return m_textRenderer.getText();
+	}
+
+	/**
 	 * Sets the text alignment
 	 *
 	 * Sets how the text is aligned in relation to the component's relative position.
