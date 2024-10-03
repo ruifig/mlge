@@ -51,7 +51,7 @@ class RenderQueue : public Singleton<RenderQueue>
 	void addRenderable(Renderable& renderable);
 
 	/**
-	 * Removes a renderable from the list of objects that widh to be rendered.
+	 * Removes a renderable from the list of objects that wish to be rendered.
 	 */
 	void removeRenderable(Renderable& renderable);
 

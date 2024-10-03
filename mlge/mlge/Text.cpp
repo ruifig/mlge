@@ -183,11 +183,11 @@ void TextRendererSettings::renderImpl(std::string_view text, const Size& textSiz
 // MTextRenderComponent
 //////////////////////////////////////////////////////////////////////////
 
-bool MTextRenderComponent::defaultConstruct()
+bool MTextRenderComponent::preConstruct()
 {
 	m_textRenderer.setAlign(HAlign::Center, VAlign::Center);
 	m_textRenderer.setColor(Color::White);
-	return Super::defaultConstruct();
+	return Super::preConstruct();
 }
 
 bool MTextRenderComponent::construct(std::string text)

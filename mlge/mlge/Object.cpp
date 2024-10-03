@@ -18,5 +18,10 @@ mlge::Class* Class::find(const char* name)
 	return nullptr;
 }
 
+ MObject::~MObject()
+{
+	CZ_LOG(VeryVerbose, "{}:{}", __FUNCTION__, m_objectName);
+}
+
 } // namespace mlge
 

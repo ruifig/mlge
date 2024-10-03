@@ -13,22 +13,39 @@ class MUIScene : public MObject
 
   public:
 
-	template<typename WidgetType, typename... Args>
-	ObjectPtr<WidgetType> createWidget(Args&& ... args)
+	enum class State
 	{
-		static_assert(!std::is_abstract_v<WidgetType>, "Widget type is abstract");
-		ObjectPtr<WidgetType> widget = mlge::createObject<WidgetType>();
-		if (widget)
-		{
-			m_widgets.push_back(widget);
-		}
+		Disabled,
+		Enabled,
+		Active
+	};
 
-		return widget;
+	MWidget& getRootWidget()
+	{
+		return *m_rootWidget;
 	}
+
+	virtual void tick(float deltaSeconds);
 
   protected:
 
-	std::vector<ObjectPtr<MWidget>> m_widgets;
+	virtual bool preConstruct() override;
+	virtual void destruct() override;
+
+	ObjectPtr<MWidget> m_rootWidget;
+
+	friend MWidget;
+
+	void addWidget(MWidget& widget);
+	void removeWidget(MWidget& widget);
+	void onUIEvent(UIEvent& evt);
+
+	// All the widgets in this scene. This is non-owning relationship.
+	// - A widget lifetime is controlled by its parent
+	// - A widget adds and removes itself from this vector
+	std::vector<MWidget*> m_widgets;
+
+	State m_state = State::Disabled;
 };
 MLGE_OBJECT_END(MUIScene)
 

@@ -31,7 +31,7 @@ MResourceDefinition::~MResourceDefinition()
 bool MResourceDefinition::construct(const ResourceRoot& root)
 {
 	m_root = &root;
-	return Super::defaultConstruct();
+	return Super::preConstruct();
 }
 
 const std::string_view MResourceDefinition::getTypeName() const
@@ -94,7 +94,7 @@ void MResourceDefinition::from_json(const nlohmann::json& j)
 bool MResource::construct(const MResourceDefinition& definition)
 {
 	m_definition = &definition;
-	return Super::defaultConstruct();
+	return Super::preConstruct();
 }
 
 

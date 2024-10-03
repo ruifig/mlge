@@ -37,7 +37,7 @@ class AStats : public AActor
   public:
 
 	virtual void destruct() override;
-	virtual bool defaultConstruct() override;
+	virtual bool preConstruct() override;
 	virtual void tick(float deltaSeconds) override;
 
   protected:

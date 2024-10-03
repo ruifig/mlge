@@ -41,7 +41,7 @@ void AStats::destruct()
 	Super::destruct();
 }
 
-bool AStats::defaultConstruct()
+bool AStats::preConstruct()
 {
 	m_statsComp = addNewComponent<MTextRenderComponent>().get();
 	m_font->loadASCIIGlyphs(10);
@@ -66,7 +66,7 @@ bool AStats::defaultConstruct()
 	m_gameBuildInfo->setAlignment(HAlign::Right, VAlign::Bottom);
 	m_gameBuildInfo->setText(getGame().getBuildInfo());
 
-	return Super::defaultConstruct();
+	return Super::preConstruct();
 }
 
 void AStats::tick(float deltaSeconds)

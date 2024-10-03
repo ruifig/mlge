@@ -4,6 +4,7 @@
 
 #include "PlayerShip.h"
 #include "Stats.h"
+#include "mlge/UI/Label.h"
 
 #include "crazygaze/core/CommandLine.h"
 
@@ -41,11 +42,33 @@ bool ScratchpadGame::init()
 
 	m_bkgColour = Color(0x0A, 0x11, 0x72, 255);
 
+	m_ui = createObject<MUIScene>();
+
+	{
+		if (MLabel* l1 = m_ui->getRootWidget().createChild<MLabel>())
+		{
+			l1->setText("Label 1!");
+			l1->setPosition({UIUnitType::Percentage, 0.5f, 0.5f, 1,1});
+			l1->setAlign(HAlign::Center, VAlign::Center);
+			l1->setPtSize(40);
+
+			if (MLabel* l2 = l1->createChild<MLabel>())
+			{
+				l2->setText("Label 2!");
+				l2->setPosition({UIUnitType::Percentage, 0.5f, 0.5f, 1,1});
+				l2->setAlign(HAlign::Center, VAlign::Center);
+				l2->setPtSize(40);
+			}
+		}
+
+	}
+
 	return true;
 }
 
 void ScratchpadGame::tick(float deltaSeconds)
 {
+	m_ui->tick(deltaSeconds);
 	Super::tick(deltaSeconds);
 }
 

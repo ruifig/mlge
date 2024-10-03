@@ -155,13 +155,15 @@ class Class;
  *
  * Object creation is done with createObject<T> and the following happens:
  *	- C++ constructor is called
- *	- The "virtual bool defaultConstruct()" is called.
+ *	- The "virtual bool preConstruct()" is called.
  *		- If it returns false, object creation is considered as failed.
  *	- If any parameters are passed to createObject<T>, then a "bool construct(...)" that method is called with those parameters.
  *		- If it returns false, object creation is considered as failed.
  *		- createObject<T> will forward any parameters to T::construct, so construct can take any parameters T wants, and thus you
  *		  can think of T::construct as the actual C++ constructor.
  *		- Note that "construct" is typically NOT virtual, because the list of parameters depends on T itself.
+ *	- "postConstruct" is called.
+ *		- This lets the object type have code called after construction, no matter what "construct" overload was used.
  *
  * Object destruction happens as:
  *	- The virtual "void destruct()" method is called.
@@ -169,9 +171,9 @@ class Class;
  *	- The C++ destructor is called.
  *
  * Derived classes must:
- *	- Implement a defaultConstruct() and/or construct(...) if necessary.
-		- Call Super::defaultConstruct Super::construct if required.
- *		- Depending on the class hierarchy, this might be virtual or not. The reason it might not be virtual is that 
+ *	- Implement a preConstruct() and/or construct(...) if necessary.
+		- Call Super::preConstruct and/or Super::construct if required.
+ *		- Depending on the class hierarchy, this might be virtual or not.
  *		- The reason it needs to be non-virtual is because the list of parameters is up to the class itself, so the signature can
  *		  be different from the one in the base class.
  *	- Override "virtual void destruct()" if required, and if so, call "Super::destruct()" at the end.
@@ -192,9 +194,7 @@ class MObject
 
 	CZ_DELETE_COPY_AND_MOVE(MObject);
 
-	virtual ~MObject()
-	{
-	}
+	virtual ~MObject();
 
 	Class& getClass()
 	{
@@ -227,12 +227,35 @@ class MObject
 	inline static ObjectClass ms_class;
 
 	/**
-	 * Called when the object is created without parameters.
+	 * Called before `construct`
+	 * If this returns false, `construct` is not called and the object creation is considered as failed.
+	 *
+	 * This is useful for objects that have multiple `construct` overloads and wish some code to always run before the
+	 * `construct` call matter what `construct` overload will be called.
 	 */
-	virtual bool defaultConstruct()
+	virtual bool preConstruct()
 	{
 		return true;
 	}
+
+	/**
+	 * Called after preConstruct and before postConstruct
+	 *
+	 * This is intentionally NOT virtual. The object types themselves can have multiple overloads for `construct`, depending on
+	 * what parameters they need for construction.
+	 */
+	bool construct()
+	{
+		return true;
+	}
+
+	/**
+	 * If the object is constructed successfully, this called.
+	 *
+	 * This is useful for objects that have multiple `construct` overloads and wish some code to always run  after the `construct`
+	 * call matter what `construct` overload was called.
+	 */
+	virtual void postConstruct() {}
 
 	/**
 	 * Used internally. Putting this in a separate function so that the actual Type::alllocObject function compiles even if
@@ -388,7 +411,7 @@ ObjectPtr<T> createObject(Args&& ... args)
 	auto obj = T::allocObject();
 
 	// First we call defaultDestruct, then construct if there are any construct parameters
-	bool res = obj->defaultConstruct();
+	bool res = obj->preConstruct();
 	if (res)
 	{
 		if constexpr(sizeof...(Args) > 0)
@@ -399,6 +422,7 @@ ObjectPtr<T> createObject(Args&& ... args)
 
 	if (res)
 	{
+		obj->postConstruct();
 		return obj;
 	}
 	else

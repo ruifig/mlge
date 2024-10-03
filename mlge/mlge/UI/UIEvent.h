@@ -20,6 +20,7 @@ struct UIEvent
 	Type type = Type::None;
 	Point pos;
 	UIWidget* source = nullptr;
+	bool consumed = false;
 };
 
 }

@@ -1,6 +1,7 @@
 #pragma once
 
 #include "mlge/Game.h"
+#include "mlge/UI/UIScene.h"
 
 using namespace mlge;
 
@@ -30,6 +31,7 @@ class ScratchpadGame : public Game
 	WeakObjectPtr<AActor> m_debugText;
 	WeakObjectPtr<AActor> m_stats;
 	WeakObjectPtr<AActor> m_playerShip;
+	ObjectPtr<MUIScene> m_ui;
 };
 
 MLGE_DECLARE_GAME(ScratchpadGame);

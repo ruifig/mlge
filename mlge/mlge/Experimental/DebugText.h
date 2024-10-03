@@ -35,7 +35,7 @@ class ADebugText : public AActor
 
 	void addEntry(const Color& color, const std::string& str);
 
-	virtual bool defaultConstruct() override;
+	virtual bool preConstruct() override;
 
   protected:
 

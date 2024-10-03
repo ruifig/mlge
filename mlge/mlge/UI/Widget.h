@@ -3,10 +3,14 @@
 #include "mlge/Common.h"
 #include "mlge/Object.h"
 #include "mlge/Render/RenderQueue.h"
+#include "mlge/UI/UIEvent.h"
+#include "mlge/Text.h"
 
 namespace mlge
 {
 
+
+class MUIScene;
 
 enum class UIUnitType
 {
@@ -60,17 +64,20 @@ struct WidgetPoint
 
 struct WidgetRect
 {
-	// TopLeft point
+	// TopLeft point (inclusive)
 	WidgetPoint tl;
-	// BottomRight point
+
+	// BottomRight point (exclusive)
 	WidgetPoint br;
 
 	WidgetRect() = default;
+
 	WidgetRect(UIUnitType type, float left, float top, float right, float bottom)
 		: tl(type, left, top)
 		, br(type, right, bottom)
 	{
 	}
+
 	WidgetRect(const WidgetPoint& tl, const WidgetPoint& br)
 		: tl(tl)
 		, br(br)
@@ -103,6 +110,10 @@ WidgetPoint toAbsolute(const WidgetPoint& p, const WidgetRect& parentAbsolute);
  */
 WidgetRect toAbsolute(const WidgetRect& r, const WidgetRect& parentAbsolute);
 
+/**
+ * Given a WidgetUnit that is expressed in absolute units, it returns a Rect that can be used by the rendering API
+ */
+Rect absoluteToRect(const WidgetRect& r);
 
 MLGE_OBJECT_START(MWidget, MObject, "Base class for all UI widgets")
 class MWidget : public MObject, public Renderable
@@ -111,19 +122,66 @@ class MWidget : public MObject, public Renderable
 
   public:
 
-	const WidgetRect& getAbsolutePos() const;
+	bool construct(MUIScene& scene); // Only used by a root widget
+	bool construct(MWidget& parent);
+
+	const WidgetRect& getAbsolutePosition() const;
+	virtual void setPosition(const WidgetRect& rect);
+
+	/**
+	 * Creates a child widget.
+	 * The lifetime of the child widget is tied to the parent.
+	 * Returns a pointer to the child widget, or nullptr if creation failed.
+	 */
+	template<typename WidgetType, typename... Args>
+	WidgetType* createChild(Args&& ... args)
+	{
+		static_assert(!std::is_abstract_v<WidgetType>, "Widget type is abstract");
+		ObjectPtr<WidgetType> w = createObject<WidgetType>(*this, std::forward<Args>(args)...);
+		if (w)
+		{
+			m_children.push_back(w);
+		}
+
+		return w.get();
+	}
+
+	inline static StaticResourceRef<MTTFFont> defaultFontRef = "fonts/RobotoCondensed-Medium";
 
   protected:
+
+	virtual bool preConstruct() override;
+	virtual void destruct() override;
+	virtual void postConstruct() override;
+
+	virtual void tick(float deltaSeconds);
+
+	void updateAbsolutePosition() const;
+	bool containsPoint(const Point& pt);
+
+
+	friend MUIScene;
+
+	/**
+	 * Processes an UI event.
+	 * 
+	 * If the widget takes care of the event, it should set `consumed` to true.
+	 */
+	virtual void onUIEvent(UIEvent& evt);
 
 	//
 	// Renderable interface
 	//
 	virtual void updateRenderQueue() override;
 
-	void updateAbsolutePos() const;
 
+	// UIScene this widget belongs to
+	MUIScene* m_scene = nullptr;
+	// Parent widget, if inside another widget
 	MWidget* m_parent = nullptr;
+
 	std::vector<ObjectPtr<MWidget>> m_children;
+
 	WidgetRect m_pos = {};
 
 	mutable bool m_posChanged = false;

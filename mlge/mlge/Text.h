@@ -265,7 +265,7 @@ class MTextRenderComponent : public MRenderComponent,  public RenderOperation
 
   public:
 
-	virtual bool defaultConstruct() override;
+	virtual bool preConstruct() override;
 	bool construct(std::string text);
 
 	/**
