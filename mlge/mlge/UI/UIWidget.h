@@ -116,15 +116,15 @@ WidgetRect toAbsolute(const WidgetRect& r, const WidgetRect& parentAbsolute);
  */
 Rect absoluteToRect(const WidgetRect& r);
 
-MLGE_OBJECT_START(MWidget, MObject, "Base class for all UI widgets")
-class MWidget : public MObject, public Renderable, public RenderOperation
+MLGE_OBJECT_START(MUIWidget, MObject, "Base class for all UI widgets")
+class MUIWidget : public MObject, public Renderable, public RenderOperation
 {
-	MLGE_OBJECT_INTERNALS(MWidget, MObject)
+	MLGE_OBJECT_INTERNALS(MUIWidget, MObject)
 
   public:
 
 	bool construct(MUIScene& scene); // Only used by a root widget
-	bool construct(MWidget& parent);
+	bool construct(MUIWidget& parent);
 
 	const WidgetRect& getAbsolutePosition() const;
 	virtual void setPosition(const WidgetRect& rect);
@@ -188,9 +188,9 @@ class MWidget : public MObject, public Renderable, public RenderOperation
 	// UIScene this widget belongs to
 	MUIScene* m_scene = nullptr;
 	// Parent widget, if inside another widget
-	MWidget* m_parent = nullptr;
+	MUIWidget* m_parent = nullptr;
 
-	std::vector<ObjectPtr<MWidget>> m_children;
+	std::vector<ObjectPtr<MUIWidget>> m_children;
 
 	WidgetRect m_pos = {};
 
@@ -205,7 +205,7 @@ class MWidget : public MObject, public Renderable, public RenderOperation
 #endif
 
 };
-MLGE_OBJECT_END(MWidget)
+MLGE_OBJECT_END(MUIWidget)
 
 
 } // namespace mlge

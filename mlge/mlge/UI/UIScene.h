@@ -1,7 +1,7 @@
 #pragma once
 
 #include "mlge/Object.h"
-#include "mlge/UI/Widget.h"
+#include "mlge/UI/UIWidget.h"
 
 namespace mlge
 {
@@ -24,7 +24,7 @@ class MUIScene : public MObject
 
 	bool construct(UIManager& outer, std::string_view name);
 
-	MWidget& getRootWidget()
+	MUIWidget& getRootWidget()
 	{
 		return *m_rootWidget;
 	}
@@ -125,13 +125,13 @@ class MUIScene : public MObject
 		}
 	}
 
-	ObjectPtr<MWidget> m_rootWidget;
+	ObjectPtr<MUIWidget> m_rootWidget;
 
-	friend MWidget;
+	friend MUIWidget;
 	friend UIManager;
 
-	void addWidget(MWidget& widget);
-	void removeWidget(MWidget& widget);
+	void addWidget(MUIWidget& widget);
+	void removeWidget(MUIWidget& widget);
 	void onUIEvent(UIEvent& evt);
 
 	UIManager* m_outer = nullptr;
@@ -141,7 +141,7 @@ class MUIScene : public MObject
 	// All the widgets in this scene. This is non-owning relationship.
 	// - A widget lifetime is controlled by its parent
 	// - A widget adds and removes itself from this vector
-	std::vector<MWidget*> m_widgets;
+	std::vector<MUIWidget*> m_widgets;
 
 	// Tells if the scene can stay in the intermediate state "Enabled"
 	bool m_canEnable = true;

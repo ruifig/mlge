@@ -1,17 +1,17 @@
 #pragma once
 
 #include "mlge/Common.h"
-#include "mlge/UI/Widget.h"
+#include "mlge/UI/UIWidget.h"
 #include "mlge/Resource/TTFFont.h"
 #include "mlge/Text.h"
 
 namespace mlge
 {
 
-MLGE_OBJECT_START(MLabel, MObject, "Display a static text")
-class MLabel : public MWidget
+MLGE_OBJECT_START(MUILabel, MObject, "Display a static text")
+class MUILabel : public MUIWidget
 {
-	MLGE_OBJECT_INTERNALS(MLabel, MWidget)
+	MLGE_OBJECT_INTERNALS(MUILabel, MUIWidget)
 
   public:
 
@@ -38,7 +38,7 @@ class MLabel : public MWidget
 	TextRenderer<true> m_textRenderer;
 };
 
-MLGE_OBJECT_END(MLabel)
+MLGE_OBJECT_END(MUILabel)
 
 
 } // namespace mlge

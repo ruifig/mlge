@@ -1,50 +1,50 @@
-#include "mlge/UI/Label.h"
+#include "mlge/UI/UIButton.h"
 #include "mlge/UI/UIScene.h"
 
 namespace mlge
 {
 
-bool MLabel::preConstruct()
+bool MUIButton::preConstruct()
 {
 	m_textRenderer.setAlign(HAlign::Center, VAlign::Center);
 	m_textRenderer.setColor(Color::White);
 	return Super::preConstruct();
 }
 
-void MLabel::postConstruct()
+void MUIButton::postConstruct()
 {
 	Super::postConstruct();
-	setStyle(m_scene->getManager().findStyle("default_label"));
+	setStyle(m_scene->getManager().findStyle("default_button"));
 }
 
-void MLabel::setText(std::string_view text)
+void MUIButton::setText(std::string_view text)
 {
 	m_textRenderer.setText(text);
 }
 
-void MLabel::setFont(ObjectPtr<MTTFFont> font)
+void MUIButton::setFont(ObjectPtr<MTTFFont> font)
 {
 	m_font = font;
 	m_textRenderer.setFont(*m_font);
 }
 
-void MLabel::setPtSize(int ptSize)
+void MUIButton::setPtSize(int ptSize)
 {
 	m_textRenderer.setPtSize(ptSize);
 }
 
-void MLabel::setAlign(HAlign halign, VAlign valign)
+void MUIButton::setAlign(HAlign halign, VAlign valign)
 {
 	m_textRenderer.setAlign(halign, valign);
 }
 
-void MLabel::setStyle(const ObjectPtr<MUIStyle>& style)
+void MUIButton::setStyle(const ObjectPtr<MUIStyle>& style)
 {
 	Super::setStyle(style);
 	setFont(m_style->getFont());
 }
 
-void MLabel::updateRenderQueue()
+void MUIButton::updateRenderQueue()
 {
 	Super::updateRenderQueue();
 
@@ -56,7 +56,7 @@ void MLabel::updateRenderQueue()
 	RenderQueue::get().addOp(*this, RenderGroup::Overlay);
 }
 
-void MLabel::render(RenderGroup group)
+void MUIButton::render(RenderGroup group)
 {
 	Super::render(group);
 

@@ -92,15 +92,17 @@ set(ALL_FILES
 	"mlge/Experimental/DebugText.cpp"
 	"mlge/Experimental/DebugText.h"
 
-	"mlge/UI/Label.cpp"
-	"mlge/UI/Label.h"
+	"mlge/UI/UIButton.cpp"
+	"mlge/UI/UIButton.h"
+	"mlge/UI/UILabel.cpp"
+	"mlge/UI/UILabel.h"
 	"mlge/UI/UIEvent.h"
 	"mlge/UI/UIScene.cpp"
 	"mlge/UI/UIScene.h"
 	"mlge/UI/UIStyle.cpp"
 	"mlge/UI/UIStyle.h"
-	"mlge/UI/Widget.cpp"
-	"mlge/UI/Widget.h"
+	"mlge/UI/UIWidget.cpp"
+	"mlge/UI/UIWidget.h"
 
 	"mlge/mlge.natvis"
 )

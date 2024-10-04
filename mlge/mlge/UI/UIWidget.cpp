@@ -1,4 +1,4 @@
-#include "Widget.h"
+#include "UIWidget.h"
 #include "crazygaze/core/Logging.h"
 #include "crazygaze/core/Algorithm.h"
 #include "mlge/Render/Renderer.h"
@@ -62,51 +62,51 @@ Rect absoluteToRect(const WidgetRect& r)
 // Widget
 //////////////////////////////////////////////////////////////////////////
 
-bool MWidget::preConstruct()
+bool MUIWidget::preConstruct()
 {
 	return true;
 }
 
-bool MWidget::construct(MUIScene& scene)
+bool MUIWidget::construct(MUIScene& scene)
 {
 	m_scene = &scene;
 	return true;
 }
 
-bool MWidget::construct(MWidget& parent)
+bool MUIWidget::construct(MUIWidget& parent)
 {
 	m_parent = &parent;
 	m_scene = parent.m_scene; 
 	return true;
 }
 
-void MWidget::postConstruct()
+void MUIWidget::postConstruct()
 {
 	Super::postConstruct();
 	m_scene->addWidget(*this);
 	setStyle(m_scene->getManager().findStyle("default"));
 }
 
-void MWidget::destruct()
+void MUIWidget::destruct()
 {
 	m_scene->removeWidget(*this);
 
 	Super::destruct();
 }
 
-const WidgetRect& MWidget::getAbsolutePosition() const
+const WidgetRect& MUIWidget::getAbsolutePosition() const
 {
 	updateAbsolutePosition();
 	return m_screenPos;
 }
 
-void MWidget::setPosition(const WidgetRect& rect)
+void MUIWidget::setPosition(const WidgetRect& rect)
 {
 	m_pos = rect;
 	m_posChanged = true;
 }
 
-void MWidget::setStyle(const ObjectPtr<MUIStyle>& style)
+void MUIWidget::setStyle(const ObjectPtr<MUIStyle>& style)
 {
 	if (style)
 	{
@@ -115,7 +115,7 @@ void MWidget::setStyle(const ObjectPtr<MUIStyle>& style)
 	}
 }
 
-void MWidget::updateAbsolutePosition() const
+void MUIWidget::updateAbsolutePosition() const
 {
 	if (!m_posChanged)
 	{
@@ -136,7 +136,7 @@ void MWidget::updateAbsolutePosition() const
 	m_posChanged = false;
 }
 
-bool MWidget::containsPoint(const Point& pt)
+bool MUIWidget::containsPoint(const Point& pt)
 {
 	updateAbsolutePosition();
 
@@ -145,7 +145,7 @@ bool MWidget::containsPoint(const Point& pt)
 		(pt.y >= static_cast<int>(m_screenPos.tl.y.val)) && (pt.y < static_cast<int>(m_screenPos.br.y.val));
 }
 
-void MWidget::updateRenderQueue()
+void MUIWidget::updateRenderQueue()
 {
 	RenderQueue::get().addOp(*this, RenderGroup::Overlay);
 
@@ -154,7 +154,7 @@ void MWidget::updateRenderQueue()
 	#endif
 }
 
-void MWidget::render(RenderGroup group)
+void MUIWidget::render(RenderGroup group)
 {
 	Rect rect = absoluteToRect(getAbsolutePosition());
 
@@ -170,7 +170,7 @@ void MWidget::render(RenderGroup group)
 	#endif
 }
 
-void MWidget::onUIEvent(UIEvent& evt)
+void MUIWidget::onUIEvent(UIEvent& evt)
 {
 	if (!containsPoint(evt.pos))
 	{
@@ -183,7 +183,7 @@ void MWidget::onUIEvent(UIEvent& evt)
 	}
 }
 
-void MWidget::tick(float deltaSeconds)
+void MUIWidget::tick(float deltaSeconds)
 {
 	for(auto&& child : m_children)
 	{

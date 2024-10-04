@@ -14,7 +14,7 @@ bool MUIScene::construct(UIManager& outer, std::string_view name)
 	m_outer = &outer;
 	m_name = name;
 
-	m_rootWidget = createObject<MWidget>(*this);
+	m_rootWidget = createObject<MUIWidget>(*this);
 	m_rootWidget->setPosition(WidgetRect(UIUnitType::Percentage, 0, 0, 1, 1));
 	m_rootWidget->setStyle(m_outer->findStyle("empty"));
 
@@ -27,7 +27,7 @@ void MUIScene::destruct()
 	m_rootWidget = nullptr;
 }
 
-void MUIScene::addWidget(MWidget& widget)
+void MUIScene::addWidget(MUIWidget& widget)
 {
 	m_widgets.push_back(&widget);
 
@@ -37,7 +37,7 @@ void MUIScene::addWidget(MWidget& widget)
 	}
 }
 
-void MUIScene::removeWidget(MWidget& widget)
+void MUIScene::removeWidget(MUIWidget& widget)
 {
 	cz::remove(m_widgets, &widget);
 
@@ -59,7 +59,7 @@ void MUIScene::tick(float deltaSeconds)
 
 void MUIScene::onEnable()
 {
-	for(MWidget* w : m_widgets)
+	for(MUIWidget* w : m_widgets)
 	{
 		RenderQueue::get().addRenderable(*w);
 	}
@@ -75,7 +75,7 @@ void MUIScene::onDeactivate()
 
 void MUIScene::onDisable()
 {
-	for(MWidget* w : m_widgets)
+	for(MUIWidget* w : m_widgets)
 	{
 		RenderQueue::get().removeRenderable(*w);
 	}
