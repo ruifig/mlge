@@ -108,6 +108,8 @@ void Game::tick(float deltaSeconds)
 	{
 		m_level->tick(deltaSeconds);
 	}
+
+	m_ui.tick(deltaSeconds);
 }
 
 void Game::requestShutdown()

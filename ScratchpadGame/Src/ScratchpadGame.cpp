@@ -42,17 +42,18 @@ bool ScratchpadGame::init()
 
 	m_bkgColour = Color(0x0A, 0x11, 0x72, 255);
 
-	m_ui = createObject<MUIScene>();
+	MUIScene* scene = m_ui.createScene<MUIScene>("main").lock().get();
+	m_ui.activateScene("main");
 
 	{
-		if (MLabel* l1 = m_ui->getRootWidget().createChild<MLabel>())
+		if (MLabel* l1 = scene->getRootWidget().createChild<MLabel>().lock().get())
 		{
 			l1->setText("Label 1!");
 			l1->setPosition({UIUnitType::Percentage, 0.5f, 0.5f, 1,1});
 			l1->setAlign(HAlign::Center, VAlign::Center);
 			l1->setPtSize(40);
 
-			if (MLabel* l2 = l1->createChild<MLabel>())
+			if (MLabel* l2 = l1->createChild<MLabel>().lock().get())
 			{
 				l2->setText("Label 2!");
 				l2->setPosition({UIUnitType::Percentage, 0.5f, 0.5f, 1,1});
@@ -68,7 +69,6 @@ bool ScratchpadGame::init()
 
 void ScratchpadGame::tick(float deltaSeconds)
 {
-	m_ui->tick(deltaSeconds);
 	Super::tick(deltaSeconds);
 }
 

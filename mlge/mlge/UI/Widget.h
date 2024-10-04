@@ -134,7 +134,7 @@ class MWidget : public MObject, public Renderable
 	 * Returns a pointer to the child widget, or nullptr if creation failed.
 	 */
 	template<typename WidgetType, typename... Args>
-	WidgetType* createChild(Args&& ... args)
+	WeakObjectPtr<WidgetType> createChild(Args&& ... args)
 	{
 		static_assert(!std::is_abstract_v<WidgetType>, "Widget type is abstract");
 		ObjectPtr<WidgetType> w = createObject<WidgetType>(*this, std::forward<Args>(args)...);
@@ -143,7 +143,7 @@ class MWidget : public MObject, public Renderable
 			m_children.push_back(w);
 		}
 
-		return w.get();
+		return w;
 	}
 
 	inline static StaticResourceRef<MTTFFont> defaultFontRef = "fonts/RobotoCondensed-Medium";

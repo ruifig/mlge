@@ -88,15 +88,6 @@ void MWidget::postConstruct()
 void MWidget::destruct()
 {
 	m_scene->removeWidget(*this);
-	//m_children.clear();
-
-	//if (m_parent)
-	//{
-	//	cz::remove_if(m_parent->m_children, [this](const ObjectPtr<MWidget>& ele)
-	//	{
-	//		return ele.get() == this;
-	//	});
-	//}
 
 	Super::destruct();
 }

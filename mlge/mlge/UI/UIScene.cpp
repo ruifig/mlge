@@ -19,13 +19,21 @@ void MUIScene::destruct()
 void MUIScene::addWidget(MWidget& widget)
 {
 	m_widgets.push_back(&widget);
-	RenderQueue::get().addRenderable(widget);
+
+	if (m_state >= State::Enabled)
+	{
+		RenderQueue::get().addRenderable(widget);
+	}
 }
 
 void MUIScene::removeWidget(MWidget& widget)
 {
 	cz::remove(m_widgets, &widget);
-	RenderQueue::get().removeRenderable(widget);
+
+	if (m_state >= State::Enabled)
+	{
+		RenderQueue::get().removeRenderable(widget);
+	}
 }
 
 void MUIScene::onUIEvent(UIEvent& evt)
@@ -37,6 +45,31 @@ void MUIScene::tick(float deltaSeconds)
 {
 	m_rootWidget->tick(deltaSeconds);
 }
+
+void MUIScene::onEnable()
+{
+	for(MWidget* w : m_widgets)
+	{
+		RenderQueue::get().addRenderable(*w);
+	}
+}
+
+void MUIScene::onActivate()
+{
+}
+
+void MUIScene::onDeactivate()
+{
+}
+
+void MUIScene::onDisable()
+{
+	for(MWidget* w : m_widgets)
+	{
+		RenderQueue::get().removeRenderable(*w);
+	}
+}
+
 
 } // namespace mlge
 

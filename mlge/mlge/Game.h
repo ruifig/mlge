@@ -5,6 +5,7 @@
 #include "mlge/GameClock.h"
 #include "mlge/Delegates.h"
 #include "mlge/Paths.h"
+#include "mlge/UI/UIScene.h"
 
 #include "crazygaze/core/Singleton.h"
 
@@ -178,6 +179,8 @@ class Game : public Singleton<Game>
 	inline static constexpr float ms_maxShutdownTimeSec = 5.0f;
 
 	Color m_bkgColour = Color::Black;
+
+	UIManager m_ui;
 
   private:
 
