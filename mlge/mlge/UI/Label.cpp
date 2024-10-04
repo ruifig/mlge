@@ -1,5 +1,5 @@
 #include "mlge/UI/Label.h"
-#include "mlge/Render/DebugUtils.h"
+#include "mlge/UI/UIScene.h"
 
 namespace mlge
 {
@@ -8,8 +8,13 @@ bool MLabel::preConstruct()
 {
 	m_textRenderer.setAlign(HAlign::Center, VAlign::Center);
 	m_textRenderer.setColor(Color::White);
-	setFont(MWidget::defaultFontRef.getResource());
 	return Super::preConstruct();
+}
+
+void MLabel::postConstruct()
+{
+	Super::postConstruct();
+	setStyle(m_scene->getManager().findStyle("default_label"));
 }
 
 void MLabel::setText(std::string_view text)
@@ -33,6 +38,12 @@ void MLabel::setAlign(HAlign halign, VAlign valign)
 	m_textRenderer.setAlign(halign, valign);
 }
 
+void MLabel::setStyle(const ObjectPtr<MUIStyle>& style)
+{
+	Super::setStyle(style);
+	setFont(m_style->getFont());
+}
+
 void MLabel::updateRenderQueue()
 {
 	Super::updateRenderQueue();
@@ -43,26 +54,17 @@ void MLabel::updateRenderQueue()
 	}
 
 	RenderQueue::get().addOp(*this, RenderGroup::Overlay);
-
-	#if MLGE_DEBUG
-		RenderQueue::get().addOp(*this, RenderGroup::OverlayDebug);
-	#endif
 }
 
 void MLabel::render(RenderGroup group)
 {
-	Rect rect = absoluteToRect(getAbsolutePosition());
+	Super::render(group);
 
-	if (group == RenderGroup::Overlay)
+	if (group == RenderGroup::Overlay && m_font && m_textRenderer.getText().size())
 	{
+		Rect rect = absoluteToRect(getAbsolutePosition());
 		m_textRenderer.setArea(rect).render();
 	}
-	#if MLGE_DEBUG
-	else if (group == RenderGroup::OverlayDebug)
-	{
-		drawDebugOverlayRect(rect);
-	}
-	#endif
 }
 
 } // namespace mlge

@@ -4,6 +4,7 @@
 #include "mlge/Object.h"
 #include "mlge/Render/RenderQueue.h"
 #include "mlge/UI/UIEvent.h"
+#include "mlge/UI/UIStyle.h"
 #include "mlge/Text.h"
 
 namespace mlge
@@ -116,7 +117,7 @@ WidgetRect toAbsolute(const WidgetRect& r, const WidgetRect& parentAbsolute);
 Rect absoluteToRect(const WidgetRect& r);
 
 MLGE_OBJECT_START(MWidget, MObject, "Base class for all UI widgets")
-class MWidget : public MObject, public Renderable
+class MWidget : public MObject, public Renderable, public RenderOperation
 {
 	MLGE_OBJECT_INTERNALS(MWidget, MObject)
 
@@ -127,6 +128,8 @@ class MWidget : public MObject, public Renderable
 
 	const WidgetRect& getAbsolutePosition() const;
 	virtual void setPosition(const WidgetRect& rect);
+
+	virtual void setStyle(const ObjectPtr<MUIStyle>& style);
 
 	/**
 	 * Creates a child widget.
@@ -146,7 +149,10 @@ class MWidget : public MObject, public Renderable
 		return w;
 	}
 
-	inline static StaticResourceRef<MTTFFont> defaultFontRef = "fonts/RobotoCondensed-Medium";
+	MUIScene& getScene()
+	{
+		return *m_scene;
+	}
 
   protected:
 
@@ -158,7 +164,6 @@ class MWidget : public MObject, public Renderable
 
 	void updateAbsolutePosition() const;
 	bool containsPoint(const Point& pt);
-
 
 	friend MUIScene;
 
@@ -174,6 +179,11 @@ class MWidget : public MObject, public Renderable
 	//
 	virtual void updateRenderQueue() override;
 
+	//
+	// RenderOperation interface
+	//
+	virtual void render(RenderGroup group) override; 
+
 
 	// UIScene this widget belongs to
 	MUIScene* m_scene = nullptr;
@@ -186,6 +196,9 @@ class MWidget : public MObject, public Renderable
 
 	mutable bool m_posChanged = false;
 	mutable WidgetRect m_screenPos;
+
+	ObjectPtr<MUIStyle> m_style;
+	ObjectPtr<MUIStyleRenderer> m_styleRenderer;
 
 #if MLGE_DEBUG
 	RenderGroup m_debugRenderGroup = RenderGroup::OverlayDebug;

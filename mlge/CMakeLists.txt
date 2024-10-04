@@ -97,6 +97,8 @@ set(ALL_FILES
 	"mlge/UI/UIEvent.h"
 	"mlge/UI/UIScene.cpp"
 	"mlge/UI/UIScene.h"
+	"mlge/UI/UIStyle.cpp"
+	"mlge/UI/UIStyle.h"
 	"mlge/UI/Widget.cpp"
 	"mlge/UI/Widget.h"
 

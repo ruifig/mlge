@@ -9,7 +9,7 @@ namespace mlge
 {
 
 MLGE_OBJECT_START(MLabel, MObject, "Display a static text")
-class MLabel : public MWidget, public RenderOperation
+class MLabel : public MWidget
 {
 	MLGE_OBJECT_INTERNALS(MLabel, MWidget)
 
@@ -21,9 +21,12 @@ class MLabel : public MWidget, public RenderOperation
 
 	void setAlign(HAlign halign, VAlign valign);
 
+	void setStyle(const ObjectPtr<MUIStyle>& style) override;
+
   protected:
 
 	virtual bool preConstruct() override;
+	virtual void postConstruct() override;
 
 	// Renderable operation
 	virtual void updateRenderQueue() override;

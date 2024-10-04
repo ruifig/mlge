@@ -22,12 +22,7 @@ class MUIScene : public MObject
 		Active,	  // Scene is fully active (visible, ticked, and receives events)
 	};
 
-	bool construct(UIManager& outer, std::string_view name)
-	{
-		m_outer = &outer;
-		m_name = name;
-		return true;
-	}
+	bool construct(UIManager& outer, std::string_view name);
 
 	MWidget& getRootWidget()
 	{
@@ -77,6 +72,11 @@ class MUIScene : public MObject
 	}
 
 	virtual void tick(float deltaSeconds);
+
+	UIManager& getManager()
+	{
+		return *m_outer;
+	}
 
   protected:
 
@@ -156,6 +156,8 @@ class UIManager
 {
   public:
 
+	UIManager();
+
 	/**
 	 * Creates a MUIScene.
 	 * The lifetime of the scene is controlled by the UIManager.
@@ -217,9 +219,14 @@ class UIManager
 		}
 	}
 
+	void addStyle(std::string_view name, const ObjectPtr<MUIStyle>& style);
+	ObjectPtr<MUIStyle> findStyle(std::string_view name);
+
   private:
 
 	std::vector<ObjectPtr<MUIScene>> m_scenes;
+	std::vector<std::pair<std::string, ObjectPtr<MUIStyle>>> m_styles;
+
 	MUIScene* m_activeScene = nullptr;
 };
 

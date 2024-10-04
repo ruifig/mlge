@@ -6,10 +6,21 @@ namespace mlge
 
 bool MUIScene::preConstruct()
 {
-	m_rootWidget = createObject<MWidget>(*this);
-	m_rootWidget->setPosition(WidgetRect(UIUnitType::Percentage, 0, 0, 1, 1));
 	return true;
 }
+
+bool MUIScene::construct(UIManager& outer, std::string_view name)
+{
+	m_outer = &outer;
+	m_name = name;
+
+	m_rootWidget = createObject<MWidget>(*this);
+	m_rootWidget->setPosition(WidgetRect(UIUnitType::Percentage, 0, 0, 1, 1));
+	m_rootWidget->setStyle(m_outer->findStyle("empty"));
+
+	return true;
+}
+
 
 void MUIScene::destruct()
 {
@@ -70,6 +81,43 @@ void MUIScene::onDisable()
 	}
 }
 
+//////////////////////////////////////////////////////////////////////////
+// MUIManager
+//////////////////////////////////////////////////////////////////////////
+
+UIManager::UIManager()
+{
+	{
+		ObjectPtr<MUIStyle> style = createObject<MUIStyleEmpty>();
+		addStyle("empty", style);
+		addStyle("default_label", style);
+	}
+
+	{
+		ObjectPtr<MUIStyleFlat> style = createObject<MUIStyleFlat>();
+		addStyle("default", style);
+		addStyle("default_button", style);
+	}
+
+}
+
+void UIManager::addStyle(std::string_view name, const ObjectPtr<MUIStyle>& style)
+{
+	m_styles.emplace_back(name, style);
+}
+
+ObjectPtr<MUIStyle> UIManager::findStyle(std::string_view name)
+{
+	for(auto&& p : m_styles)
+	{
+		if (p.first == name)
+		{
+			return p.second;
+		}
+	}
+
+	return nullptr;
+}
 
 } // namespace mlge
 

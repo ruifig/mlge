@@ -4,6 +4,7 @@
 #include "mlge/Render/Renderer.h"
 #include "mlge/Game.h"
 #include "mlge/UI/UIScene.h"
+#include "mlge/Render/DebugUtils.h"
 
 namespace mlge
 {
@@ -83,6 +84,7 @@ void MWidget::postConstruct()
 {
 	Super::postConstruct();
 	m_scene->addWidget(*this);
+	setStyle(m_scene->getManager().findStyle("default"));
 }
 
 void MWidget::destruct()
@@ -102,6 +104,15 @@ void MWidget::setPosition(const WidgetRect& rect)
 {
 	m_pos = rect;
 	m_posChanged = true;
+}
+
+void MWidget::setStyle(const ObjectPtr<MUIStyle>& style)
+{
+	if (style)
+	{
+		m_style = style;
+		m_styleRenderer = m_style->createRenderer();
+	}
 }
 
 void MWidget::updateAbsolutePosition() const
@@ -136,6 +147,27 @@ bool MWidget::containsPoint(const Point& pt)
 
 void MWidget::updateRenderQueue()
 {
+	RenderQueue::get().addOp(*this, RenderGroup::Overlay);
+
+	#if MLGE_DEBUG
+		RenderQueue::get().addOp(*this, RenderGroup::OverlayDebug);
+	#endif
+}
+
+void MWidget::render(RenderGroup group)
+{
+	Rect rect = absoluteToRect(getAbsolutePosition());
+
+	if (group == RenderGroup::Overlay)
+	{
+		m_styleRenderer->render(rect);
+	}
+	#if MLGE_DEBUG
+	else if (group == RenderGroup::OverlayDebug)
+	{
+		drawDebugOverlayRect(rect);
+	}
+	#endif
 }
 
 void MWidget::onUIEvent(UIEvent& evt)
