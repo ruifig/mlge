@@ -34,11 +34,13 @@ void MShipMoveComponent::onProcessEvent(SDL_Event& evt)
 
 	if (evt.type == SDL_MOUSEMOTION)
 	{
+		#if 0
 		CZ_LOG(Log, "mousemotion: timestamp={}, state={}, x={}, y={}, xrel={}, yrel={}",
 			evt.motion.timestamp,
 			evt.motion.state,
 			evt.motion.x, evt.motion.y,
 			evt.motion.xrel, evt.motion.yrel);
+		#endif
 	}
 
 	if (evt.type == SDL_KEYDOWN)
@@ -178,7 +180,7 @@ bool APlayerShip::preConstruct()
 	m_txt->setText("Hello");
 	m_txt->setFont(m_font);
 	m_txt->setAlignment(HAlign::Center, VAlign::Center);
-	m_txt->setRelativePosition({m_move->getSprite(0).rect.w / 2.0f, m_move->getSprite(0).rect.h / 4.0f});
+	m_txt->setRelativePosition({-m_move->getSprite(0).rect.w / 4.0f, -m_move->getSprite(0).rect.h / 4.0f});
 
 	return Super::preConstruct();
 }

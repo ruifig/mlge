@@ -142,6 +142,11 @@ void MUIScene::setState(State newState)
 	}
 }
 
+void MUIMouseCursor::setPosition(Point pos)
+{
+	m_pos = pos;
+}
+
 void MUIMouseCursor::incPosition(Point inc)
 {
 	Size screenSize = Game::get().getRenderTarget().getSize();
@@ -224,7 +229,7 @@ UIManager::UIManager()
 
 	m_mouseCursor = createObject<MUIMouseCursor>();
 
-	SDL_SetRelativeMouseMode(SDL_TRUE);
+	//SDL_SetRelativeMouseMode(SDL_TRUE);
 }
 
 void UIManager::addStyle(std::string_view name, const ObjectPtr<MUIStyle>& style)
@@ -286,15 +291,37 @@ void UIManager::activateScene(std::string_view name)
 
 void UIManager::onProcessEvent(SDL_Event& evt)
 {
-	if (evt.type == SDL_MOUSEMOTION)
+	if (evt.type == SDL_WINDOWEVENT)
 	{
+		if (evt.window.event == SDL_WINDOWEVENT_ENTER)
+		{
+			CZ_LOG(Log, "Window ENTER");
+			m_mouseFocus = evt.window.windowID;
+			m_mouseCursor->setEnabled(true);
+		}
+		else if (evt.window.event == SDL_WINDOWEVENT_LEAVE)
+		{
+			CZ_LOG(Log, "Window LEAVE");
+			m_mouseFocus = std::nullopt;
+			m_mouseCursor->setEnabled(false);
+		}
+	}
+	else if (evt.type == SDL_MOUSEMOTION)
+	{
+	#if 1
 		CZ_LOG(Log, "mousemotion: timestamp={}, state={}, x={}, y={}, xrel={}, yrel={}",
 			evt.motion.timestamp,
 			evt.motion.state,
 			evt.motion.x, evt.motion.y,
 			evt.motion.xrel, evt.motion.yrel);
+	#endif
 
-		m_mouseCursor->incPosition({evt.motion.xrel, evt.motion.yrel});
+		if (m_mouseFocus.has_value())
+		{
+			m_mouseCursor->setPosition({evt.motion.x, evt.motion.y});
+			//m_mouseCursor->setPosition({evt.motion.xrel, evt.motion.yrel});
+		}
+
 	}
 
 

@@ -93,7 +93,5 @@ const Sprite& MFlipbook::getSpriteAndUpdatePosition(MFlipbook::Position& pos) co
 	return getSprite(m_frames[static_cast<size_t>(pos.frameIdx)].spriteIdx);
 }
 
-
-
 } // mlge
 
