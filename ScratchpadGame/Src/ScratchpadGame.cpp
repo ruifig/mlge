@@ -3,7 +3,6 @@
 #include "mlge/Experimental/DebugText.h"
 
 #include "PlayerShip.h"
-#include "Stats.h"
 #include "mlge/UI/UILabel.h"
 #include "mlge/UI/UIButton.h"
 
@@ -30,9 +29,6 @@ bool ScratchpadGame::init()
 	{
 		return false;
 	}
-
-	m_stats = getLevel().addNewActor<AStats>();
-	m_stats.lock()->setPosition({+10,0});
 
 	m_debugText = getLevel().addNewActor<ADebugText>();
 	m_debugText.lock()->setPosition({300,0});

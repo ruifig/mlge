@@ -5,6 +5,7 @@
 #include "mlge/Render/DXDebugLayer.h"
 #include "mlge/Resource/Resource.h"
 #include "mlge/Config.h"
+#include "mlge/PerformanceStats.h"
 
 #include "crazygaze/core/ScopeGuard.h"
 #include "crazygaze/core/CommandLine.h"
@@ -91,13 +92,18 @@ void Engine::processEvents()
 				Game::get().requestShutdown();
 			}
 		}
-		else if (
-			evt.type == SDL_WINDOWEVENT && evt.window.event == SDL_WINDOWEVENT_CLOSE &&
-			evt.window.windowID == SDL_GetWindowID(Renderer::get().getSDLWindow()))
+		else if (evt.type == SDL_WINDOWEVENT)
 		{
-			if (Game::tryGet())
+			if (evt.window.event == SDL_WINDOWEVENT_CLOSE && evt.window.windowID == SDL_GetWindowID(Renderer::get().getSDLWindow()))
 			{
-				Game::get().requestShutdown();
+				if (Game::tryGet())
+				{
+					Game::get().requestShutdown();
+				}
+			}
+			else if (gIsGame && evt.window.event == SDL_WINDOWEVENT_RESIZED)
+			{
+				Game::get().getRenderTarget().setSize({evt.window.data1, evt.window.data2});
 			}
 		}
 	}
@@ -230,6 +236,8 @@ namespace
 
 		Clock::time_point m_tsA;
 		Clock::time_point m_tsB;
+
+		// Time spent over the last frame, excluding the frame limting
 		std::chrono::duration<double, std::milli> m_lastWorkTime = {};
 
 		int m_maxFps;
@@ -250,6 +258,8 @@ bool Engine::run()
 
 	int maxFps = Config::get().getValueOrDefault("Engine", "maxfps", 0);
 	FPSLimiter fpsLimiter(maxFps);
+	PerformanceStats performanceStats;
+	performanceStats.setEnabled(true);
 
 	do
 	{
@@ -258,11 +268,20 @@ bool Engine::run()
 		MLGE_PROFILE_SCOPE(mlge_Engine_run);
 
 		fpsLimiter.tick();
-		m_stats.lastFrametime = fpsLimiter.getLastWorkTimeMs();
+		//m_stats.frameWorkMs = fpsLimiter.getLastWorkTimeMs();
 
 		Renderer::get().beginFrame();
 		processEvents();
 		tick();
+
+		performanceStats.tick();
+
+		#if 0
+		m_stats.fps = varianceCalculator.fps;
+		m_stats.avgFrametimeMs = varianceCalculator.avgMsPerFrame;
+		m_stats.frametimeVariance = varianceCalculator.variance;
+		#endif
+
 		Renderer::get().render();
 
 		// We initiate shutdown if both the game and editor want to shutdown

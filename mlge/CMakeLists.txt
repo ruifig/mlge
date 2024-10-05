@@ -29,6 +29,8 @@ set(ALL_FILES
 	"mlge/ObjectPtr.h"
 	"mlge/Paths.cpp"
 	"mlge/Paths.h"
+	"mlge/PerformanceStats.cpp"
+	"mlge/PerformanceStats.h"
 	"mlge/PreSetup.h"
 	"mlge/Profiler.cpp"
 	"mlge/Profiler.h"

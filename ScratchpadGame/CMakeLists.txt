@@ -11,8 +11,6 @@ set(ALL_FILES
 	"./Src/ScratchpadGame.cpp"
 	"./Src/ScratchpadGame.h"
 	"./Src/ScratchpadGamePch.h"
-	"./Src/Stats.cpp"
-	"./Src/Stats.h"
 )
 
 add_executable(ScratchpadGame

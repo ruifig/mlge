@@ -33,15 +33,36 @@ public:
 		m_deferedTasks.emplace(std::forward<TaskFunc>(task));
 	}
 
+	#if 0
 	struct Stats
 	{
-		float lastFrametime = 0;
-	};
+		/**
+		 * Time spent processing work (in milliseconds)
+		 * This is the time spend processing game logic (including SDL calls to render), up to the point the SDL_RenderPresent
+		 * call is done.
+		 *
+		 * You can think of this as how much time the game is spending per frame doing work.
+		 */
+		float frameWorkMs = 0;
 
+		/**
+		 * Fps calculated over a few last frames.
+		 */
+		float fps;
+
+		/**
+		 * Frametime in milliseconds
+		 */
+		float avgFrametimeMs; 
+
+		float frametimeVariance;
+	};
 	const Stats& getStats() const
 	{
 		return m_stats;
 	}
+	#endif
+
 
 protected:
 
@@ -69,7 +90,6 @@ protected:
 	// NOTE: Using a naked pointer because using a std::unique_ptr would require a dependency on the header
 	Game* m_game = nullptr;
 
-	Stats m_stats;
 };
 
 
