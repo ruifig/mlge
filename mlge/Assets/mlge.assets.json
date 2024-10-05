@@ -2,6 +2,11 @@
 
 	"resources": [
 		{
+			"type": "Texture",
+			"name": "cursors/default",
+			"file": "cursors/white_cursor.png"
+		},
+		{
 			"type": "TTFFont",
 			"name": "fonts/UbuntuMono-Regular",
 			"file": "fonts/UbuntuMono/UbuntuMono-Regular.ttf",

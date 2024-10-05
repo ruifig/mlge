@@ -2,6 +2,8 @@
 
 #include "mlge/Object.h"
 #include "mlge/UI/UIWidget.h"
+#include "mlge/Delegates.h"
+#include "mlge/Resource/Texture.h"
 
 namespace mlge
 {
@@ -47,29 +49,13 @@ class MUIScene : public MObject
 	 * If the scene is not in Active state, it lowers the state down to Enabled or Disabled, depending on if Enabled state is
 	 * allowed.
 	 */
-	void deactivate()
-	{
-		if (m_state < State::Active)
-		{
-			return;
-		}
-
-		setState(m_canEnable ? State::Enabled : State::Disabled);
-	}
+	void deactivate();
 
 	/**
 	 * Changes the state to Disabled.
 	 * Depending on the current state, it will first call onDeactivate then onDisable methods.
 	 */
-	void disable()
-	{
-		if (m_state == State::Disabled)
-		{
-			return;
-		}
-
-		setState(State::Disabled);
-	}
+	void disable();
 
 	virtual void tick(float deltaSeconds);
 
@@ -91,39 +77,7 @@ class MUIScene : public MObject
 	virtual void onDeactivate();
 	virtual void onDisable();
 
-	void setState(State newState)
-	{
-		// Going up
-		if (newState > m_state)
-		{
-			if (m_state == State::Disabled)
-			{
-				m_state = State::Enabled;
-				onEnable();
-			}
-
-			if (newState == State::Active)
-			{
-				m_state = State::Active;
-				onActivate();
-			}
-		}
-		// Going down
-		else if (newState < m_state)
-		{
-			if (m_state == State::Active)
-			{
-				m_state = State::Enabled;
-				onDeactivate();
-			}
-
-			if (newState == State::Disabled)
-			{
-				m_state = State::Disabled;
-				onDisable();
-			}
-		}
-	}
+	void setState(State newState);
 
 	ObjectPtr<MUIWidget> m_rootWidget;
 
@@ -148,6 +102,47 @@ class MUIScene : public MObject
 };
 MLGE_OBJECT_END(MUIScene)
 
+MLGE_OBJECT_START(MUIMouseCursor, MObject, "Tracks and renders the mouse cursor")
+class MUIMouseCursor : public MObject , public Renderable, public RenderOperation
+{
+	MLGE_OBJECT_INTERNALS(MUIMouseCursor, MObject)
+  public:
+
+ 
+  protected:
+
+	friend UIManager;
+
+	virtual void setEnabled(bool enabled)
+	{
+		m_enabled = enabled;
+	}
+
+	virtual void setPosition(Point pos)
+	{
+		m_pos = pos;
+	}
+
+	virtual void incPosition(Point inc);
+
+
+  private:
+
+	virtual void postConstruct();
+	virtual void destruct();
+	
+	// Renderable interface
+	virtual void updateRenderQueue() override;
+
+	// RenderOperation interface
+	virtual void render(RenderGroup group) override;
+
+	bool m_enabled = false;
+	Point m_pos = {};
+	inline static StaticResourceRef<MTexture> ms_textRef = "cursors/default";
+	ObjectPtr<MTexture> m_tex;
+};
+MLGE_OBJECT_END(MUIMouseCursor)
 
 /**
  * Controls a group of UI scenes
@@ -177,47 +172,18 @@ class UIManager
 		return scene;
 	}
 
-	void tick(float deltaSeconds)
+	void tick(float deltaSeconds);
+
+	void showMouseCursor(bool show)
 	{
-		for(auto&& scene : m_scenes)
-		{
-			if (scene->getState() >= MUIScene::State::Enabled)
-			{
-				scene->tick(deltaSeconds);
-			}
-		}
+		m_mouseCursor->setEnabled(show);
+		SDL_ShowCursor(SDL_DISABLE);
 	}
 
 	/**
 	 * Activate the specified scene and deactivates all others.
 	 */
-	void activateScene(std::string_view name)
-	{
-		for(const ObjectPtr<MUIScene>& scene : m_scenes)
-		{
-			if (scene->m_name == name)
-			{
-				// Nothing to do
-				if (scene->m_state == MUIScene::State::Active)
-				{
-					CZ_LOG(Verbose, "Scene '{}' already active.", name);
-					return;
-				}
-			}
-
-			// First we deactivate the currently active scene
-			if (m_activeScene)
-			{
-				CZ_CHECK(m_activeScene->m_state == MUIScene::State::Active);
-				CZ_LOG(Log, "Deactivating scene '{}'.", m_activeScene->m_name);
-				m_activeScene->setState(m_activeScene->m_canEnable ? MUIScene::State::Enabled : MUIScene::State::Disabled);
-			}
-
-			CZ_LOG(Log, "Activating scene '{}'.", scene->m_name);
-			scene->setState(MUIScene::State::Active);
-			m_activeScene = scene.get();
-		}
-	}
+	void activateScene(std::string_view name);
 
 	void addStyle(std::string_view name, const ObjectPtr<MUIStyle>& style);
 	ObjectPtr<MUIStyle> findStyle(std::string_view name);
@@ -227,7 +193,12 @@ class UIManager
 	std::vector<ObjectPtr<MUIScene>> m_scenes;
 	std::vector<std::pair<std::string, ObjectPtr<MUIStyle>>> m_styles;
 
+	ObjectPtr<MUIMouseCursor> m_mouseCursor;
+
 	MUIScene* m_activeScene = nullptr;
+
+	DelegateHandle m_onProcessEventHandle;
+	void onProcessEvent(SDL_Event& evt);
 };
 
 } // namespace mlge

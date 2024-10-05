@@ -17,6 +17,7 @@ enum class RenderGroup
 	PhysicsDebug = 20,
 	SkiesLate = 21,
 	Overlay = 25,
+	MouseCursor = 29,
 	OverlayDebug = 30,
 	Stats = 31,
 	MAX = 32

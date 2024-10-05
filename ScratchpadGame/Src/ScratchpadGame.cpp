@@ -64,6 +64,8 @@ bool ScratchpadGame::init()
 
 	}
 
+	m_ui.showMouseCursor(true);
+
 	return true;
 }
 

@@ -142,6 +142,14 @@ struct Rect : public SDL_Rect
 		this->h = height;
 	}
 
+	constexpr Rect(const Point& origin, const Size& size)
+	{
+		this->x = origin.x;
+		this->y = origin.y;
+		this->w = size.w;
+		this->h = size.h;
+	}
+
 	constexpr Size size() const
 	{
 		return {w, h};
