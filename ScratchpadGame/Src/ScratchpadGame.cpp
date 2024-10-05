@@ -5,6 +5,7 @@
 #include "PlayerShip.h"
 #include "Stats.h"
 #include "mlge/UI/UILabel.h"
+#include "mlge/UI/UIButton.h"
 
 #include "crazygaze/core/CommandLine.h"
 
@@ -60,6 +61,17 @@ bool ScratchpadGame::init()
 				l2->setAlign(HAlign::Center, VAlign::Center);
 				l2->setPtSize(40);
 			}
+		}
+
+
+		if (MUIButton* b1 = scene->getRootWidget().createChild<MUIButton>().lock().get())
+		{
+			b1->setText("This is a Button");
+			
+			WidgetRect rect;
+			rect.tl = {UIUnitType::Percentage, 0.1f, 0.3f};
+			rect.br = {UIUnitType::Absolute, 1280/2, 720/2};
+			b1->setPosition(rect);
 		}
 
 	}

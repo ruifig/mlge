@@ -34,6 +34,9 @@ class MUIButton : public MUIWidget
 	// RenderOperation interface
 	virtual void render(RenderGroup group) override;
 
+	virtual void onMouseEnter() override;
+	virtual void onMouseLeave() override;
+
 	ObjectPtr<MTTFFont> m_font;
 	TextRenderer<true> m_textRenderer;
 };

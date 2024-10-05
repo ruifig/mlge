@@ -118,6 +118,10 @@ class MUIMouseCursor : public MObject , public Renderable, public RenderOperatio
 		m_enabled = enabled;
 	}
 
+	const Point& getPosition() const
+	{
+		return m_pos;
+	}
 	virtual void setPosition(Point pos);
 
 	virtual void incPosition(Point inc);
@@ -194,6 +198,8 @@ class UIManager
 	// WindowID with mouse focus. If not set, then mouse is not focus on the window
 	std::optional<uint32_t> m_mouseFocus;
 	MUIScene* m_activeScene = nullptr;
+
+	std::vector<MUIWidget*> m_eventStack;
 
 	DelegateHandle m_onProcessEventHandle;
 	void onProcessEvent(SDL_Event& evt);

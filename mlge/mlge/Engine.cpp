@@ -205,28 +205,32 @@ namespace
 
 		void tick()
 		{
-			if (m_maxFps == 0)
-			{
-				return;
-			}
-
 			m_tsA = Clock::now();
-			std::chrono::duration<double, std::milli> workTime = m_tsA - m_tsB;
+			m_lastWorkTime = m_tsA - m_tsB;
 
-			if (workTime.count() < m_msPerFrame)
+			if (m_maxFps != 0)
 			{
-				std::chrono::duration<double, std::milli> delta_ms(m_msPerFrame - workTime.count());
-				auto delta_ms_duration = std::chrono::duration_cast<std::chrono::milliseconds>(delta_ms);
-				std::this_thread::sleep_for(delta_ms_duration);
+				if (m_lastWorkTime.count() < m_msPerFrame)
+				{
+					std::chrono::duration<double, std::milli> delta_ms(m_msPerFrame - m_lastWorkTime.count());
+					auto delta_ms_duration = std::chrono::duration_cast<std::chrono::milliseconds>(delta_ms);
+					std::this_thread::sleep_for(delta_ms_duration);
+				}
 			}
 
 			m_tsB = Clock::now();
+		}
+
+		float getLastWorkTimeMs() const
+		{
+			return static_cast<float>(m_lastWorkTime.count());
 		}
 
 	  private:
 
 		Clock::time_point m_tsA;
 		Clock::time_point m_tsB;
+		std::chrono::duration<double, std::milli> m_lastWorkTime = {};
 
 		int m_maxFps;
 		float m_msPerFrame;
@@ -254,6 +258,7 @@ bool Engine::run()
 		MLGE_PROFILE_SCOPE(mlge_Engine_run);
 
 		fpsLimiter.tick();
+		m_stats.lastFrametime = fpsLimiter.getLastWorkTimeMs();
 
 		Renderer::get().beginFrame();
 		processEvents();

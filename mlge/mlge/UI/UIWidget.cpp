@@ -115,6 +115,23 @@ void MUIWidget::setStyle(const ObjectPtr<MUIStyle>& style)
 	}
 }
 
+void MUIWidget::onMouseEnter()
+{
+	CZ_LOG(Verbose, "{}:{}", m_objectName, __FUNCTION__);
+	CZ_CHECK(m_mouseHover == false);
+	m_mouseHover = true;
+	m_styleRenderer->setHover(true);
+}
+
+void MUIWidget::onMouseLeave()
+{
+	CZ_LOG(Verbose, "{}:{}", m_objectName, __FUNCTION__);
+	CZ_CHECK(m_mouseHover);
+
+	m_mouseHover = false;
+	m_styleRenderer->setHover(false);
+}
+
 void MUIWidget::updateAbsolutePosition() const
 {
 	if (!m_posChanged)
@@ -188,6 +205,30 @@ void MUIWidget::tick(float deltaSeconds)
 	for(auto&& child : m_children)
 	{
 		child->tick(deltaSeconds);
+	}
+}
+
+void MUIWidget::processMouseCursor(const Point& pos, std::vector<MUIWidget*>& eventStack)
+{
+	if (containsPoint(pos))
+	{
+		eventStack.push_back(this);
+		if (!m_mouseHover)
+		{
+			onMouseEnter();
+		}
+	}
+	else
+	{
+		if (m_mouseHover)
+		{
+			onMouseLeave();
+		}
+	}
+
+	for(const ObjectPtr<MUIWidget>& child : m_children)
+	{
+		child->processMouseCursor(pos, eventStack);
 	}
 }
 

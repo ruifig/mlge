@@ -67,5 +67,16 @@ void MUIButton::render(RenderGroup group)
 	}
 }
 
+void MUIButton::onMouseEnter()
+{
+	Super::onMouseEnter();
+}
+
+void MUIButton::onMouseLeave()
+{
+	Super::onMouseLeave();
+}
+
+
 } // namespace mlge
 

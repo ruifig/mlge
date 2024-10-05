@@ -201,7 +201,7 @@ void MUIMouseCursor::updateRenderQueue()
 	RenderQueue::get().addOp(*this, RenderGroup::MouseCursor);
 }
 
-void MUIMouseCursor::render(RenderGroup group)
+void MUIMouseCursor::render(RenderGroup /*group*/)
 {
 	renderSprite(m_spriteSheet->getSprite(0), m_pos);
 }
@@ -251,13 +251,20 @@ ObjectPtr<MUIStyle> UIManager::findStyle(std::string_view name)
 
 void UIManager::tick(float deltaSeconds)
 {
+	m_eventStack.clear();
+
 	for (auto&& scene : m_scenes)
 	{
 		if (scene->getState() >= MUIScene::State::Enabled)
 		{
 			scene->tick(deltaSeconds);
+			if (m_mouseFocus.has_value())
+			{
+				scene->getRootWidget().processMouseCursor(m_mouseCursor->getPosition(), m_eventStack);
+			}
 		}
 	}
+
 }
 
 void UIManager::activateScene(std::string_view name)
@@ -303,6 +310,19 @@ void UIManager::onProcessEvent(SDL_Event& evt)
 			CZ_LOG(Log, "Window LEAVE");
 			m_mouseFocus = std::nullopt;
 			m_mouseCursor->setEnabled(false);
+
+			// Process all widgets considering a position outside the screen.
+			// This makes sure that the onMouseLeave methods are called when the mouse moves outside the window
+			{
+				m_eventStack.clear();
+				for (auto&& scene : m_scenes)
+				{
+					if (scene->getState() >= MUIScene::State::Enabled)
+					{
+						scene->getRootWidget().processMouseCursor({-1,-1}, m_eventStack);
+					}
+				}
+			}
 		}
 	}
 	else if (evt.type == SDL_MOUSEMOTION)

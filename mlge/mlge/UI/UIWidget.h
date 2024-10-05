@@ -154,6 +154,11 @@ class MUIWidget : public MObject, public Renderable, public RenderOperation
 		return *m_scene;
 	}
 
+	void processMouseCursor(const Point& pos, std::vector<MUIWidget*>& eventStack);
+
+	virtual void onMouseEnter();
+	virtual void onMouseLeave();
+
   protected:
 
 	virtual bool preConstruct() override;
@@ -193,6 +198,8 @@ class MUIWidget : public MObject, public Renderable, public RenderOperation
 	std::vector<ObjectPtr<MUIWidget>> m_children;
 
 	WidgetRect m_pos = {};
+
+	bool m_mouseHover = false;
 
 	mutable bool m_posChanged = false;
 	mutable WidgetRect m_screenPos;

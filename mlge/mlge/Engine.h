@@ -33,6 +33,16 @@ public:
 		m_deferedTasks.emplace(std::forward<TaskFunc>(task));
 	}
 
+	struct Stats
+	{
+		float lastFrametime = 0;
+	};
+
+	const Stats& getStats() const
+	{
+		return m_stats;
+	}
+
 protected:
 
 	bool initSDL();
@@ -58,6 +68,8 @@ protected:
 	// This is only created if running a non-editor build or an editor build with -game.
 	// NOTE: Using a naked pointer because using a std::unique_ptr would require a dependency on the header
 	Game* m_game = nullptr;
+
+	Stats m_stats;
 };
 
 
