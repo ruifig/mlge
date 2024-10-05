@@ -72,25 +72,30 @@ int MFlipbook::getFrameAtTime(float timeSec) const
 MFlipbook::Position MFlipbook::getTimelineStartPosition() const
 {
 	Position pos;
+	pos.outer = this;
 	pos.timeSec = 0;
 	pos.frameIdx = 0;
 	pos.nextFrameTime = m_frames[0].getNextFrameTime();
 	return pos;
 }
 
-const Sprite& MFlipbook::getSpriteAndUpdatePosition(MFlipbook::Position& pos) const
-{
-	if (pos.frameEnded())
-	{
-		if (pos.timeSec >= m_duration)
-		{
-			pos.timeSec = fmod(pos.timeSec, m_duration);
-		}
-		pos.frameIdx = getFrameAtTime(pos.timeSec);
-		pos.nextFrameTime = m_frames[static_cast<size_t>(pos.frameIdx)].getNextFrameTime();
-	}
+//////////////////////////////////////////////////////////////////////////
+//		MFlipbook::Position	
+//////////////////////////////////////////////////////////////////////////
 
-	return getSprite(m_frames[static_cast<size_t>(pos.frameIdx)].spriteIdx);
+void MFlipbook::Position::tick(float deltaSeconds)
+{
+	timeSec += deltaSeconds;
+
+	if (frameEnded())
+	{
+		if (timeSec >= outer->m_duration)
+		{
+			timeSec = fmod(timeSec, outer->m_duration);
+		}
+		frameIdx = outer->getFrameAtTime(timeSec);
+		nextFrameTime = outer->m_frames[static_cast<size_t>(frameIdx)].getNextFrameTime();
+	}
 }
 
 } // mlge

@@ -74,10 +74,7 @@ class MFlipbook : public MResource
 	 */
 	struct Position
 	{
-		void tick(float deltaSeconds)
-		{
-			timeSec += deltaSeconds;
-		}
+		void tick(float deltaSeconds);
 
 		void reset()
 		{
@@ -91,6 +88,19 @@ class MFlipbook : public MResource
 		{
 			return timeSec >= nextFrameTime ? true : false;
 		}
+
+		const Sprite& getSprite() const
+		{
+			return outer->getSprite(outer->m_frames[static_cast<size_t>(frameIdx)].spriteIdx);
+		}
+
+		void render(const Point& pos, float angleDegrees = 0.0f, float scale = 1.0f)
+		{
+			mlge::renderSprite(getSprite(), pos, angleDegrees, scale);
+		}
+
+		/** Flipbook this is tied to */
+		const MFlipbook* outer = nullptr;
 
 		/** Time in seconds */
 		float timeSec = 0;
@@ -120,14 +130,6 @@ class MFlipbook : public MResource
 	{
 		return m_spriteSheet->getSprite(idx);
 	}
-
-	/**
-	 * Gets a sprite by timeline
-	 *
-	 * @param [in/out] timelineSeconds Considering the fps of the flipbook, it gets the right sprite for the specified time.
-	 * The time can be higher than the total playback time of the flipbook, and if so, on exit it will have a value of [0, m_duration[
-	 */
-	const Sprite& getSpriteAndUpdatePosition(Position& pos) const;
 
   protected:
 	friend class MFlipbookDefinition;

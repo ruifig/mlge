@@ -2,9 +2,22 @@
 
 	"resources": [
 		{
-			"type": "Texture",
+			"type": "SpriteSheet",
 			"name": "cursors/default",
-			"file": "cursors/white_cursor.png"
+			"file": "cursors/white_cursor.png",
+			"cellWidth": 12,
+			"cellHeight": 20,
+			"originX": 0,
+			"originY": 0
+		},
+		{
+			"type": "SpriteSheet",
+			"name": "cursors/crosshairs",
+			"file": "cursors/crosshairs.png",
+			"cellWidth": 32,
+			"cellHeight": 32,
+			"originX": 16,
+			"originY": 16
 		},
 		{
 			"type": "TTFFont",

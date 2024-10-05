@@ -178,8 +178,12 @@ void MUIMouseCursor::incPosition(Point inc)
 
 void MUIMouseCursor::postConstruct()
 {
-	m_tex = ms_textRef.getResource();
-	RenderQueue::get().addRenderable(*this);
+	m_spriteSheet = ms_spriteSheetRef.getResource();
+	
+	if (m_spriteSheet)
+	{
+		RenderQueue::get().addRenderable(*this);
+	}
 }
 
 void MUIMouseCursor::destruct()
@@ -199,13 +203,8 @@ void MUIMouseCursor::updateRenderQueue()
 
 void MUIMouseCursor::render(RenderGroup group)
 {
-	SDL_Renderer* sdlRenderer = Renderer::get().getSDLRenderer();
-	Size size = m_tex->getSize();
-	Rect dstRect(m_pos, size);
-	Rect srcRect({0,0}, size);
-	SDL_RenderCopy(sdlRenderer, m_tex->getTexture(), &srcRect, &dstRect);
+	renderSprite(m_spriteSheet->getSprite(0), m_pos);
 }
-
 
 //////////////////////////////////////////////////////////////////////////
 // MUIManager

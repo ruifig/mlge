@@ -3,7 +3,7 @@
 #include "mlge/Object.h"
 #include "mlge/UI/UIWidget.h"
 #include "mlge/Delegates.h"
-#include "mlge/Resource/Texture.h"
+#include "mlge/Resource/SpriteSheet.h"
 
 namespace mlge
 {
@@ -135,8 +135,8 @@ class MUIMouseCursor : public MObject , public Renderable, public RenderOperatio
 
 	bool m_enabled = false;
 	Point m_pos = {};
-	inline static StaticResourceRef<MTexture> ms_textRef = "cursors/default";
-	ObjectPtr<MTexture> m_tex;
+	inline static StaticResourceRef<MSpriteSheet> ms_spriteSheetRef = "cursors/default";
+	ObjectPtr<MSpriteSheet> m_spriteSheet;
 };
 MLGE_OBJECT_END(MUIMouseCursor)
 

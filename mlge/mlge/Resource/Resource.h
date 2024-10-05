@@ -397,7 +397,26 @@ class StaticResourceRef : public BaseStaticResourceRef
 	ObjectPtr<T> getResource()
 	{
 		CZ_CHECK(m_def);
-		return dynamic_pointer_cast<T>(m_def->getResource());
+
+		ObjectPtr<MResource> originalResource = m_def->getResource();
+
+		if (originalResource)
+		{
+			ObjectPtr<T> ptr = dynamic_pointer_cast<T>(originalResource);
+			if (ptr)
+			{
+				return ptr;
+			}
+			else
+			{
+				CZ_LOG(Error, "Resource '{}' is of unexpected type. Expected a {} but is a {}.", m_resourceName, Class::get<T>().getName(), m_def->getTypeName());
+				return nullptr;
+			}
+		}
+		else
+		{
+			return nullptr;
+		}
 	}
 
   protected:

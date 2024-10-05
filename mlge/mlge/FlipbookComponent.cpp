@@ -31,7 +31,7 @@ void MFlipbookComponent::updateRenderQueue()
 
 void MFlipbookComponent::render(RenderGroup /*group*/)
 {
-	renderSprite(m_flipbook->getSpriteAndUpdatePosition(m_pos), calcFinalPosition(), m_owner->getRotation(), 1.0f);
+	m_pos.render(calcFinalPosition(), m_owner->getRotation(), 1.0f);
 }
 
 
