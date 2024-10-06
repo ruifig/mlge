@@ -200,6 +200,10 @@ class UIManager
 	std::optional<uint32_t> m_mouseFocus;
 	MUIScene* m_activeScene = nullptr;
 
+	// When we detect a press, we remember what widget we started the press with, so that when we release, we only raise
+	// a click event if the widget was still the same.
+	MUIWidget* m_pressedWidget = nullptr;
+
 	std::vector<MUIWidget*> m_eventStack;
 
 	DelegateHandle m_onProcessEventHandle;

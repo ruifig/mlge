@@ -78,7 +78,8 @@ bool ScratchpadGame::init()
 
 					if (count == 2)
 					{
-						btn->temp_setDisabled();
+						btn->setEnabled(false);
+						//btn->temp_setDisabled();
 					}	
 					else if (count == 3)
 					{

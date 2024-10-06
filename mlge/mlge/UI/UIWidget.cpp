@@ -112,7 +112,9 @@ void MUIWidget::setStyle(const ObjectPtr<MUIStyle>& style)
 	{
 		m_style = style;
 		m_styleRenderer = m_style->createRenderer();
+		setEnabled(true);
 	}
+
 }
 
 void MUIWidget::onWindowResized()
@@ -121,6 +123,33 @@ void MUIWidget::onWindowResized()
 	for (auto&& child : m_children)
 	{
 		child->onWindowResized();
+	}
+}
+
+void MUIWidget::setEnabled(bool enabled)
+{
+	m_enabled = enabled;
+	propagateEnabled();
+}
+
+void MUIWidget::propagateEnabled()
+{
+	if (m_parent)
+	{
+		m_parentEnabled = m_parent->isEnabled();
+	}
+	else
+	{
+		m_parentEnabled = m_scene->getState() == MUIScene::State::Disabled ? false : true;
+	}
+
+
+	CZ_LOG(Verbose, "{}:{}: {}", m_objectName, __FUNCTION__, isEnabled());
+	m_styleRenderer->setEnabled(isEnabled());
+
+	for (auto child : m_children)
+	{
+		child->propagateEnabled();
 	}
 }
 
@@ -218,7 +247,11 @@ void MUIWidget::processMouseCursor(const Point& pos, std::vector<MUIWidget*>& ev
 {
 	if (containsPoint(pos))
 	{
-		eventStack.push_back(this);
+		if (isEnabled())
+		{
+			eventStack.push_back(this);
+		}
+
 		if (!m_mouseHover)
 		{
 			onMouseEnter();

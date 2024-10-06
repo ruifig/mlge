@@ -119,6 +119,8 @@ void MUIScene::setState(State newState)
 			m_state = State::Active;
 			onActivate();
 		}
+
+		m_rootWidget->propagateEnabled();
 	}
 	// Going down
 	else if (newState < m_state)
@@ -134,6 +136,8 @@ void MUIScene::setState(State newState)
 			m_state = State::Disabled;
 			onDisable();
 		}
+
+		m_rootWidget->propagateEnabled();
 	}
 }
 
@@ -338,23 +342,58 @@ void UIManager::onProcessEvent(SDL_Event& evt)
 		}
 
 	}
-	else if (evt.type == SDL_MOUSEBUTTONDOWN)
+	else if (evt.type == SDL_MOUSEBUTTONDOWN || evt.type == SDL_MOUSEBUTTONUP)
 	{
-		CZ_LOG(Log, "Mouse button {} : {}", evt.button.button, evt.button.state);
-		if (evt.button.button == 1)
+		
+		auto raiseEvent = [this](UIInternalEvent::Type type, const Point& pos)
 		{
 			UIInternalEvent e;
-			e.type = UIInternalEvent::Type::Pressed;
-			e.pos = m_mouseCursor->getPosition();
+			e.type = type;
+			e.pos = pos;
+
+			CZ_LOG(Verbose, "EventStack:{}", m_eventStack.size());
+			for (auto w : m_eventStack)
+			{
+				CZ_LOG(Verbose, "    {}", w->getObjectName());
+			}
 
 			for (auto it = m_eventStack.rbegin(); it != m_eventStack.rend(); it++)
 			{
 				(*it)->onUIInternalEvent(e);
 				if (e.consumed)
 				{
+					CZ_LOG(Verbose, "CONSUMED");
 					break;
 				}
 			}
+		};
+
+		CZ_LOG(Log, "Mouse: button {}, state {}, numclicks {}", evt.button.button, evt.button.state, evt.button.clicks);
+		if (evt.button.button == 1 && m_eventStack.size())
+		{
+			UIInternalEvent::Type type =
+				evt.button.state == SDL_PRESSED ? UIInternalEvent::Type::Pressed : UIInternalEvent::Type::Released;
+
+			bool raiseClick = false;
+			if (type == UIInternalEvent::Type::Pressed)
+			{
+				m_pressedWidget = m_eventStack.back();
+			}
+			else if (type == UIInternalEvent::Type::Released)
+			{
+				if (m_eventStack.back() == m_pressedWidget)
+				{
+					raiseClick = true;
+				}
+			}
+
+			raiseEvent(type, m_mouseCursor->getPosition());
+
+			if (raiseClick)
+			{
+				raiseEvent(UIInternalEvent::Type::Click, m_mouseCursor->getPosition());
+			}
+
 		}
 	}
 

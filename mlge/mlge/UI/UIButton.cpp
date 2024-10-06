@@ -93,11 +93,16 @@ void MUIButton::onUIInternalEvent(UIInternalEvent& evt)
 	Super::onUIInternalEvent(evt);
 	evt.consumed = true;
 
-	UIEvent e;
-	e.name = m_eventId.id;
-	e.hash = m_eventId.hash;
-	e.source = this;
-	m_scene->getManager().uiEventDelegate.broadcast(e);
+
+	if (evt.type == UIInternalEvent::Type::Click)
+	{
+		UIEvent e;
+		e.name = m_eventId.id;
+		e.hash = m_eventId.hash;
+		e.source = this;
+		CZ_LOG(Verbose, "{}: CLICK", m_objectName);
+		m_scene->getManager().uiEventDelegate.broadcast(e);
+	}
 }
 
 

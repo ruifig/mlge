@@ -133,6 +133,15 @@ class MUIWidget : public MObject, public Renderable, public RenderOperation
 
 	void onWindowResized();
 
+	void setEnabled(bool enabled);
+
+	bool isEnabled() const
+	{
+		return m_enabled && m_parentEnabled;
+	}
+
+	void propagateEnabled();
+
 	/**
 	 * Creates a child widget.
 	 * The lifetime of the child widget is tied to the parent.
@@ -161,10 +170,10 @@ class MUIWidget : public MObject, public Renderable, public RenderOperation
 	virtual void onMouseEnter();
 	virtual void onMouseLeave();
 
-	void temp_setDisabled()
-	{
-		m_styleRenderer->setEnabled(false);
-	}
+	//void temp_setDisabled()
+	//{
+	//	m_styleRenderer->setEnabled(false);
+	//}
 	void temp_setPressed()
 	{
 		m_styleRenderer->setPressed(true);
@@ -212,6 +221,11 @@ class MUIWidget : public MObject, public Renderable, public RenderOperation
 	WidgetRect m_pos = {};
 
 	bool m_mouseHover = false;
+
+	// A widget can be set to enabled, but it's effective state can still be disabled if the parent widget is disabled.
+	// So we keep track of two booleans, and the actual state is "m_enabled && m_parentEnabled"
+	bool m_enabled = true;
+	bool m_parentEnabled = true;
 
 	mutable bool m_posChanged = false;
 	mutable WidgetRect m_screenPos;
