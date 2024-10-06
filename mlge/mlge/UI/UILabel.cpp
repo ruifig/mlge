@@ -6,8 +6,13 @@ namespace mlge
 
 bool MUILabel::preConstruct()
 {
+	if (!Super::preConstruct())
+	{
+		return false;
+	}
+
 	m_textRenderer.setAlign(HAlign::Center, VAlign::Center);
-	return Super::preConstruct();
+	return true;
 }
 
 void MUILabel::postConstruct()

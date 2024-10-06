@@ -48,6 +48,11 @@ void ADebugText::addEntry(const Color& color, const std::string& str)
 
 bool ADebugText::preConstruct()
 {
+	if (!Super::preConstruct())
+	{
+		return false;
+	}
+
 	gDebugText = this;
 
 	// Load the font
@@ -59,7 +64,7 @@ bool ADebugText::preConstruct()
 
 	m_font->loadASCIIGlyphs(m_fontSize);
 
-	return Super::preConstruct();
+	return true;
 }
 
 void ADebugText::tick(float deltaSeconds)

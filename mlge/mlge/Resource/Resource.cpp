@@ -30,8 +30,13 @@ MResourceDefinition::~MResourceDefinition()
 
 bool MResourceDefinition::construct(const ResourceRoot& root)
 {
+	if (!Super::preConstruct())
+	{
+		return false;
+	}
+
 	m_root = &root;
-	return Super::preConstruct();
+	return true;
 }
 
 const std::string_view MResourceDefinition::getTypeName() const
@@ -93,8 +98,13 @@ void MResourceDefinition::from_json(const nlohmann::json& j)
 
 bool MResource::construct(const MResourceDefinition& definition)
 {
+	if (!Super::preConstruct())
+	{
+		return false;
+	}
+
 	m_definition = &definition;
-	return Super::preConstruct();
+	return true;
 }
 
 

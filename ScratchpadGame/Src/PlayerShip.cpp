@@ -21,8 +21,13 @@ FPoint moveWithRotation(const FPoint& pos, float angleDegrees, float speedPixels
 
 bool MShipMoveComponent::preConstruct()
 {
+	if (!Super::preConstruct())
+	{
+		return false;
+	}
+
 	m_onProcessEventHandle = Engine::get().processEventDelegate.bind(this, &MShipMoveComponent::onProcessEvent);
-	return Super::preConstruct();
+	return true;
 }
 
 void MShipMoveComponent::onProcessEvent(SDL_Event& evt)
@@ -169,6 +174,11 @@ void APlayerShip::destruct()
 
 bool APlayerShip::preConstruct()
 {
+	if (!Super::preConstruct())
+	{
+		return false;
+	}
+
 	m_renderComp = addNewComponent<MFlipbookComponent>().get();
 	m_renderComp->setFlipbook(m_move);
 
@@ -182,7 +192,7 @@ bool APlayerShip::preConstruct()
 	m_txt->setAlignment(HAlign::Center, VAlign::Center);
 	m_txt->setRelativePosition({-m_move->getSprite(0).rect.w / 4.0f, -m_move->getSprite(0).rect.h / 4.0f});
 
-	return Super::preConstruct();
+	return true;
 }
 
 void APlayerShip::tick(float deltaSeconds)
