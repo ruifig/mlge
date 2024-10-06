@@ -203,6 +203,9 @@ class UIManager
 
 	DelegateHandle m_onProcessEventHandle;
 	void onProcessEvent(SDL_Event& evt);
+
+	DelegateHandle m_onWindowResizedHandle;
+	void onWindowResized(Size newSize);
 };
 
 } // namespace mlge

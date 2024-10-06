@@ -115,6 +115,15 @@ void MUIWidget::setStyle(const ObjectPtr<MUIStyle>& style)
 	}
 }
 
+void MUIWidget::onWindowResized()
+{
+	m_posChanged = true;
+	for (auto&& child : m_children)
+	{
+		child->onWindowResized();
+	}
+}
+
 void MUIWidget::onMouseEnter()
 {
 	CZ_LOG(Verbose, "{}:{}", m_objectName, __FUNCTION__);

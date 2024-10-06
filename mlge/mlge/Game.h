@@ -171,7 +171,9 @@ class Game : public Singleton<Game>
 		return *m_renderTarget;
 	}
 
-	protected:
+	MultiCastDelegate<Size> windowResizedDelegate;
+
+  protected:
 
 	/**
 	 * How long the game loop will wait for the shutdown before forcing a close
@@ -181,7 +183,6 @@ class Game : public Singleton<Game>
 	Color m_bkgColour = Color::Black;
 
 	UIManager m_ui;
-
   private:
 
 	friend class Engine;
@@ -191,7 +192,7 @@ class Game : public Singleton<Game>
 	 */
 	void gameClockTick();
 
-	void processInput(SDL_Event& evt);
+	void processEvent(SDL_Event& evt);
 
 	std::string m_name;
 	std::string m_buildInfo;

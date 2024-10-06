@@ -82,7 +82,7 @@ void Engine::processEvents()
 
 		if (Game::tryGet())
 		{
-			Game::get().processInput(evt);
+			Game::get().processEvent(evt);
 		}
 
 		if (evt.type == SDL_QUIT)
@@ -100,10 +100,6 @@ void Engine::processEvents()
 				{
 					Game::get().requestShutdown();
 				}
-			}
-			else if (gIsGame && evt.window.event == SDL_WINDOWEVENT_RESIZED)
-			{
-				Game::get().getRenderTarget().setSize({evt.window.data1, evt.window.data2});
 			}
 		}
 	}

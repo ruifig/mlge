@@ -131,6 +131,8 @@ class MUIWidget : public MObject, public Renderable, public RenderOperation
 
 	virtual void setStyle(const ObjectPtr<MUIStyle>& style);
 
+	void onWindowResized();
+
 	/**
 	 * Creates a child widget.
 	 * The lifetime of the child widget is tied to the parent.

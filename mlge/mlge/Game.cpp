@@ -42,8 +42,17 @@ Game::~Game()
 	CZ_LOG(Log, "Game destroyed");
 }
 
-void Game::processInput(SDL_Event& /*evt*/)
+void Game::processEvent(SDL_Event& evt)
 {
+	if (evt.type == SDL_WINDOWEVENT)
+	{
+		if (gIsGame && evt.window.event == SDL_WINDOWEVENT_RESIZED)
+		{
+			Size size(evt.window.data1, evt.window.data2);
+			getRenderTarget().setSize(size);
+			windowResizedDelegate.broadcast(size);
+		}
+	}
 }
 
 const std::string& Game::getBuildInfo() const

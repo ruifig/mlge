@@ -26,7 +26,6 @@ public:
 	MultiCastDelegate<SDL_Event&> processEventDelegate;
 	MultiCastDelegate<> tickDelegate;
 
-
 	template<typename TaskFunc>
 	void deferToNextTick(TaskFunc&& task)
 	{

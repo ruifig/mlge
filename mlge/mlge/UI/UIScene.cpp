@@ -225,6 +225,7 @@ UIManager::UIManager()
 	}
 
 	m_onProcessEventHandle = Engine::get().processEventDelegate.bind(this, &UIManager::onProcessEvent);
+	m_onWindowResizedHandle = Game::get().windowResizedDelegate.bind(this, &UIManager::onWindowResized);
 
 	m_mouseCursor = createObject<MUIMouseCursor>();
 
@@ -382,6 +383,15 @@ void UIManager::onProcessEvent(SDL_Event& evt)
 		}
 	}
 #endif
+}
+
+
+void UIManager::onWindowResized(Size newSize)
+{
+	for (const ObjectPtr<MUIScene>& scene : m_scenes)
+	{
+		scene->getRootWidget().onWindowResized();
+	}
 }
 
 } // namespace mlge
