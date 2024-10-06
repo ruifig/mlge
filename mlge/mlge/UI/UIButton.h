@@ -9,6 +9,8 @@
 namespace mlge
 {
 
+using namespace cz::hash;
+
 MLGE_OBJECT_START(MUIButton, MObject, "Base button. Can optionally display a text")
 class MUIButton : public MUIWidget
 {
@@ -44,7 +46,7 @@ class MUIButton : public MUIWidget
 	struct
 	{
 		std::string id;
-		uint64_t hash = 0;
+		uint64_t hash = ""_fnv1a_64;
 	} m_eventId;
 };
 

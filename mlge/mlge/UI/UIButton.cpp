@@ -48,6 +48,12 @@ void MUIButton::setStyle(const ObjectPtr<MUIStyle>& style)
 	setFont(m_style->getFont());
 }
 
+void MUIButton::setEventID(std::string_view id)
+{
+	m_eventId.id = id;
+	m_eventId.hash = Hash::fnv_64a_str(m_eventId.id.c_str());
+}
+
 void MUIButton::updateRenderQueue()
 {
 	Super::updateRenderQueue();
@@ -86,6 +92,12 @@ void MUIButton::onUIInternalEvent(UIInternalEvent& evt)
 {
 	Super::onUIInternalEvent(evt);
 	evt.consumed = true;
+
+	UIEvent e;
+	e.name = m_eventId.id;
+	e.hash = m_eventId.hash;
+	e.source = this;
+	m_scene->getManager().uiEventDelegate.broadcast(e);
 }
 
 

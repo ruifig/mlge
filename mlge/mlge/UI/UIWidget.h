@@ -10,7 +10,6 @@
 namespace mlge
 {
 
-
 class MUIScene;
 class UIManager;
 

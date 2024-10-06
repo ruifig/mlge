@@ -5,7 +5,7 @@
 namespace mlge
 {
 
-class UIWidget;
+class MUIWidget;
 
 struct UIInternalEvent
 {
@@ -28,7 +28,7 @@ struct UIEvent
 	std::string_view name;
 	// Event name, hashed
 	uint64_t hash;
-	UIWidget* source = nullptr;
+	MUIWidget* source = nullptr;
 };
 
 }
