@@ -268,19 +268,16 @@ bool Engine::run()
 		MLGE_PROFILE_SCOPE(mlge_Engine_run);
 
 		fpsLimiter.tick();
-		//m_stats.frameWorkMs = fpsLimiter.getLastWorkTimeMs();
 
-		Renderer::get().beginFrame();
-		processEvents();
-		tick();
+		{
+			performanceStats.stat_Tick_Start();
 
-		performanceStats.tick();
+			Renderer::get().beginFrame();
+			processEvents();
+			tick();
 
-		#if 0
-		m_stats.fps = varianceCalculator.fps;
-		m_stats.avgFrametimeMs = varianceCalculator.avgMsPerFrame;
-		m_stats.frametimeVariance = varianceCalculator.variance;
-		#endif
+			performanceStats.stat_Tick_End();
+		}
 
 		Renderer::get().render();
 
@@ -296,6 +293,8 @@ bool Engine::run()
 			shuttingDown &= editor::Editor::get().isShuttingDown();
 		}
 	#endif
+
+		performanceStats.tick();
 
 	} while(shuttingDown == false);
 

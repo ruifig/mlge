@@ -327,7 +327,7 @@ void UIManager::onProcessEvent(SDL_Event& evt)
 	}
 	else if (evt.type == SDL_MOUSEMOTION)
 	{
-	#if 1
+	#if 0
 		CZ_LOG(Log, "mousemotion: timestamp={}, state={}, x={}, y={}, xrel={}, yrel={}",
 			evt.motion.timestamp,
 			evt.motion.state,

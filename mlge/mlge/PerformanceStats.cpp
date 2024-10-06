@@ -66,12 +66,46 @@ void PerformanceStats::render(RenderGroup /*group*/)
 	int x = 5;
 	Rect rect(x, 0, renderTargetSize.w - x, textRenderer.getFontHeight());
 
-	textRenderer.setArea(rect);
-	textRenderer.render(std::format(
-		"FPS: {:3.0f}, MS: {:4.1f}, Variance: {:3.2f}",
-		m_fpsCalculator.fps,
-		m_fpsCalculator.avgMsPerFrame,
-		m_fpsCalculator.variance));
+
+	// These show the actual FPS calculations (as perceived by the player).
+	{
+		textRenderer.setArea(rect);
+		textRenderer.render(std::format(
+			"FPS: {:3.0f}, MS: {:4.1f}, Variance: {:3.2f}",
+			m_fpsCalculator.fps,
+			m_fpsCalculator.avgMsPerFrame,
+			m_fpsCalculator.variance));
+	}
+
+	// These show the time spending updating engine/game logic
+	{
+		rect.translate({0, textRenderer.getFontHeight()});
+		textRenderer.setArea(rect);
+		textRenderer.render(std::format(
+			"Tick: {:3.2f}, TickVariance: {:3.2f}",
+			m_tickCalculator.avgMsPerFrame,
+			m_tickCalculator.variance));
+	}
+
+	// These show the time spent in engine rendering operations
+	{
+		rect.translate({0, textRenderer.getFontHeight()});
+		textRenderer.setArea(rect);
+		textRenderer.render(std::format(
+			"Draw: {:3.2f}, DrawVariance: {:3.2f}",
+			m_drawCalculator.avgMsPerFrame,
+			m_drawCalculator.variance));
+	}
+
+	// These show the time blocked int he SDL_RenderPresent
+	{
+		rect.translate({0, textRenderer.getFontHeight()});
+		textRenderer.setArea(rect);
+		textRenderer.render(std::format(
+			"Present: {:3.2f}, PresentVariance: {:3.2f}",
+			m_presentCalculator.avgMsPerFrame,
+			m_presentCalculator.variance));
+	}
 
 	int buildInfoHeight = m_showBuildInfo ? textRenderer.getFontHeight() : 0;
 

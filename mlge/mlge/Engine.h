@@ -33,37 +33,6 @@ public:
 		m_deferedTasks.emplace(std::forward<TaskFunc>(task));
 	}
 
-	#if 0
-	struct Stats
-	{
-		/**
-		 * Time spent processing work (in milliseconds)
-		 * This is the time spend processing game logic (including SDL calls to render), up to the point the SDL_RenderPresent
-		 * call is done.
-		 *
-		 * You can think of this as how much time the game is spending per frame doing work.
-		 */
-		float frameWorkMs = 0;
-
-		/**
-		 * Fps calculated over a few last frames.
-		 */
-		float fps;
-
-		/**
-		 * Frametime in milliseconds
-		 */
-		float avgFrametimeMs; 
-
-		float frametimeVariance;
-	};
-	const Stats& getStats() const
-	{
-		return m_stats;
-	}
-	#endif
-
-
 protected:
 
 	bool initSDL();

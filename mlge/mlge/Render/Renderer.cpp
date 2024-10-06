@@ -3,6 +3,7 @@
 #include "mlge/Profiler.h"
 #include "mlge/Config.h"
 #include "mlge/Paths.h"
+#include "mlge/PerformanceStats.h"
 
 #include "mlge/Render/RenderQueue.h"
 #include "mlge/Render/DXDebugLayer.h"
@@ -131,9 +132,11 @@ void Renderer::draw()
 {
 	MLGE_PROFILE_SCOPE(mlge_Renderer_draw);
 
+	PerformanceStats::get().stat_Draw_Start();
 	endFrameDelegate.broadcast();
 	RenderQueue::get().render();
 	gameRenderFinishedDelegate.broadcast();
+	PerformanceStats::get().stat_Draw_End();
 }
 
 void Renderer::render()
@@ -144,7 +147,9 @@ void Renderer::render()
 
 	{
 		MLGE_PROFILE_SCOPE(mlge_Renderer_SDL_RenderPresent);
+		PerformanceStats::get().stat_Present_Start();
 		SDL_RenderPresent(m_sdlRenderer.get());
+		PerformanceStats::get().stat_Present_End();
 	}
 
 	m_frameNumber++;

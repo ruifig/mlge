@@ -24,27 +24,29 @@ namespace mlge
 			using Clock = std::chrono::high_resolution_clock;
 			Clock::time_point previousTs = Clock::now();
 
+			/**
+			 * Use this to add points based on timing between each call.
+			 *
+			 * For a given instance, don't mix use with start() and end(). Use either tick() or start/end.
+			 */
 			void tick()
 			{
 				Clock::time_point now = Clock::now();
-
-				numTicks++;
 				auto deltaMicroseconds = std::chrono::duration_cast<std::chrono::microseconds>(now - previousTs);
-
-				tickSum -= tickList[tickIndex];			 /* subtract value falling off */
-				tickSum += deltaMicroseconds;			 /* add new value */
-				tickList[tickIndex] = deltaMicroseconds; /* save new value so it can be subtracted later */
-				if (++tickIndex == MaxSamples)			 /* inc buffer index */
-				{
-					tickIndex = 0;
-				}
-
-				avgMsPerFrame = float(static_cast<double>(tickSum.count()) / (MaxSamples * 1000));
-				fps = 1000.0f / avgMsPerFrame;
-
-				calculateVariance();
-
+				addPoint(deltaMicroseconds);
 				previousTs = now;
+			}
+
+			void start()
+			{
+				previousTs = Clock::now();
+			}
+
+			void end()
+			{
+				Clock::time_point now = Clock::now();
+				auto deltaMicroseconds = std::chrono::duration_cast<std::chrono::microseconds>(now - previousTs);
+				addPoint(deltaMicroseconds);
 			}
 
 			void addPoint(std::chrono::microseconds deltaMicroseconds)
@@ -100,6 +102,15 @@ class PerformanceStats : public Singleton<PerformanceStats>, public Renderable, 
 	void showBuildInfo(bool enabled);
 	void showTime(bool enabled);
 
+
+	// These need to ALWAYS be used in pairs.
+	void stat_Tick_Start()    { m_tickCalculator.start(); }
+	void stat_Tick_End()      { m_tickCalculator.end(); }
+	void stat_Draw_Start()    { m_drawCalculator.start(); }
+	void stat_Draw_End()      { m_drawCalculator.end(); }
+	void stat_Present_Start() { m_presentCalculator.start(); }
+	void stat_Present_End()   { m_presentCalculator.end(); }
+
   private:
 
 	// Renderable interface
@@ -114,6 +125,8 @@ class PerformanceStats : public Singleton<PerformanceStats>, public Renderable, 
 
 	details::VarianceCalculator<60> m_fpsCalculator;
 	details::VarianceCalculator<60> m_tickCalculator;
+	details::VarianceCalculator<60> m_drawCalculator;
+	details::VarianceCalculator<60> m_presentCalculator;
 
 	inline static StaticResourceRef<MTTFFont> ms_fontRef = "fonts/RobotoCondensed-Medium";
 	ObjectPtr<MTTFFont> m_font;
