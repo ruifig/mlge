@@ -386,7 +386,7 @@ void UIManager::onProcessEvent(SDL_Event& evt)
 }
 
 
-void UIManager::onWindowResized(Size newSize)
+void UIManager::onWindowResized(Size /*newSize*/)
 {
 	for (const ObjectPtr<MUIScene>& scene : m_scenes)
 	{

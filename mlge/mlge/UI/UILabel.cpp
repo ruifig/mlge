@@ -7,7 +7,6 @@ namespace mlge
 bool MUILabel::preConstruct()
 {
 	m_textRenderer.setAlign(HAlign::Center, VAlign::Center);
-	m_textRenderer.setColor(Color::White);
 	return Super::preConstruct();
 }
 
@@ -63,6 +62,7 @@ void MUILabel::render(RenderGroup group)
 	if (group == RenderGroup::Overlay && m_font && m_textRenderer.getText().size())
 	{
 		Rect rect = absoluteToRect(getAbsolutePosition());
+		m_textRenderer.setColor(m_styleRenderer->getTextColor());
 		m_textRenderer.setArea(rect).render();
 	}
 }

@@ -26,11 +26,22 @@ bool MUIStyleRendererFlat::construct(MUIStyleFlat& outer)
 	return true;
 }
 
+Color MUIStyleRendererFlat::getTextColor()
+{
+	Color c = m_outer->m_textColor;
+	return Color(c.r, c.g, c.b, m_enabled ? uint8_t(255) : m_outer->ms_disabledAlpha);
+}
+
 void MUIStyleRendererFlat::render(const Rect& rect)
 {
 	SDL_Renderer* sdlRenderer = Renderer::get().getSDLRenderer();
 
 	Color color = m_outer->m_disabledBkgColor;
+
+	auto setColor = [&](const Color& color)
+	{
+		SDL_SetRenderDrawColor(sdlRenderer, color.r, color.g, color.b, color.a);
+	};
 
 	if (m_enabled)
 	{
@@ -52,10 +63,25 @@ void MUIStyleRendererFlat::render(const Rect& rect)
 	SDL_GetRenderDrawBlendMode(sdlRenderer, &originalBlendMode);
 	SDL_SetRenderDrawBlendMode(sdlRenderer, SDL_BLENDMODE_BLEND);
 
-	SDL_SetRenderDrawColor(sdlRenderer, color.r, color.g, color.b, color.a);
+	setColor(color);
 	SDL_RenderFillRect(sdlRenderer, &rect); 
 
+	if (m_outer->m_borderThickness)
+	{
+		Rect borderRect = rect;
+		SDL_SetRenderDrawBlendMode(sdlRenderer, SDL_BLENDMODE_NONE);
+		setColor(m_outer->m_borderColor);
+
+		int count = m_outer->m_borderThickness;
+		while(count--)
+		{
+			SDL_RenderDrawRect(sdlRenderer, &borderRect);
+			borderRect.contract(1);
+		}
+	}
+
 	SDL_SetRenderDrawBlendMode(sdlRenderer, originalBlendMode);
+
 }
 
 ObjectPtr<MUIStyleRenderer> MUIStyleFlat::createRenderer()

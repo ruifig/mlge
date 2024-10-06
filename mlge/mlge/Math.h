@@ -273,6 +273,22 @@ struct Rect : public SDL_Rect
 		this->y = pos.y;
 	}
 
+	/**
+	 * Expands rectangle by the specified ammount.
+	 */
+	constexpr void expand(int delta)
+	{
+		x -= delta;
+		y -= delta;
+		w += (delta*2);
+		h += (delta*2);
+	}
+
+	constexpr void contract(int delta)
+	{
+		expand(-delta);
+	}
+
 	#if 0
 	/**
 	 * Convert to a SDL_Rect

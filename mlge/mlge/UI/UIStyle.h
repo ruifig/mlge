@@ -34,6 +34,14 @@ class MUIStyleRenderer : public MObject
 
 	virtual void render(const Rect& rect) = 0;
 
+	/**
+	 * Returns what color should be used for text, taking into account the current state
+	 */
+	virtual Color getTextColor()
+	{
+		return Color::White;
+	}
+
   protected:
 
 		//! The widget is enabled
@@ -133,6 +141,9 @@ class MUIStyleRendererFlat : public MUIStyleRenderer
   public:
 
 	bool construct(MUIStyleFlat& outer);
+
+	virtual Color getTextColor() override;
+
 	virtual void render(const Rect& rect) override;
 
   private:
@@ -154,11 +165,21 @@ class MUIStyleFlat : public MUIStyle
 
 	friend MUIStyleRendererFlat;
 
-	static constexpr uint8_t ms_alpha = 128; 
-	Color m_disabledBkgColor = Color(0x7F , 0x7F, 0x7F, ms_alpha);
-	Color m_enabledBkgColor = Color(0x9F , 0x9F, 0x9F, ms_alpha);
-	Color m_hoverBkgColor = Color(0x9F , 0x9F, 0x9F, 255);
-	Color m_pressedBkgColor = Color(0xAF , 0xAF, 0xAF, 255);
+	static constexpr uint8_t ms_disabledAlpha = 64; 
+
+	Color m_disabledBkgColor = Color(56 , 0, 44, ms_disabledAlpha);
+	Color m_enabledBkgColor = Color(56 , 0, 44, 255);
+	Color m_hoverBkgColor = Color(86 , 106, 137, 255);
+	Color m_pressedBkgColor = Color(101 , 124, 160, 255);
+
+	Color m_textColor = Color::White;
+
+	/**
+	 * How thick (in pixels) the border should be.
+	 * If 0, then no border is drawn
+	 */
+	int m_borderThickness = 2;
+	Color m_borderColor = Color::Black;
 };
 MLGE_OBJECT_END(MUIStyleFlat)
 

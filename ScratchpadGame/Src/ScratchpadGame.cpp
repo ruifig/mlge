@@ -60,15 +60,34 @@ bool ScratchpadGame::init()
 		}
 
 
-		if (MUIButton* b1 = scene->getRootWidget().createChild<MUIButton>().lock().get())
+		// Create some buttons
 		{
-			b1->setText("This is a Button");
-			
 			WidgetRect rect;
-			rect.tl = {UIUnitType::Percentage, 0.1f, 0.3f};
-			rect.br = {UIUnitType::Absolute, 1280/2, 720/2};
-			b1->setPosition(rect);
+			rect.tl = {UIUnitType::Relative, 50, 80};
+
+			for(int count = 0; count < 4; count++)
+			{
+				if (MUIButton* btn = scene->getRootWidget().createChild<MUIButton>().lock().get())
+				{
+					rect.br = {UIUnitType::Relative, rect.tl.x.val + 150, rect.tl.y.val + 35};
+					btn->setPtSize(24);
+					btn->setText(std::format("Button {}", count));
+					btn->setPosition(rect);
+
+					rect.tl.y.val += 50;
+
+					if (count == 2)
+					{
+						btn->temp_setDisabled();
+					}	
+					else if (count == 3)
+					{
+						btn->temp_setPressed();
+					}
+				}
+			}
 		}
+
 
 	}
 

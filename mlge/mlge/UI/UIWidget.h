@@ -161,6 +161,15 @@ class MUIWidget : public MObject, public Renderable, public RenderOperation
 	virtual void onMouseEnter();
 	virtual void onMouseLeave();
 
+	void temp_setDisabled()
+	{
+		m_styleRenderer->setEnabled(false);
+	}
+	void temp_setPressed()
+	{
+		m_styleRenderer->setPressed(true);
+	}
+
   protected:
 
 	virtual bool preConstruct() override;

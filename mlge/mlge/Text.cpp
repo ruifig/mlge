@@ -164,6 +164,7 @@ void TextRendererSettings::renderImpl(std::string_view text, const Size& textSiz
 		dstRect.h = glyph->rect.h;
 
 		SDL_SetTextureColorMod(glyph->texture, color.r, color.g, color.b);
+		SDL_SetTextureAlphaMod(glyph->texture, color.a);
 		SDL_RenderCopy(sdlRenderer, glyph->texture, &glyph->rect, &dstRect);
 		dstRect.x += glyph->advance;
 	}
