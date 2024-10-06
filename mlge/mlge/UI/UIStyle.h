@@ -178,7 +178,7 @@ class MUIStyleFlat : public MUIStyle
 	 * How thick (in pixels) the border should be.
 	 * If 0, then no border is drawn
 	 */
-	int m_borderThickness = 2;
+	int m_borderThickness = 3;
 	Color m_borderColor = Color::Black;
 };
 MLGE_OBJECT_END(MUIStyleFlat)

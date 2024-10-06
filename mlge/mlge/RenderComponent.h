@@ -53,7 +53,7 @@ class MRenderComponent : public MActorComponent, public Renderable
 	/**
 	 * What render group to use
 	 */
-	RenderGroup m_renderGroup = RenderGroup::Overlay;
+	RenderGroup m_renderGroup = RenderGroup::Main;
 #if MLGE_DEBUG
 	RenderGroup m_debugRenderGroup = RenderGroup::OverlayDebug;
 #endif

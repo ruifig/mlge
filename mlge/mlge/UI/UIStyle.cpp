@@ -69,8 +69,14 @@ void MUIStyleRendererFlat::render(const Rect& rect)
 	if (m_outer->m_borderThickness)
 	{
 		Rect borderRect = rect;
-		SDL_SetRenderDrawBlendMode(sdlRenderer, SDL_BLENDMODE_NONE);
-		setColor(m_outer->m_borderColor);
+		color = m_outer->m_borderColor;
+		if (!m_enabled)
+		{
+			color.a = m_outer->ms_disabledAlpha;
+		}
+
+		//SDL_SetRenderDrawBlendMode(sdlRenderer, SDL_BLENDMODE_NONE);
+		setColor(color);
 
 		int count = m_outer->m_borderThickness;
 		while(count--)
