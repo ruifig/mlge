@@ -54,11 +54,6 @@ void MUIScene::removeWidget(MUIWidget& widget)
 	}
 }
 
-void MUIScene::onUIEvent(UIEvent& evt)
-{
-	m_rootWidget->onUIEvent(evt);
-}
-
 void MUIScene::deactivate()
 {
 	if (m_state < State::Active)
@@ -342,6 +337,25 @@ void UIManager::onProcessEvent(SDL_Event& evt)
 			//m_mouseCursor->setPosition({evt.motion.xrel, evt.motion.yrel});
 		}
 
+	}
+	else if (evt.type == SDL_MOUSEBUTTONDOWN)
+	{
+		CZ_LOG(Log, "Mouse button {} : {}", evt.button.button, evt.button.state);
+		if (evt.button.button == 1)
+		{
+			UIInternalEvent e;
+			e.type = UIInternalEvent::Type::Pressed;
+			e.pos = m_mouseCursor->getPosition();
+
+			for (auto it = m_eventStack.rbegin(); it != m_eventStack.rend(); it++)
+			{
+				(*it)->onUIInternalEvent(e);
+				if (e.consumed)
+				{
+					break;
+				}
+			}
+		}
 	}
 
 

@@ -12,6 +12,7 @@ namespace mlge
 
 
 class MUIScene;
+class UIManager;
 
 enum class UIUnitType
 {
@@ -182,13 +183,14 @@ class MUIWidget : public MObject, public Renderable, public RenderOperation
 	bool containsPoint(const Point& pt);
 
 	friend MUIScene;
+	friend UIManager;
 
 	/**
 	 * Processes an UI event.
 	 * 
 	 * If the widget takes care of the event, it should set `consumed` to true.
 	 */
-	virtual void onUIEvent(UIEvent& evt);
+	virtual void onUIInternalEvent(UIInternalEvent& evt);
 
 	//
 	// Renderable interface

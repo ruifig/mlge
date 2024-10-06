@@ -196,17 +196,14 @@ void MUIWidget::render(RenderGroup group)
 	#endif
 }
 
-void MUIWidget::onUIEvent(UIEvent& evt)
+void MUIWidget::onUIInternalEvent(UIInternalEvent& evt)
 {
-	if (!containsPoint(evt.pos))
-	{
-		return;
-	}
+	//if (!containsPoint(evt.pos))
+	//{
+	//	return;
+	//}
 
-	for(auto&& widget : m_children)
-	{
-		widget->onUIEvent(evt);
-	}
+	CZ_LOG(Verbose, "{}:{}", m_objectName, __FUNCTION__);
 }
 
 void MUIWidget::tick(float deltaSeconds)

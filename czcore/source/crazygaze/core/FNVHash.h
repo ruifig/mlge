@@ -14,6 +14,7 @@ namespace cz
 
 namespace hash
 {
+
 	template <typename S> struct fnv_internal;
 	template <typename S> struct fnv1a;
  
@@ -55,19 +56,20 @@ namespace hash
 		}
 	};
 
+	inline constexpr uint32_t operator "" _fnv1a_32 (const char* aString, const size_t aStrlen)
+	{
+		using hash_type = hash::fnv1a<uint32_t>;
+		return hash_type::hash(aString, aStrlen, hash_type::default_offset_basis);
+	}
+
+	inline constexpr uint64_t operator "" _fnv1a_64 (const char* aString, const size_t aStrlen)
+	{
+		using hash_type = hash::fnv1a<uint64_t>;
+		return hash_type::hash(aString, aStrlen, hash_type::default_offset_basis);
+	}
+
 } // namespace hash
  
-inline constexpr uint32_t operator "" _fnv1a_32 (const char* aString, const size_t aStrlen)
-{
-	using hash_type = hash::fnv1a<uint32_t>;
-	return hash_type::hash(aString, aStrlen, hash_type::default_offset_basis);
-}
-
-inline constexpr uint64_t operator "" _fnv1a_64 (const char* aString, const size_t aStrlen)
-{
-	using hash_type = hash::fnv1a<uint64_t>;
-	return hash_type::hash(aString, aStrlen, hash_type::default_offset_basis);
-}
 
 //
 // Runtime only hashing

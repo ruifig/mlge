@@ -383,7 +383,7 @@ class BaseStaticResourceRef : public DoublyLinked<BaseStaticResourceRef>
  *		inline static StaticResourceRef<MTTFFont> ms_fontRef = "fonts/Vera";
  *	};
  *
- * Note that this doesn't in itself doesn't load the resource. It's loaded on demand or for validation during launch time.
+ * Note that this by itself doesn't load the resource. It's loaded on demand or for validation during launch time.
  */
 template<typename T>
 class StaticResourceRef : public BaseStaticResourceRef

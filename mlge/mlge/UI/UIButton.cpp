@@ -77,6 +77,12 @@ void MUIButton::onMouseLeave()
 	Super::onMouseLeave();
 }
 
+void MUIButton::onUIInternalEvent(UIInternalEvent& evt)
+{
+	Super::onUIInternalEvent(evt);
+	evt.consumed = true;
+}
+
 
 } // namespace mlge
 

@@ -86,7 +86,6 @@ class MUIScene : public MObject
 
 	void addWidget(MUIWidget& widget);
 	void removeWidget(MUIWidget& widget);
-	void onUIEvent(UIEvent& evt);
 
 	UIManager* m_outer = nullptr;
 	State m_state = State::Disabled;
@@ -187,6 +186,8 @@ class UIManager
 
 	void addStyle(std::string_view name, const ObjectPtr<MUIStyle>& style);
 	ObjectPtr<MUIStyle> findStyle(std::string_view name);
+
+	MultiCastDelegate<const UIEvent&> uiEventDelegate;
 
   private:
 
