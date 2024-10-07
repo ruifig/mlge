@@ -45,17 +45,21 @@ void MUIStyleRendererFlat::render(const Rect& rect)
 
 	if (m_enabled)
 	{
+		
 		if (m_hover)
 		{
 			color = m_outer->m_hoverBkgColor;
 		}
-		else if (m_pressed)
-		{
-			color = m_outer->m_pressedBkgColor;
-		}
 		else
 		{
 			color = m_outer->m_enabledBkgColor;
+		}
+
+		// NOTE: This is intentionally NOT an "else if", because we can be "hover" and "pressing", in which case we use the
+		// "pressing" color
+		if (m_pressed)
+		{
+			color = m_outer->m_pressedBkgColor;
 		}
 	}
 

@@ -93,9 +93,17 @@ void MUIButton::onUIInternalEvent(UIInternalEvent& evt)
 	Super::onUIInternalEvent(evt);
 	evt.consumed = true;
 
-
-	if (evt.type == UIInternalEvent::Type::Click)
+	if (evt.type == UIInternalEvent::Type::Pressed)
 	{
+		m_styleRenderer->setPressed(true);
+	}
+	else if (evt.type == UIInternalEvent::Type::Released)
+	{
+		m_styleRenderer->setPressed(false);
+	}
+	else if (evt.type == UIInternalEvent::Type::Click)
+	{
+		m_styleRenderer->setPressed(false);
 		UIEvent e;
 		e.name = m_eventId.id;
 		e.hash = m_eventId.hash;

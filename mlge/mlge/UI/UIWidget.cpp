@@ -168,6 +168,7 @@ void MUIWidget::onMouseLeave()
 
 	m_mouseHover = false;
 	m_styleRenderer->setHover(false);
+	m_styleRenderer->setPressed(false);
 }
 
 void MUIWidget::updateAbsolutePosition() const

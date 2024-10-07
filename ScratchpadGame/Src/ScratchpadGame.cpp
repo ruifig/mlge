@@ -83,7 +83,7 @@ bool ScratchpadGame::init()
 					}	
 					else if (count == 3)
 					{
-						btn->temp_setPressed();
+						//btn->temp_setPressed();
 					}
 				}
 			}
