@@ -71,10 +71,11 @@ void GameControlBar::show()
 					if (Game::tryGet())
 					{
 						RenderTarget& renderTarget = Game::get().getRenderTarget();
-						if (renderTarget.getSize() != newResolution && renderTarget.setSize(newResolution))
+						if (renderTarget.getSize() != newResolution)
 						{
 							m_resolution = newResolution;
 							m_resolutionIdx = newIdx;
+							Game::get().onWindowResized(newResolution);
 						}
 					}
 					else
