@@ -78,7 +78,9 @@ void GameWindow::show()
 					if (m_resizeCountdown.applyTime <= now && renderTarget.getSize() != m_resizeCountdown.newSize)
 					{
 						CZ_LOG(Log, "Resizing render target to {}x{}", m_resizeCountdown.newSize.w, m_resizeCountdown.newSize.h);
-						renderTarget.setSize(Size::fromFloat(size.x, size.y));
+						Size renderTargetSize = Size::fromFloat(size.x, size.y);
+						renderTarget.setSize(renderTargetSize);
+						Game::get().windowResizedDelegate.broadcast(renderTargetSize);
 					}
 				}
 				else
@@ -98,6 +100,16 @@ void GameWindow::show()
 			{
 				CZ_LOG(Log, "Switching focus to game window");
 				Editor::get().setGameFocus(true);
+			}
+
+			// Simulate the Window Enter/Leave event while in Editor mode
+			{
+				bool hovered = ImGui::IsItemHovered(ImGuiHoveredFlags_None);
+				if (hovered != m_entered)
+				{
+					m_entered = hovered;
+					Game::get().onWindowEnter(m_entered);
+				}
 			}
 		}
 	}

@@ -225,6 +225,7 @@ UIManager::UIManager()
 
 	m_onProcessEventHandle = Engine::get().processEventDelegate.bind(this, &UIManager::onProcessEvent);
 	m_onWindowResizedHandle = Game::get().windowResizedDelegate.bind(this, &UIManager::onWindowResized);
+	m_onWindowEnterHandle = Game::get().windowEnterDelegate.bind(this, &UIManager::onWindowEnter);
 
 	m_mouseCursor = createObject<MUIMouseCursor>();
 
@@ -258,7 +259,7 @@ void UIManager::tick(float deltaSeconds)
 		if (scene->getState() >= MUIScene::State::Enabled)
 		{
 			scene->tick(deltaSeconds);
-			if (m_mouseFocus.has_value())
+			if (m_mouseWindowFocus)
 			{
 				scene->getRootWidget().processMouseCursor(m_mouseCursor->getPosition(), m_eventStack);
 			}
@@ -295,19 +296,47 @@ void UIManager::activateScene(std::string_view name)
 	}
 }
 
+void UIManager::onWindowEnter(bool entered)
+{
+	if (entered)
+	{
+		m_mouseWindowFocus = true;
+		m_mouseCursor->setEnabled(true);
+	}
+	else
+	{
+		m_mouseWindowFocus = false;
+		m_mouseCursor->setEnabled(false);
+
+		// Process all widgets considering a position outside the screen.
+		// This makes sure that the onMouseLeave methods are called when the mouse moves outside the window
+		{
+			m_eventStack.clear();
+			for (auto&& scene : m_scenes)
+			{
+				if (scene->getState() >= MUIScene::State::Enabled)
+				{
+					scene->getRootWidget().processMouseCursor({-1,-1}, m_eventStack);
+				}
+			}
+		}
+	}
+}
+
 void UIManager::onProcessEvent(SDL_Event& evt)
 {
 	if (evt.type == SDL_WINDOWEVENT)
 	{
+		#if 0
 		if (evt.window.event == SDL_WINDOWEVENT_ENTER)
 		{
-			CZ_LOG(Log, "Window ENTER");
+			CZ_LOG(VeryVerbose, "Window Enter");
 			m_mouseFocus = evt.window.windowID;
 			m_mouseCursor->setEnabled(true);
 		}
 		else if (evt.window.event == SDL_WINDOWEVENT_LEAVE)
 		{
-			CZ_LOG(Log, "Window LEAVE");
+			CZ_LOG(VeryVerbose, "Window Leave");
 			m_mouseFocus = std::nullopt;
 			m_mouseCursor->setEnabled(false);
 
@@ -324,6 +353,7 @@ void UIManager::onProcessEvent(SDL_Event& evt)
 				}
 			}
 		}
+		#endif
 	}
 	else if (evt.type == SDL_MOUSEMOTION)
 	{
@@ -335,7 +365,7 @@ void UIManager::onProcessEvent(SDL_Event& evt)
 			evt.motion.xrel, evt.motion.yrel);
 	#endif
 
-		if (m_mouseFocus.has_value())
+		if (m_mouseWindowFocus)
 		{
 			m_mouseCursor->setPosition({evt.motion.x, evt.motion.y});
 			//m_mouseCursor->setPosition({evt.motion.xrel, evt.motion.yrel});
@@ -351,24 +381,25 @@ void UIManager::onProcessEvent(SDL_Event& evt)
 			e.type = type;
 			e.pos = pos;
 
-			CZ_LOG(Verbose, "EventStack:{}", m_eventStack.size());
+			#if 0
+			CZ_LOG(VeryVerbose, "EventStack:{}", m_eventStack.size());
 			for (auto w : m_eventStack)
 			{
-				CZ_LOG(Verbose, "    {}", w->getObjectName());
+				CZ_LOG(VeryVerbose, "    {}", w->getObjectName());
 			}
+			#endif
 
 			for (auto it = m_eventStack.rbegin(); it != m_eventStack.rend(); it++)
 			{
 				(*it)->onUIInternalEvent(e);
 				if (e.consumed)
 				{
-					CZ_LOG(Verbose, "CONSUMED");
 					break;
 				}
 			}
 		};
 
-		CZ_LOG(Log, "Mouse: button {}, state {}, numclicks {}", evt.button.button, evt.button.state, evt.button.clicks);
+		//CZ_LOG(Log, "Mouse: button {}, state {}, numclicks {}", evt.button.button, evt.button.state, evt.button.clicks);
 		if (evt.button.button == 1 && m_eventStack.size())
 		{
 			UIInternalEvent::Type type =

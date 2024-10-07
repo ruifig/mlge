@@ -21,7 +21,7 @@ class GameWindow : public Window
 	virtual void show();
 
 	bool m_resizable = false;
-
+	bool m_entered = false;
 
 	// This struct is used to help detect when the user stops resizing the window.
 	// Instead of recreating the render target constantly, we detect when the size doesn't change for a while. After that timeout

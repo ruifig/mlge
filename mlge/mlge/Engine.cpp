@@ -101,6 +101,23 @@ void Engine::processEvents()
 					Game::get().requestShutdown();
 				}
 			}
+
+			// #RVF : Once I add support for multiple games in the editor, these needs to be forward to the right Game instance
+			// In short, from the windowID, it should get the game instance, and broadcast the event of that one. 
+			if (gIsGame && Game::tryGet())
+			{
+				if (evt.window.event == SDL_WINDOWEVENT_ENTER)
+				{
+					Game::get().onWindowEnter(true);
+				}
+				if (evt.window.event == SDL_WINDOWEVENT_LEAVE)
+				{
+					Game::get().onWindowEnter(false);
+				}
+				else if (evt.window.event == SDL_WINDOWEVENT_RESIZED)
+				{
+				}
+			}
 		}
 	}
 

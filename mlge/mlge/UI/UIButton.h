@@ -39,7 +39,7 @@ class MUIButton : public MUIWidget
 	virtual void onMouseEnter() override;
 	virtual void onMouseLeave() override;
 
-	virtual void onUIInternalEvent(UIInternalEvent& evt) override;
+	virtual bool onClicked(const Point& pos) override;
 
 	ObjectPtr<MTTFFont> m_font;
 	TextRenderer<true> m_textRenderer;

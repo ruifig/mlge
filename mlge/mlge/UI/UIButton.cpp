@@ -88,29 +88,25 @@ void MUIButton::onMouseLeave()
 	Super::onMouseLeave();
 }
 
-void MUIButton::onUIInternalEvent(UIInternalEvent& evt)
+bool MUIButton::onClicked(const Point& pos)
 {
-	Super::onUIInternalEvent(evt);
-	evt.consumed = true;
+	Super::onClicked(pos);
 
-	if (evt.type == UIInternalEvent::Type::Pressed)
+	if (m_eventId.id.size())
 	{
-		m_styleRenderer->setPressed(true);
-	}
-	else if (evt.type == UIInternalEvent::Type::Released)
-	{
-		m_styleRenderer->setPressed(false);
-	}
-	else if (evt.type == UIInternalEvent::Type::Click)
-	{
-		m_styleRenderer->setPressed(false);
 		UIEvent e;
 		e.name = m_eventId.id;
 		e.hash = m_eventId.hash;
 		e.source = this;
-		CZ_LOG(Verbose, "{}: CLICK", m_objectName);
+		CZ_LOG(Verbose, "{}: Clicked", m_objectName);
 		m_scene->getManager().uiEventDelegate.broadcast(e);
 	}
+	else
+	{
+		CZ_LOG(Warning, "{}: Clicked but no event ID set", m_objectName);
+	}
+
+	return true;
 }
 
 

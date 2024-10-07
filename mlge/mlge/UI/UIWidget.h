@@ -181,6 +181,24 @@ class MUIWidget : public MObject, public Renderable, public RenderOperation
 	void updateAbsolutePosition() const;
 	bool containsPoint(const Point& pt);
 
+	/**
+	 * These are called internally when UIWidget processes events and figures out there is that kind of event.
+	 * Derived classes should return true if they handled the click or false if not. 
+	 * Returning true means the event is considered handled and it won't be passed to other widgets.
+	 */
+	virtual bool onPressed(const Point& /*pos*/)
+	{
+		return false;
+	}
+	virtual bool onReleased(const Point& /*pos*/)
+	{
+		return false;
+	}
+	virtual bool onClicked(const Point& /*pos*/)
+	{
+		return false;
+	}
+
 	friend MUIScene;
 	friend UIManager;
 

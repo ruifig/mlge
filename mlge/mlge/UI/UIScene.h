@@ -196,8 +196,7 @@ class UIManager
 
 	ObjectPtr<MUIMouseCursor> m_mouseCursor;
 
-	// WindowID with mouse focus. If not set, then mouse is not focus on the window
-	std::optional<uint32_t> m_mouseFocus;
+	bool m_mouseWindowFocus = false;
 	MUIScene* m_activeScene = nullptr;
 
 	// When we detect a press, we remember what widget we started the press with, so that when we release, we only raise
@@ -211,6 +210,9 @@ class UIManager
 
 	DelegateHandle m_onWindowResizedHandle;
 	void onWindowResized(Size newSize);
+
+	DelegateHandle m_onWindowEnterHandle;
+	void onWindowEnter(bool entered);
 };
 
 } // namespace mlge

@@ -125,6 +125,18 @@ class Game : public Singleton<Game>
 		m_hasFocus = focus;
 	}
 
+	virtual void onWindowEnter(bool entered)
+	{
+		CZ_LOG(VeryVerbose, "Window {}", entered ? "Enter" : "Leave");
+		Game::get().windowEnterDelegate.broadcast(entered);
+	}
+
+	virtual void onWindowResized(const Size& size)
+	{
+		CZ_LOG(VeryVerbose, "Window resized to {}*{}", size.w, size.h);
+		Game::get().windowResizedDelegate.broadcast(size);
+	}
+
 	/**
 	 * Gets the current level
 	 * If a level is not set yet, it creates an empty "Level" instance
@@ -172,6 +184,8 @@ class Game : public Singleton<Game>
 	}
 
 	MultiCastDelegate<Size> windowResizedDelegate;
+	// Broadcast when the mouse enters or leaves the window
+	MultiCastDelegate<bool> windowEnterDelegate;
 
   protected:
 
