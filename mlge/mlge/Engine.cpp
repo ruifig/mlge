@@ -102,8 +102,8 @@ void Engine::processEvents()
 				}
 			}
 
-			// #RVF : Once I add support for multiple games in the editor, these needs to be forward to the right Game instance
-			// In short, from the windowID, it should get the game instance, and broadcast the event of that one. 
+			// #RVF : Once I add support for multiple games in the editor, these needs to be forward these to the right Game
+			// instance. In short, from the windowID, it should get the game instance, and broadcast the event of that one. 
 			if (gIsGame && Game::tryGet())
 			{
 				if (evt.window.event == SDL_WINDOWEVENT_ENTER)
@@ -116,6 +116,7 @@ void Engine::processEvents()
 				}
 				else if (evt.window.event == SDL_WINDOWEVENT_RESIZED)
 				{
+					Game::get().onWindowResized({evt.window.data1, evt.window.data2});
 				}
 			}
 		}

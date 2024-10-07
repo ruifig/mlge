@@ -42,17 +42,8 @@ Game::~Game()
 	CZ_LOG(Log, "Game destroyed");
 }
 
-void Game::processEvent(SDL_Event& evt)
+void Game::processEvent(SDL_Event& /*evt*/)
 {
-	if (evt.type == SDL_WINDOWEVENT)
-	{
-		if (gIsGame && evt.window.event == SDL_WINDOWEVENT_RESIZED)
-		{
-			Size size(evt.window.data1, evt.window.data2);
-			getRenderTarget().setSize(size);
-			windowResizedDelegate.broadcast(size);
-		}
-	}
 }
 
 const std::string& Game::getBuildInfo() const
@@ -97,6 +88,19 @@ void Game::onEndFrame()
 {
 	Renderer::get().setTarget(m_renderTarget.get());
 	Renderer::get().clearTarget(m_bkgColour);
+}
+
+void Game::onWindowEnter(bool entered)
+{
+	CZ_LOG(VeryVerbose, "Window {}", entered ? "Enter" : "Leave");
+	Game::get().windowEnterDelegate.broadcast(entered);
+}
+
+void Game::onWindowResized(const Size& size)
+{
+	CZ_LOG(VeryVerbose, "Window resized to {}*{}", size.w, size.h);
+	getRenderTarget().setSize(size);
+	windowResizedDelegate.broadcast(size);
 }
 
 void Game::gameClockTick()

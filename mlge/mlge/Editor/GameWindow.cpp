@@ -77,10 +77,8 @@ void GameWindow::show()
 				{
 					if (m_resizeCountdown.applyTime <= now && renderTarget.getSize() != m_resizeCountdown.newSize)
 					{
-						CZ_LOG(Log, "Resizing render target to {}x{}", m_resizeCountdown.newSize.w, m_resizeCountdown.newSize.h);
 						Size renderTargetSize = Size::fromFloat(size.x, size.y);
-						renderTarget.setSize(renderTargetSize);
-						Game::get().windowResizedDelegate.broadcast(renderTargetSize);
+						Game::get().onWindowResized(renderTargetSize);
 					}
 				}
 				else

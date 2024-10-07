@@ -125,17 +125,14 @@ class Game : public Singleton<Game>
 		m_hasFocus = focus;
 	}
 
-	virtual void onWindowEnter(bool entered)
-	{
-		CZ_LOG(VeryVerbose, "Window {}", entered ? "Enter" : "Leave");
-		Game::get().windowEnterDelegate.broadcast(entered);
-	}
-
-	virtual void onWindowResized(const Size& size)
-	{
-		CZ_LOG(VeryVerbose, "Window resized to {}*{}", size.w, size.h);
-		Game::get().windowResizedDelegate.broadcast(size);
-	}
+	/**
+	 * Called when the mouse cursor enters or leaves the window
+	 */
+	virtual void onWindowEnter(bool entered);
+	/**
+	 * Called when the window is resized
+	 */
+	virtual void onWindowResized(const Size& size);
 
 	/**
 	 * Gets the current level
