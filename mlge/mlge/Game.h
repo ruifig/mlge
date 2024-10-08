@@ -5,7 +5,6 @@
 #include "mlge/GameClock.h"
 #include "mlge/Delegates.h"
 #include "mlge/Paths.h"
-#include "mlge/UI/UIScene.h"
 
 #include "crazygaze/core/Singleton.h"
 
@@ -45,6 +44,7 @@ namespace mlge
 
 class MLevel;
 class RenderTarget;
+class UIManager;
 
 class Game : public Singleton<Game>
 {
@@ -118,14 +118,6 @@ class Game : public Singleton<Game>
 	virtual void shutdown();
 
 	/**
-	 * Called by the engine when the game gets or looses focus
-	 */
-	virtual void onFocusChanged(bool focus)
-	{
-		m_hasFocus = focus;
-	}
-
-	/**
 	 * Called when the mouse cursor enters or leaves the window
 	 */
 	virtual void onWindowEnter(bool entered);
@@ -133,6 +125,12 @@ class Game : public Singleton<Game>
 	 * Called when the window is resized
 	 */
 	virtual void onWindowResized(const Size& size);
+
+
+	/**
+	 * Called when the window gains or loses focus
+	 */
+	virtual void onWindowFocus(bool focus);
 
 	/**
 	 * Gets the current level
@@ -183,6 +181,22 @@ class Game : public Singleton<Game>
 	MultiCastDelegate<Size> windowResizedDelegate;
 	// Broadcast when the mouse enters or leaves the window
 	MultiCastDelegate<bool> windowEnterDelegate;
+	MultiCastDelegate<bool> windowFocus;
+
+	struct MouseMotionEvent
+	{
+		// Mouse position within the window
+		Point pos;
+		// Relative mouse movement
+		Point rel;
+	};
+
+	MultiCastDelegate<const MouseMotionEvent&> mouseMotionDelegate;
+
+	/**
+	 * Called when a mouse movement occurs
+	 */
+	virtual void onMouseMotion(const MouseMotionEvent& evt);
 
   protected:
 
@@ -193,7 +207,7 @@ class Game : public Singleton<Game>
 
 	Color m_bkgColour = Color::Black;
 
-	UIManager m_ui;
+	std::unique_ptr<UIManager> m_ui;
   private:
 
 	friend class Engine;

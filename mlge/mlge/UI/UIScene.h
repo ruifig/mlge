@@ -4,6 +4,7 @@
 #include "mlge/UI/UIWidget.h"
 #include "mlge/Delegates.h"
 #include "mlge/Resource/SpriteSheet.h"
+#include "mlge/Game.h"
 
 namespace mlge
 {
@@ -112,10 +113,7 @@ class MUIMouseCursor : public MObject , public Renderable, public RenderOperatio
 
 	friend UIManager;
 
-	virtual void setEnabled(bool enabled)
-	{
-		m_enabled = enabled;
-	}
+	virtual void setEnabled(bool enabled);
 
 	const Point& getPosition() const
 	{
@@ -138,7 +136,7 @@ class MUIMouseCursor : public MObject , public Renderable, public RenderOperatio
 
 	bool m_enabled = false;
 	Point m_pos = {};
-	inline static StaticResourceRef<MSpriteSheet> ms_spriteSheetRef = "cursors/default";
+	inline static StaticResourceRef<MSpriteSheet> ms_spriteSheetRef = "cursors/crosshairs";
 	ObjectPtr<MSpriteSheet> m_spriteSheet;
 };
 MLGE_OBJECT_END(MUIMouseCursor)
@@ -176,7 +174,6 @@ class UIManager
 	void showMouseCursor(bool show)
 	{
 		m_mouseCursor->setEnabled(show);
-		SDL_ShowCursor(SDL_DISABLE);
 	}
 
 	/**
@@ -213,6 +210,13 @@ class UIManager
 
 	DelegateHandle m_onWindowEnterHandle;
 	void onWindowEnter(bool entered);
+
+	DelegateHandle m_onWindowFocusHandle;
+	void onWindowFocus(bool focus);
+
+	DelegateHandle m_onMouseMotionHandle;
+	void onMouseMotion(const Game::MouseMotionEvent& evt);
+
 };
 
 } // namespace mlge

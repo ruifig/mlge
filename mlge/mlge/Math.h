@@ -53,6 +53,20 @@ struct Point : public SDL_Point
 	 * Returns a rectangle centered at the point position, and with the specified width and height
 	 */
 	Rect createRect(int width, int height) const;
+
+	Point& operator+=(const Point& other)
+	{
+		x += other.x;
+		y += other.y;
+		return *this;
+	}
+
+	Point& operator-=(const Point& other)
+	{
+		x -= other.x;
+		y -= other.y;
+		return *this;
+	}
 };
 
 constexpr bool operator==(const Point& lhs, const Point& rhs)

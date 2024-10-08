@@ -39,8 +39,8 @@ bool ScratchpadGame::init()
 
 	m_bkgColour = Color(0x0A, 0x11, 0x72, 255);
 
-	MUIScene* scene = m_ui.createScene<MUIScene>("main").lock().get();
-	m_ui.activateScene("main");
+	MUIScene* scene = m_ui->createScene<MUIScene>("main").lock().get();
+	m_ui->activateScene("main");
 
 	{
 		if (MUILabel* l1 = scene->getRootWidget().createChild<MUILabel>().lock().get())
@@ -92,7 +92,7 @@ bool ScratchpadGame::init()
 
 	}
 
-	m_ui.showMouseCursor(true);
+	m_ui->showMouseCursor(true);
 
 	return true;
 }

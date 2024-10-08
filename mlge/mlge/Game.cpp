@@ -3,6 +3,7 @@
 #include "mlge/Config.h"
 #include "mlge/Render/RenderTarget.h"
 #include "mlge/Render/Renderer.h"
+#include "mlge/UI/UIScene.h"
 
 #include "crazygaze/core/Logging.h"
 #include "timestamp.h"
@@ -35,6 +36,8 @@ Game::Game(std::string_view name)
 
 	m_buildInfo = std::format("{} v{}, GitHash:{}, Build type:{}, Build timestamp:{} UTC",
 		m_name, "0.0.0", git_short_hash_str, buildType, build_time_str);
+
+	m_ui = std::make_unique<UIManager>();
 }
 
 Game::~Game()
@@ -103,6 +106,19 @@ void Game::onWindowResized(const Size& size)
 	windowResizedDelegate.broadcast(size);
 }
 
+void Game::onWindowFocus(bool focus)
+{
+	CZ_LOG(VeryVerbose, "Window {} focus", focus ? "gained" : "lost");
+	m_hasFocus = focus;
+	windowFocus.broadcast(focus);
+}
+
+void Game::onMouseMotion(const MouseMotionEvent& evt)
+{
+	//CZ_LOG(VeryVerbose, "MouseMotionEvent: Pos=({},{}) , Rel=({},{})", evt.pos.x, evt.pos.y, evt.rel.x, evt.rel.y);
+	mouseMotionDelegate.broadcast(evt);
+}
+
 void Game::gameClockTick()
 {
 	MLGE_PROFILE_SCOPE(mlge_Game_gameClockTick);
@@ -122,7 +138,7 @@ void Game::tick(float deltaSeconds)
 		m_level->tick(deltaSeconds);
 	}
 
-	m_ui.tick(deltaSeconds);
+	m_ui->tick(deltaSeconds);
 }
 
 void Game::requestShutdown()

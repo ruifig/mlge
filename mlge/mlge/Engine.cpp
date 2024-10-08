@@ -119,7 +119,25 @@ void Engine::processEvents()
 					Game::get().onWindowResized({evt.window.data1, evt.window.data2});
 				}
 			}
+
+			if (gIsGame && evt.window.event == SDL_WINDOWEVENT_FOCUS_GAINED)
+			{
+				Game::get().onWindowFocus(true);
+			}
+			else if (gIsGame && evt.window.event == SDL_WINDOWEVENT_FOCUS_LOST)
+			{
+				Game::get().onWindowFocus(false);
+			}
+
 		}
+		else if (gIsGame && evt.type == SDL_MOUSEMOTION)
+		{
+			Game::MouseMotionEvent gameEvt;
+			gameEvt.pos = {evt.motion.x, evt.motion.y};
+			gameEvt.rel = {evt.motion.xrel, evt.motion.yrel};
+			Game::get().onMouseMotion(gameEvt);
+		}
+
 	}
 
 }

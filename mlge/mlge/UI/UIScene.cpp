@@ -141,6 +141,15 @@ void MUIScene::setState(State newState)
 	}
 }
 
+void MUIMouseCursor::setEnabled(bool enabled)
+{
+	m_enabled = enabled;
+	if (enabled)
+	{
+		SDL_ShowCursor(SDL_DISABLE);
+	}
+}
+
 void MUIMouseCursor::setPosition(Point pos)
 {
 	m_pos = pos;
@@ -202,6 +211,7 @@ void MUIMouseCursor::updateRenderQueue()
 
 void MUIMouseCursor::render(RenderGroup /*group*/)
 {
+	//CZ_LOG(Log, "Mouse render");
 	renderSprite(m_spriteSheet->getSprite(0), m_pos);
 }
 
@@ -226,6 +236,8 @@ UIManager::UIManager()
 	m_onProcessEventHandle = Engine::get().processEventDelegate.bind(this, &UIManager::onProcessEvent);
 	m_onWindowResizedHandle = Game::get().windowResizedDelegate.bind(this, &UIManager::onWindowResized);
 	m_onWindowEnterHandle = Game::get().windowEnterDelegate.bind(this, &UIManager::onWindowEnter);
+	m_onMouseMotionHandle = Game::get().mouseMotionDelegate.bind(this, &UIManager::onMouseMotion);
+	m_onWindowFocusHandle = Game::get().windowFocus.bind(this, &UIManager::onWindowFocus);
 
 	m_mouseCursor = createObject<MUIMouseCursor>();
 
@@ -323,56 +335,31 @@ void UIManager::onWindowEnter(bool entered)
 	}
 }
 
+void UIManager::onWindowResized(Size /*newSize*/)
+{
+	for (const ObjectPtr<MUIScene>& scene : m_scenes)
+	{
+		scene->getRootWidget().onWindowResized();
+	}
+}
+
+void UIManager::onMouseMotion(const Game::MouseMotionEvent& evt)
+{
+	if (m_mouseWindowFocus)
+	{
+		m_mouseCursor->setPosition({evt.pos.x, evt.pos.y});
+		//m_mouseCursor->setPosition({evt.motion.xrel, evt.motion.yrel});
+	}
+}
+
+void UIManager::onWindowFocus(bool focus)
+{
+	m_mouseCursor->setEnabled(focus);
+}
+
 void UIManager::onProcessEvent(SDL_Event& evt)
 {
-	if (evt.type == SDL_WINDOWEVENT)
-	{
-		#if 0
-		if (evt.window.event == SDL_WINDOWEVENT_ENTER)
-		{
-			CZ_LOG(VeryVerbose, "Window Enter");
-			m_mouseFocus = evt.window.windowID;
-			m_mouseCursor->setEnabled(true);
-		}
-		else if (evt.window.event == SDL_WINDOWEVENT_LEAVE)
-		{
-			CZ_LOG(VeryVerbose, "Window Leave");
-			m_mouseFocus = std::nullopt;
-			m_mouseCursor->setEnabled(false);
-
-			// Process all widgets considering a position outside the screen.
-			// This makes sure that the onMouseLeave methods are called when the mouse moves outside the window
-			{
-				m_eventStack.clear();
-				for (auto&& scene : m_scenes)
-				{
-					if (scene->getState() >= MUIScene::State::Enabled)
-					{
-						scene->getRootWidget().processMouseCursor({-1,-1}, m_eventStack);
-					}
-				}
-			}
-		}
-		#endif
-	}
-	else if (evt.type == SDL_MOUSEMOTION)
-	{
-	#if 0
-		CZ_LOG(Log, "mousemotion: timestamp={}, state={}, x={}, y={}, xrel={}, yrel={}",
-			evt.motion.timestamp,
-			evt.motion.state,
-			evt.motion.x, evt.motion.y,
-			evt.motion.xrel, evt.motion.yrel);
-	#endif
-
-		if (m_mouseWindowFocus)
-		{
-			m_mouseCursor->setPosition({evt.motion.x, evt.motion.y});
-			//m_mouseCursor->setPosition({evt.motion.xrel, evt.motion.yrel});
-		}
-
-	}
-	else if (evt.type == SDL_MOUSEBUTTONDOWN || evt.type == SDL_MOUSEBUTTONUP)
+	if (evt.type == SDL_MOUSEBUTTONDOWN || evt.type == SDL_MOUSEBUTTONUP)
 	{
 		
 		auto raiseEvent = [this](UIInternalEvent::Type type, const Point& pos)
@@ -426,55 +413,6 @@ void UIManager::onProcessEvent(SDL_Event& evt)
 			}
 
 		}
-	}
-
-
-#if 0
-
-	if (evt.type == SDL_KEYDOWN)
-	{
-		if (evt.key.keysym.scancode == SDL_SCANCODE_LEFT)
-		{
-			if (m_rotationOn != -1)
-			{
-				m_angularSpeed = 0;
-			}
-			m_rotationOn = -1;
-		}
-		else if (evt.key.keysym.scancode == SDL_SCANCODE_RIGHT)
-		{
-			if (m_rotationOn != +1)
-			{
-				m_angularSpeed = 0;
-			}
-			m_rotationOn = +1;
-		}
-		else if (evt.key.keysym.scancode == SDL_SCANCODE_UP)
-		{
-			m_engineOn = true;
-		}
-
-	}
-	else if (evt.type == SDL_KEYUP)
-	{
-		if (evt.key.keysym.scancode == SDL_SCANCODE_LEFT || evt.key.keysym.scancode == SDL_SCANCODE_RIGHT)
-		{
-			m_rotationOn = 0;
-		}
-		else if (evt.key.keysym.scancode == SDL_SCANCODE_UP)
-		{
-			m_engineOn = false;
-		}
-	}
-#endif
-}
-
-
-void UIManager::onWindowResized(Size /*newSize*/)
-{
-	for (const ObjectPtr<MUIScene>& scene : m_scenes)
-	{
-		scene->getRootWidget().onWindowResized();
 	}
 }
 
