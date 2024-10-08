@@ -18,14 +18,14 @@ bool RenderQueue::init()
 	return true;
 }
 
-void RenderQueue::addRenderComponent(MRenderComponent& component)
+void RenderQueue::addRenderable(Renderable& renderable)
 {
-	m_renderables.emplace(&component);
+	m_renderables.emplace(&renderable);
 }
 
-void RenderQueue::removeRenderComponent(MRenderComponent& component)
+void RenderQueue::removeRenderable(Renderable& renderable)
 {
-	m_renderables.erase(&component);
+	m_renderables.erase(&renderable);
 }
 
 void RenderQueue::addOp(RenderOperation& op, RenderGroup group)
@@ -42,7 +42,7 @@ void RenderQueue::render()
 
 	{
 		MLGE_PROFILE_SCOPE(mlge_RenderQueue_updateRenderQueue);
-		for(MRenderComponent* renderable : m_renderables)
+		for(Renderable* renderable : m_renderables)
 		{
 			renderable->updateRenderQueue();
 		}
@@ -65,60 +65,6 @@ void RenderQueue::render()
 			group.ops.clear();
 		}
 	}
-}
-
-//
-// MRenderComponent
-//
-
-MRenderComponent::~MRenderComponent()
-{
-	// At this point the component should not be attached to any actor
-	CZ_CHECK(m_owner==nullptr);
-}
-
-void MRenderComponent::setRenderGroup(
-	RenderGroup renderGroup, RenderGroup
-#if MLGE_DEBUG
-	debugRenderGroup
-#endif
-)
-{
-	m_renderGroup = renderGroup;
-#if MLGE_DEBUG
-	m_debugRenderGroup = debugRenderGroup;
-#endif
-}
-
-void MRenderComponent::setRelativePosition(const FPoint& position)
-{
-	m_relativePos = position;
-}
-
-Point MRenderComponent::calcFinalPosition() const
-{
-	return (m_relativePos + m_owner->getPosition()).toPoint();
-}
-
-void MRenderComponent::onAttached()
-{
-	Super::onAttached();
-	RenderQueue::get().addRenderComponent(*this);
-}
-
-void MRenderComponent::onDetached()
-{
-	if (m_owner)
-	{
-		RenderQueue::get().removeRenderComponent(*this);
-	}
-
-	Super::onDetached();
-}
-
-
-void MRenderComponent::updateRenderQueue()
-{
 }
 
 } // namespace mlge

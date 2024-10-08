@@ -2,22 +2,140 @@
 
 	"resources": [
 		{
-			"type": "TTFFont",
-			"name": "fonts/VeraMono",
-			"file": "ttf-bitstream-vera-1.10/VeraMono.ttf",
-			"defaultPtSize" :  12,
-			"renderMethod": "blended",
-			"bold" : true
-
+			"type": "SpriteSheet",
+			"name": "cursors/default",
+			"file": "cursors/white_cursor.png",
+			"cellWidth": 12,
+			"cellHeight": 20,
+			"originX": 0,
+			"originY": 0
+		},
+		{
+			"type": "SpriteSheet",
+			"name": "cursors/crosshairs",
+			"file": "cursors/crosshairs.png",
+			"cellWidth": 32,
+			"cellHeight": 32,
+			"originX": 16,
+			"originY": 16
 		},
 		{
 			"type": "TTFFont",
-			"name": "fonts/Vera",
-			"file": "ttf-bitstream-vera-1.10/Vera.ttf",
+			"name": "fonts/UbuntuMono-Regular",
+			"file": "fonts/UbuntuMono/UbuntuMono-Regular.ttf",
+			"defaultPtSize" :  14,
+			"renderMethod" : "blended",
+			"bold" : false
+		},
+		{
+			"type": "TTFFont",
+			"name": "fonts/UbuntuMono-Bold",
+			"file": "fonts/UbuntuMono/UbuntuMono-Bold.ttf",
+			"defaultPtSize" :  14,
+			"renderMethod" : "blended",
+			"bold" : false
+		},
+		{
+			"type": "TTFFont",
+			"name": "fonts/Poppins-Regular",
+			"file": "fonts/Poppins/Poppins-Regular.ttf",
 			"defaultPtSize" :  12,
 			"renderMethod" : "blended",
-			"bold" : true
+			"bold" : false
+		},
+		{
+			"type": "TTFFont",
+			"name": "fonts/Poppins-Medium",
+			"file": "fonts/Poppins/Poppins-Medium.ttf",
+			"defaultPtSize" :  12,
+			"renderMethod" : "blended",
+			"bold" : false
+		},
+		{
+			"type": "TTFFont",
+			"name": "fonts/Poppins-SemiBold",
+			"file": "fonts/Poppins/Poppins-SemiBold.ttf",
+			"defaultPtSize" :  12,
+			"renderMethod" : "blended",
+			"bold" : false
+		},
+		{
+			"type": "TTFFont",
+			"name": "fonts/Poppins-Bold",
+			"file": "fonts/Poppins/Poppins-Bold.ttf",
+			"defaultPtSize" :  12,
+			"renderMethod" : "blended",
+			"bold" : false
+		},
+		{
+			"type": "TTFFont",
+			"name": "fonts/Poppins-ExtraBold",
+			"file": "fonts/Poppins/Poppins-ExtraBold.ttf",
+			"defaultPtSize" :  12,
+			"renderMethod" : "blended",
+			"bold" : false
+		},
+		{
+			"type": "TTFFont",
+			"name": "fonts/RobotoCondensed-Regular",
+			"file": "fonts/RobotoCondensed/static/RobotoCondensed-Regular.ttf",
+			"defaultPtSize": 12,
+			"renderMethod": "blended",
+			"bold": false
+		},
+		{
+			"type": "TTFFont",
+			"name": "fonts/RobotoCondensed-Medium",
+			"file": "fonts/RobotoCondensed/static/RobotoCondensed-Medium.ttf",
+			"defaultPtSize": 12,
+			"renderMethod": "blended",
+			"bold": false
+		},
+		{
+			"type": "TTFFont",
+			"name": "fonts/RobotoCondensed-SemiBold",
+			"file": "fonts/RobotoCondensed/static/RobotoCondensed-SemiBold.ttf",
+			"defaultPtSize": 12,
+			"renderMethod": "blended",
+			"bold": false
+		},
+		{
+			"type": "TTFFont",
+			"name": "fonts/RobotoCondensed-Bold",
+			"file": "fonts/RobotoCondensed/static/RobotoCondensed-Bold.ttf",
+			"defaultPtSize": 12,
+			"renderMethod": "blended",
+			"bold": false
+		},
+
+		{
+			"type": "TTFFont",
+			"name": "fonts/ProggyClean",
+			"description" : "Pixel based. Should always be used at size 16",
+			"file": "fonts/Proggy/ProggyClean.ttf",
+			"defaultPtSize": 16,
+			"renderMethod": "solid",
+			"bold": false
+		},
+		{
+			"type": "TTFFont",
+			"name": "fonts/ProggySmall",
+			"description" : "Pixel based. Should always be used at size 16",
+			"file": "fonts/Proggy/ProggySmall.ttf",
+			"defaultPtSize": 16,
+			"renderMethod": "solid",
+			"bold": false
+		},
+		{
+			"type": "TTFFont",
+			"name": "fonts/ProggyTiny",
+			"description" : "Pixel based. Should always be used at size 16",
+			"file": "fonts/Proggy/ProggyTiny.ttf",
+			"defaultPtSize": 16,
+			"renderMethod": "solid",
+			"bold": false
 		}
+
 	]
 }
 

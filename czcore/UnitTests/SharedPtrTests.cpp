@@ -15,19 +15,18 @@ struct Base
 	}
 
 	inline static int alive = 0;
-	int a=100;
+	int a = 100;
 };
 
 struct Foo : Base
 {
-	int b=200;
+	int b = 200;
 };
 
 struct Bar : Foo
 {
-	int c=300;
+	int c = 300;
 };
-
 
 struct MyDeleter
 {
@@ -49,7 +48,7 @@ struct SharedPtrTests
 {
 
 	/**
-	 * Calls std::make_shared or cz::MakeShared depending on the smart pointer type being tested
+	 * Calls std::make_shared or cz::makeShared depending on the smart pointer type being tested
 	 */
 	template<typename T, typename... Args>
 	static SmartPtrType<T> createSharedPtr(Args&& ... args)
@@ -701,10 +700,32 @@ struct SharedPtrTests
 	}
 };
 
-
 TEST_CASE("SharedPtr", "[SmartPointers]")
 {
 	SharedPtrTests<std::shared_ptr, std::weak_ptr>::all();
 	SharedPtrTests<SharedPtr, WeakPtr>::all();
 }
+
+// Test if the memory is being cleared when the object is destroyed but the memory not yet deallocated
+#if CZ_SHAREDPTR_CLEARMEM
+TEST_CASE("Memory clear", "[SmartPointers]")
+{
+	auto bar = makeShared<Bar>();
+	WeakPtr<Bar> wbar = bar;
+	Bar* ptr = bar.get();
+
+	CHECK(ptr->a == 100);
+	CHECK(ptr->b == 200);
+	CHECK(ptr->c == 300);
+
+	// Destroy the object, but don't deallocated the memory yet (Because the WeakPtr is still alive)
+	bar.reset();
+
+	// The object has been destroyed, but we still have a raw pointer and we test if the memory has been cleared.
+	CHECK(ptr->a == 0xDDDDDDDD);
+	CHECK(ptr->b == 0xDDDDDDDD);
+	CHECK(ptr->c == 0xDDDDDDDD);
+}
+
+#endif
 

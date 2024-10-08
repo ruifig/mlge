@@ -31,18 +31,7 @@ void MFlipbookComponent::updateRenderQueue()
 
 void MFlipbookComponent::render(RenderGroup /*group*/)
 {
-	SDL_Renderer* sdlRenderer = Renderer::get().getSDLRenderer();
-
-	const Sprite& sprite = m_flipbook->getSpriteAndUpdatePosition(m_pos);
-	Rect dstRect = sprite.rect;
-	dstRect.move(calcFinalPosition());
-
-	SDL_RenderCopyEx(sdlRenderer, sprite.texture,
-		&sprite.rect, &dstRect,
-		m_owner->getRotation(),
-		nullptr, // Rotation center
-		SDL_FLIP_NONE
-		);
+	m_pos.render(calcFinalPosition(), m_owner->getRotation(), 1.0f);
 }
 
 

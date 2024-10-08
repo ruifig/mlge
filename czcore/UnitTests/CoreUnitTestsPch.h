@@ -3,6 +3,11 @@
 #include "crazygaze/core/CorePch.h" 
 
 #include "crazygaze/core/SharedPtr.h"
+#include "crazygaze/core/FNVHash.h"
+
+#include <future>
+#include <chrono>
+#include <type_traits>
 
 CZ_THIRD_PARTY_INCLUDES_START
 #include <catch2/catch_all.hpp>

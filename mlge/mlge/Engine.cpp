@@ -5,6 +5,7 @@
 #include "mlge/Render/DXDebugLayer.h"
 #include "mlge/Resource/Resource.h"
 #include "mlge/Config.h"
+#include "mlge/PerformanceStats.h"
 
 #include "crazygaze/core/ScopeGuard.h"
 #include "crazygaze/core/CommandLine.h"
@@ -81,7 +82,7 @@ void Engine::processEvents()
 
 		if (Game::tryGet())
 		{
-			Game::get().processInput(evt);
+			Game::get().processEvent(evt);
 		}
 
 		if (evt.type == SDL_QUIT)
@@ -91,15 +92,52 @@ void Engine::processEvents()
 				Game::get().requestShutdown();
 			}
 		}
-		else if (
-			evt.type == SDL_WINDOWEVENT && evt.window.event == SDL_WINDOWEVENT_CLOSE &&
-			evt.window.windowID == SDL_GetWindowID(Renderer::get().getSDLWindow()))
+		else if (evt.type == SDL_WINDOWEVENT)
 		{
-			if (Game::tryGet())
+			if (evt.window.event == SDL_WINDOWEVENT_CLOSE && evt.window.windowID == SDL_GetWindowID(Renderer::get().getSDLWindow()))
 			{
-				Game::get().requestShutdown();
+				if (Game::tryGet())
+				{
+					Game::get().requestShutdown();
+				}
 			}
+
+			// #RVF : Once I add support for multiple games in the editor, these needs to be forward these to the right Game
+			// instance. In short, from the windowID, it should get the game instance, and broadcast the event of that one. 
+			if (gIsGame && Game::tryGet())
+			{
+				if (evt.window.event == SDL_WINDOWEVENT_ENTER)
+				{
+					Game::get().onWindowEnter(true);
+				}
+				if (evt.window.event == SDL_WINDOWEVENT_LEAVE)
+				{
+					Game::get().onWindowEnter(false);
+				}
+				else if (evt.window.event == SDL_WINDOWEVENT_RESIZED)
+				{
+					Game::get().onWindowResized({evt.window.data1, evt.window.data2});
+				}
+			}
+
+			if (gIsGame && evt.window.event == SDL_WINDOWEVENT_FOCUS_GAINED)
+			{
+				Game::get().onWindowFocus(true);
+			}
+			else if (gIsGame && evt.window.event == SDL_WINDOWEVENT_FOCUS_LOST)
+			{
+				Game::get().onWindowFocus(false);
+			}
+
 		}
+		else if (gIsGame && evt.type == SDL_MOUSEMOTION)
+		{
+			Game::MouseMotionEvent gameEvt;
+			gameEvt.pos = {evt.motion.x, evt.motion.y};
+			gameEvt.rel = {evt.motion.xrel, evt.motion.yrel};
+			Game::get().onMouseMotion(gameEvt);
+		}
+
 	}
 
 }
@@ -205,28 +243,34 @@ namespace
 
 		void tick()
 		{
-			if (m_maxFps == 0)
-			{
-				return;
-			}
-
 			m_tsA = Clock::now();
-			std::chrono::duration<double, std::milli> workTime = m_tsA - m_tsB;
+			m_lastWorkTime = m_tsA - m_tsB;
 
-			if (workTime.count() < m_msPerFrame)
+			if (m_maxFps != 0)
 			{
-				std::chrono::duration<double, std::milli> delta_ms(m_msPerFrame - workTime.count());
-				auto delta_ms_duration = std::chrono::duration_cast<std::chrono::milliseconds>(delta_ms);
-				std::this_thread::sleep_for(delta_ms_duration);
+				if (m_lastWorkTime.count() < m_msPerFrame)
+				{
+					std::chrono::duration<double, std::milli> delta_ms(m_msPerFrame - m_lastWorkTime.count());
+					auto delta_ms_duration = std::chrono::duration_cast<std::chrono::milliseconds>(delta_ms);
+					std::this_thread::sleep_for(delta_ms_duration);
+				}
 			}
 
 			m_tsB = Clock::now();
+		}
+
+		float getLastWorkTimeMs() const
+		{
+			return static_cast<float>(m_lastWorkTime.count());
 		}
 
 	  private:
 
 		Clock::time_point m_tsA;
 		Clock::time_point m_tsB;
+
+		// Time spent over the last frame, excluding the frame limting
+		std::chrono::duration<double, std::milli> m_lastWorkTime = {};
 
 		int m_maxFps;
 		float m_msPerFrame;
@@ -246,6 +290,8 @@ bool Engine::run()
 
 	int maxFps = Config::get().getValueOrDefault("Engine", "maxfps", 0);
 	FPSLimiter fpsLimiter(maxFps);
+	PerformanceStats performanceStats;
+	performanceStats.setEnabled(true);
 
 	do
 	{
@@ -255,9 +301,16 @@ bool Engine::run()
 
 		fpsLimiter.tick();
 
-		Renderer::get().beginFrame();
-		processEvents();
-		tick();
+		{
+			performanceStats.stat_Tick_Start();
+
+			Renderer::get().beginFrame();
+			processEvents();
+			tick();
+
+			performanceStats.stat_Tick_End();
+		}
+
 		Renderer::get().render();
 
 		// We initiate shutdown if both the game and editor want to shutdown
@@ -272,6 +325,8 @@ bool Engine::run()
 			shuttingDown &= editor::Editor::get().isShuttingDown();
 		}
 	#endif
+
+		performanceStats.tick();
 
 	} while(shuttingDown == false);
 

@@ -49,11 +49,41 @@ ObjectPtr<MResource> MSpriteSheetDefinition::create() const
 			Sprite sprite;
 			sprite.rect = Rect({col * m_cellWidth, row * m_cellHeight}, m_cellWidth, m_cellHeight);
 			sprite.texture = res->m_texture.get();
+			sprite.origin = {m_originX, m_originY};
 			res->m_sprites.push_back(sprite);
 		}
 	}
 
 	return res;
+}
+
+void MSpriteSheetDefinition::to_json(nlohmann::json& j) const
+{
+	Super::to_json(j);
+	j["cellWidth"] = m_cellWidth;
+	j["cellHeight"] = m_cellHeight;
+	j["originX"] = m_originX;
+	j["originY"] = m_originY;
+}
+
+void MSpriteSheetDefinition::from_json(const nlohmann::json& j)
+{
+	Super::from_json(j);
+	j.at("cellWidth").get_to(m_cellWidth);
+	j.at("cellHeight").get_to(m_cellHeight);
+
+	m_originX = m_cellWidth / 2;
+	m_originY = m_cellHeight / 2;
+
+	if (j.count("originX") != 0)
+	{
+		j.at("originX").get_to(m_originX);
+	}
+
+	if (j.count("originY") != 0)
+	{
+		j.at("originY").get_to(m_originY);
+	}
 }
 
 
@@ -72,4 +102,26 @@ std::unique_ptr<editor::BaseResourceWindow> MSpriteSheetDefinition::createEditWi
 }
 #endif
 
+void renderSprite(const Sprite& sprite, const Point& pos, float angleDegrees, float scale)
+{
+	SDL_Renderer* sdlRenderer = Renderer::get().getSDLRenderer();
+
+	Rect dstRect = {
+		0, 0,
+		static_cast<int>(static_cast<float>(sprite.rect.w) * scale), static_cast<int>(static_cast<float>(sprite.rect.h) * scale)};
+
+	dstRect.move(pos);
+
+	FPoint offset = {static_cast<float>(sprite.origin.x) * scale, static_cast<float>(sprite.origin.y) * scale};
+	dstRect.translate(static_cast<int>(-offset.x), static_cast<int>(-offset.y));
+
+	SDL_RenderCopyEx(sdlRenderer, sprite.texture,
+		&sprite.rect, &dstRect,
+		angleDegrees,
+		nullptr, // Rotation center
+		SDL_FLIP_NONE
+		);
+}
+
 } // namespace mlge
+

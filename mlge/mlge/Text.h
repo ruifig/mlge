@@ -1,7 +1,7 @@
 #pragma once
 
 #include "mlge/Resource/TTFFont.h"
-#include "mlge/Render/RenderQueue.h"
+#include "mlge/RenderComponent.h"
 
 namespace mlge
 {
@@ -57,10 +57,10 @@ class TextRendererBase<true>
 
 
 /**
- * Renders an UTF8 string
+ * Renders an UTF8 string.
  *
- * The object is lightweight with the intention of being created on the spot. This makes it possible to setup the common parameters once,
- * then making the calls to print text
+ * The object is lightweight with the intention of being created on the spot. This makes it possible to setup the common
+ * parameters once, then making the calls to print text.
  *
  * @param CacheText If false, then it doesn't cache the text or it's size.
  *	If true, then a `setText` method exists to set the text and a `render()` exists to render it. This is more efficient since
@@ -97,6 +97,11 @@ struct TextRenderer : public TextRendererBase<CacheText>
 	{
 		m_settings.setPtSize(ptsize);
 		return *this;
+	}
+
+	int getPtSize() const
+	{
+		return m_settings.ptsize;
 	}
 
 	int getFontHeight()
@@ -153,6 +158,15 @@ struct TextRenderer : public TextRendererBase<CacheText>
 		return m_settings.calcTextSize(str);
 	}
 
+	/**
+	 * Returns the text that will be displayed
+	 * This is function is only available when CacheText == true
+	 */
+	template<typename R = const std::string&>
+	auto getText() const -> std::enable_if_t<CacheText==true, R>
+	{
+		return this->m_text;
+	}
 
 	/**
 	 * Calculates the text dimensions of the cached text.
@@ -197,7 +211,7 @@ struct TextRenderer : public TextRendererBase<CacheText>
 			return *this;
 		}
 
-		m_settings.renderImpl(text, m_settings.calculateTextSize(text));
+		m_settings.renderImpl(text, m_settings.calcTextSize(text));
 		return *this;
 	}
 
@@ -238,7 +252,10 @@ struct TextRenderer : public TextRendererBase<CacheText>
 MLGE_OBJECT_START(MTextRenderComponent, MRenderComponent, "An actor component that can render text")
 /**
  * Component that can be attached to an Actor to render text
- * The text is displayed at a position relative to the owning Actor's position.
+ * The text is displayed at the component's final position, and the alignment is done relative to that position.
+ *
+ * For example, if the component's final position is {0,100}, and alignment is {HAlign::Left, VAlign::Center}, the text will be
+ * aligned on the left size of {0,100}, therefore outside the viewing area and not visible at all.
  * 
  * See `setRelativePosition`.
  */
@@ -248,7 +265,7 @@ class MTextRenderComponent : public MRenderComponent,  public RenderOperation
 
   public:
 
-	virtual bool defaultConstruct() override;
+	virtual bool preConstruct() override;
 	bool construct(std::string text);
 
 	/**
@@ -257,9 +274,22 @@ class MTextRenderComponent : public MRenderComponent,  public RenderOperation
 	void setFont(ObjectPtr<MTTFFont> font);
 
 	/**
+	 * Gets the font that is being used
+	 */
+	const ObjectPtr<MTTFFont>& getFont() const
+	{
+		return m_font;
+	}
+
+	/**
 	 * Sets the font size to use
 	 */
 	void setPtSize(int ptsize);
+
+	/**
+	 * Gets the font size being used
+	 */
+	int getPtSize() const;
 
 	/**
 	 * Returns the height in pixels for the selected font and ptsize
@@ -270,6 +300,14 @@ class MTextRenderComponent : public MRenderComponent,  public RenderOperation
 	 * Set the text to render
 	 */
 	void setText(std::string_view text);
+
+	/**
+	 * Returns the text
+	 */
+	const std::string& getText() const
+	{
+		return m_textRenderer.getText();
+	}
 
 	/**
 	 * Sets the text alignment

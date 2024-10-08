@@ -296,6 +296,8 @@ bool Editor::stopGame()
 	}
 }
 
+
+// #RVF : Remove this if not used
 void Editor::setGameFocus(bool state)
 {
 	if (!m_game)
@@ -305,10 +307,15 @@ void Editor::setGameFocus(bool state)
 
 	if (state != m_game->hasFocus())
 	{
-		m_game->onFocusChanged(state);
+		m_game->onWindowFocus(state);
+
+		if (!state)
+		{
+			SDL_ShowCursor(true);
+		}
 	}
 
-	SDL_SetWindowGrab(Renderer::get().getSDLWindow(), state ? SDL_TRUE : SDL_FALSE);
+	//SDL_SetWindowGrab(Renderer::get().getSDLWindow(), state ? SDL_TRUE : SDL_FALSE);
 }
 
 void Editor::addWindow(std::unique_ptr<Window> window)

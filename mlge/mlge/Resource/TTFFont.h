@@ -29,6 +29,11 @@ class MTTFFontDefinition : public MResourceDefinition
 		return m_bold;
 	}
 
+	int getDefaultSize() const
+	{
+		return m_defaultPtSize;
+	}
+
   protected:
 
 	virtual void to_json(nlohmann::json& j) const override;
@@ -88,6 +93,10 @@ class MTTFFont : public MResource
 		{
 		}
 
+		~Instance()
+		{
+		}
+
 		/** If set, then the font is monospaced and the value is the glyphs "advance" */
 		std::optional<int> monospaced = {};
 
@@ -129,7 +138,6 @@ class MTTFFont : public MResource
 		bool loadGlyphs(const MTTFFontDefinition& def, std::string_view str);
 	};
 
-	MTTFFont(const MTTFFontDefinition* definition);
 	~MTTFFont();
 
 	const MTTFFontDefinition& getDefinition()

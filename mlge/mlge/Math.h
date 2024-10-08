@@ -53,6 +53,20 @@ struct Point : public SDL_Point
 	 * Returns a rectangle centered at the point position, and with the specified width and height
 	 */
 	Rect createRect(int width, int height) const;
+
+	Point& operator+=(const Point& other)
+	{
+		x += other.x;
+		y += other.y;
+		return *this;
+	}
+
+	Point& operator-=(const Point& other)
+	{
+		x -= other.x;
+		y -= other.y;
+		return *this;
+	}
 };
 
 constexpr bool operator==(const Point& lhs, const Point& rhs)
@@ -142,9 +156,25 @@ struct Rect : public SDL_Rect
 		this->h = height;
 	}
 
+	constexpr Rect(const Point& origin, const Size& size)
+	{
+		this->x = origin.x;
+		this->y = origin.y;
+		this->w = size.w;
+		this->h = size.h;
+	}
+
 	constexpr Size size() const
 	{
 		return {w, h};
+	}
+
+	/**
+	 * Returns true if the rectangle has no area
+	 */
+	bool isEmpty() const
+	{
+		return w <= 0 && h <= 0;
 	}
 
 	constexpr int left() const
@@ -257,6 +287,22 @@ struct Rect : public SDL_Rect
 		this->y = pos.y;
 	}
 
+	/**
+	 * Expands rectangle by the specified ammount.
+	 */
+	constexpr void expand(int delta)
+	{
+		x -= delta;
+		y -= delta;
+		w += (delta*2);
+		h += (delta*2);
+	}
+
+	constexpr void contract(int delta)
+	{
+		expand(-delta);
+	}
+
 	#if 0
 	/**
 	 * Convert to a SDL_Rect
@@ -305,6 +351,7 @@ struct Color : public SDL_Color
 
 	static Color Red;
 	static Color Green;
+	static Color DarkGreen;
 	static Color Blue;
 	static Color White;
 	static Color Black;

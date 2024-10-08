@@ -1,0 +1,34 @@
+{
+	"resources": [
+		{
+			"type": "SpriteSheet",
+			"name": "SpriteSheet/Fighter_Move",
+			"file": "../../../TestGame/Assets/Ships/Fighter/Move.png",
+			"cellWidth": 192,
+			"cellHeight": 192,
+			"originX": 96,
+			"originY": 96
+		},
+		{
+			"type": "SpriteSheet",
+			"name": "SpriteSheet/Fighter_Destroyed",
+			"file": "../../../TestGame/Assets/Ships/Fighter/Destroyed.png",
+			"cellWidth": 192,
+			"cellHeight": 192
+		},
+		{
+			"type": "Flipbook",
+			"name": "Flipbook/Fighter_Move",
+			"spriteSheet": "SpriteSheet/Fighter_Move",
+			"fps":  10
+		},
+		{
+			"type": "Flipbook",
+			"name": "Flipbook/Fighter_Destroyed",
+			"spriteSheet": "SpriteSheet/Fighter_Destroyed",
+			"fps":  10
+		}
+
+	]
+}
+

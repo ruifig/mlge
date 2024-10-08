@@ -9,6 +9,7 @@ set(ALL_FILES
 	"crazygaze/core/CorePreSetup.h"
 	"crazygaze/core/File.cpp"
 	"crazygaze/core/File.h"
+	"crazygaze/core/FNVHash.h"
 	"crazygaze/core/IniFile.cpp"
 	"crazygaze/core/IniFile.h"
 	"crazygaze/core/Logging.cpp"
@@ -27,6 +28,14 @@ set(ALL_FILES
 	"crazygaze/core/StringUtils.cpp"
 	"crazygaze/core/StringUtils.h"
 )
+
+if(WIN32)
+	list(APPEND ALL_FILES
+		"crazygaze/core/Windows/Win32Event.cpp"
+		"crazygaze/core/Windows/Win32Event.h"
+	)
+endif()
+
 
 add_library(czcore STATIC ${ALL_FILES})
 
