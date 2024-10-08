@@ -23,7 +23,7 @@ void GameWindow::onProcessEvent(SDL_Event& evt)
 	}
 
 	// Simulate a mouse motion event.
-	// This takes into account where the game is being rendered, so the event the game receives looks like it's it's running
+	// This takes into account where the game is being rendered, so the event the game receives looks like it's running
 	// in actual game mode and not in the editor
 	if (evt.type == SDL_MOUSEMOTION)
 	{
