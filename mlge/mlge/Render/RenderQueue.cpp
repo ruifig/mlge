@@ -2,6 +2,7 @@
 #include "mlge/Config.h"
 #include "mlge/Actor.h"
 #include "mlge/Profiler.h"
+#include "mlge/Game.h"
 
 namespace mlge
 {
@@ -10,12 +11,15 @@ namespace mlge
 // RenderQueue
 //
 
-bool RenderQueue::init()
+RenderQueue::RenderQueue()
 {
 	bool overlayDebug = Config::get().getValueOrDefault("Engine", "renderqueue_overlaydebug", false);
 	m_groups[static_cast<int>(RenderGroup::OverlayDebug)].active = overlayDebug;
+}
 
-	return true;
+RenderQueue& RenderQueue::get()
+{
+	return Game::get().getRenderQueue();
 }
 
 void RenderQueue::addRenderable(Renderable& renderable)

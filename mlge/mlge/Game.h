@@ -45,8 +45,17 @@ namespace mlge
 class MLevel;
 class RenderTarget;
 class UIManager;
+class RenderQueue;
+class PerformanceStats;
 
-class Game : public Singleton<Game>
+#if MLGE_EDITOR
+namespace editor
+{
+	class Editor;
+}
+#endif
+
+class Game
 {
   public:
 
@@ -54,6 +63,25 @@ class Game : public Singleton<Game>
 	virtual ~Game();
 
 	CZ_DELETE_COPY_AND_MOVE(Game)
+
+	/**
+	 * Gets the game instance currently being processed.
+	 * It asserts if there isn't an instance.
+	 * If the caller code needs to check if an instance exists, it should use tryGet instead.
+	 */
+	static Game& get()
+	{
+		CZ_CHECK(ms_currentInstance);
+		return *ms_currentInstance;
+	}
+
+	/**
+	 * Tries getting the game instance currently being processed
+	 */
+	static Game* tryGet()
+	{
+		return ms_currentInstance;
+	}
 
 	/**
 	 * Returns the game name
@@ -198,19 +226,45 @@ class Game : public Singleton<Game>
 	 */
 	virtual void onMouseMotion(const MouseMotionEvent& evt);
 
+	RenderQueue& getRenderQueue()
+	{
+		return *m_renderQueue;
+	}
+
+	PerformanceStats& getPerformanceStats()
+	{
+		return *m_performanceStats;
+	}
+
   protected:
+
+	// The order is important, because we need a specific destruction order (the C++ standards guarantees the objects are
+	// destroyed in the reverse order)
+	std::unique_ptr<RenderQueue> m_renderQueue;
+	std::unique_ptr<UIManager> m_ui;
+	std::unique_ptr<PerformanceStats> m_performanceStats;
 
 	/**
 	 * How long the game loop will wait for the shutdown before forcing a close
 	 */
 	inline static constexpr float ms_maxShutdownTimeSec = 5.0f;
 
+	inline static Game* ms_currentInstance = nullptr;
+
 	Color m_bkgColour = Color::Black;
 
-	std::unique_ptr<UIManager> m_ui;
   private:
 
 	friend class Engine;
+
+	#if MLGE_EDITOR
+	friend class mlge::editor::Editor;
+	#endif
+
+	static void setCurrentInstance(Game* instance)
+	{
+		ms_currentInstance = instance;
+	}
 
 	/**
 	 * Called by the engine loop to tick the game using the game clock. Ends up calling tick(float deltaSeconds)

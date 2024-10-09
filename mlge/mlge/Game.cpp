@@ -4,6 +4,7 @@
 #include "mlge/Render/RenderTarget.h"
 #include "mlge/Render/Renderer.h"
 #include "mlge/UI/UIScene.h"
+#include "mlge/PerformanceStats.h"
 
 #include "crazygaze/core/Logging.h"
 #include "timestamp.h"
@@ -36,8 +37,6 @@ Game::Game(std::string_view name)
 
 	m_buildInfo = std::format("{} v{}, GitHash:{}, Build type:{}, Build timestamp:{} UTC",
 		m_name, "0.0.0", git_short_hash_str, buildType, build_time_str);
-
-	m_ui = std::make_unique<UIManager>();
 }
 
 Game::~Game()
@@ -56,6 +55,11 @@ const std::string& Game::getBuildInfo() const
 
 bool Game::init()
 {
+	m_renderQueue = std::make_unique<RenderQueue>();
+	m_ui = std::make_unique<UIManager>();
+	m_performanceStats = std::make_unique<PerformanceStats>();
+	m_performanceStats->setEnabled(true);
+
 	Size windowSize;
 	windowSize.w = Config::get().getValueOrDefault<int>("Engine", "resx", 0);
 	windowSize.h = Config::get().getValueOrDefault<int>("Engine", "resy", 0);

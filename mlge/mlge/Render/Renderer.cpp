@@ -132,11 +132,24 @@ void Renderer::draw()
 {
 	MLGE_PROFILE_SCOPE(mlge_Renderer_draw);
 
-	PerformanceStats::get().stat_Draw_Start();
+	if (Game::tryGet())
+	{
+		PerformanceStats::get().stat_Draw_Start();
+	}
+
 	endFrameDelegate.broadcast();
-	RenderQueue::get().render();
+
+	if (Game::tryGet())
+	{
+		RenderQueue::get().render();
+	}
+
 	gameRenderFinishedDelegate.broadcast();
-	PerformanceStats::get().stat_Draw_End();
+
+	if (Game::tryGet())
+	{
+		PerformanceStats::get().stat_Draw_End();
+	}
 }
 
 void Renderer::render()
@@ -147,9 +160,18 @@ void Renderer::render()
 
 	{
 		MLGE_PROFILE_SCOPE(mlge_Renderer_SDL_RenderPresent);
-		PerformanceStats::get().stat_Present_Start();
+
+		if (Game::tryGet())
+		{
+			PerformanceStats::get().stat_Present_Start();
+		}
+
 		SDL_RenderPresent(m_sdlRenderer.get());
-		PerformanceStats::get().stat_Present_End();
+
+		if (Game::tryGet())
+		{
+			PerformanceStats::get().stat_Present_End();
+		}
 	}
 
 	m_frameNumber++;

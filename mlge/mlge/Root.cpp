@@ -2,7 +2,6 @@
 
 #include "mlge/Resource/Resource.h"
 #include "mlge/Render/Renderer.h"
-#include "mlge/Render/RenderQueue.h"
 #include "mlge/Profiler.h"
 #include "mlge/Config.h"
 
@@ -27,7 +26,6 @@ struct RootImpl : public Root
 	Profiler profiler;
 	Renderer renderer;
 	ResourceManager resourceManager;
-	RenderQueue renderQueue;
 #if MLGE_EDITOR
 	// Even for an editor build, we use a unique_ptr, so it only gets initialized if `-game` is not specified in the command line
 	std::unique_ptr<editor::Editor> editor;
@@ -52,11 +50,6 @@ struct RootImpl : public Root
 		}
 
 		if (!resourceManager.init())
-		{
-			return false;
-		}
-
-		if (!renderQueue.init())
 		{
 			return false;
 		}

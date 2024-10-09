@@ -145,6 +145,7 @@ void Editor::onTick()
 		{
 			m_game->shutdown();
 			m_game.reset();
+			Game::get().setCurrentInstance(nullptr);
 			m_stopDeadline.reset();
 		}
 	}
@@ -256,6 +257,7 @@ bool Editor::startGame()
 	}
 
 	auto game = createGame();
+	Game::setCurrentInstance(game.get());
 	if (game->init())
 	{
 		m_game = std::move(game);

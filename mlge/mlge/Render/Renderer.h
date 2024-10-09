@@ -39,9 +39,7 @@ class Renderer : public Singleton<Renderer>
 	void beginFrame();
 
 	/**
-	 * Starts the rendering operations
-	 * This actually transfers control to the render thread and blocks until the render thread has done all it needs with
-	 * the shared state. This means that from the game's perspective, everything is still single threaded.
+	 * Starts the rendering operations.
 	 */
 	void render();
 

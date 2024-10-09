@@ -90,7 +90,7 @@ namespace mlge
 	}
 
 
-class PerformanceStats : public Singleton<PerformanceStats>, public Renderable, public RenderOperation
+class PerformanceStats : public Renderable, public RenderOperation
 {
   public:
 
@@ -110,6 +110,11 @@ class PerformanceStats : public Singleton<PerformanceStats>, public Renderable, 
 	void stat_Draw_End()      { m_drawCalculator.end(); }
 	void stat_Present_Start() { m_presentCalculator.start(); }
 	void stat_Present_End()   { m_presentCalculator.end(); }
+
+	/**
+	 * Get the instance associated with the game instance currently being processed
+	 */
+	static PerformanceStats& get();
 
   private:
 

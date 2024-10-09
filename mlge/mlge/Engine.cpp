@@ -181,6 +181,7 @@ bool Engine::init(int argc, char* argv[])
 	if (gIsGame)
 	{
 		m_game = createGame().release();
+		Game::setCurrentInstance(m_game);
 		if (!Game::get().init())
 		{
 			return false;
@@ -290,8 +291,6 @@ bool Engine::run()
 
 	int maxFps = Config::get().getValueOrDefault("Engine", "maxfps", 0);
 	FPSLimiter fpsLimiter(maxFps);
-	PerformanceStats performanceStats;
-	performanceStats.setEnabled(true);
 
 	do
 	{
@@ -302,13 +301,19 @@ bool Engine::run()
 		fpsLimiter.tick();
 
 		{
-			performanceStats.stat_Tick_Start();
+			if (Game::tryGet())
+			{
+				PerformanceStats::get().stat_Tick_Start();
+			}
 
 			Renderer::get().beginFrame();
 			processEvents();
 			tick();
 
-			performanceStats.stat_Tick_End();
+			if (Game::tryGet())
+			{
+				PerformanceStats::get().stat_Tick_End();
+			}
 		}
 
 		Renderer::get().render();
@@ -326,7 +331,11 @@ bool Engine::run()
 		}
 	#endif
 
-		performanceStats.tick();
+
+		if (Game::tryGet())
+		{
+			PerformanceStats::get().tick();
+		}
 
 	} while(shuttingDown == false);
 

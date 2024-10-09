@@ -190,7 +190,7 @@ bool APlayerShip::preConstruct()
 	m_txt->setText("Hello");
 	m_txt->setFont(m_font);
 	m_txt->setAlignment(HAlign::Center, VAlign::Center);
-	m_txt->setRelativePosition({-m_move->getSprite(0).rect.w / 4.0f, -m_move->getSprite(0).rect.h / 4.0f});
+	m_txt->setRelativePosition({static_cast<float>(-m_move->getSprite(0).rect.w) / 4.0f, -static_cast<float>(-m_move->getSprite(0).rect.h) / 4.0f});
 
 	return true;
 }

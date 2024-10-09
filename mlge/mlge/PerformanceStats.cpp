@@ -6,6 +6,11 @@
 namespace mlge
 {
 
+PerformanceStats& PerformanceStats::get()
+{
+	return Game::get().getPerformanceStats();
+}
+
 PerformanceStats::PerformanceStats()
 {
 	m_font = ms_fontRef.getResource();
