@@ -49,8 +49,36 @@ void GameControlBar::show()
 			atoi(std::string(str, str.find('x')+1).c_str())};
 	};
 
+	float spacing = ImGui::GetStyle().ItemInnerSpacing.x;
+
+	// Game count
+	{
+		ImGui::Text("Game count:");
+		ImGui::SameLine();
+		if (ImGui::ArrowButton("##left", ImGuiDir_Left))
+		{
+			if (m_numGames > 1)
+			{
+				m_numGames--;
+			}
+		}
+		ImGui::SameLine(0.0f, spacing);
+		ImGui::Text("%u", m_numGames);
+		ImGui::SameLine(0.0f, spacing);
+		if (ImGui::ArrowButton("##right", ImGuiDir_Right))
+		{
+			if (m_numGames < 10)
+			{
+				m_numGames++;
+			}
+		}
+
+	}
+
 	// Resolution selection
 	{
+		ImGui::SameLine(0.0f, spacing);
+
 		const char* combo_preview_value =
 			m_resolutions[static_cast<size_t>(m_resolutionIdx)].c_str();  // Pass in the preview value visible before opening the combo (it could be anything)
 
@@ -68,15 +96,18 @@ void GameControlBar::show()
 					Config::get().setGameValue("Engine", "resy", newResolution.h);
 					Config::get().save();
 
-					if (Game::tryGet())
+					if (Editor::get().getGamesCount())
 					{
-						RenderTarget& renderTarget = Game::get().getRenderTarget();
-						if (renderTarget.getSize() != newResolution)
+						Editor::get().visitGames([&](Game& game)
 						{
-							m_resolution = newResolution;
-							m_resolutionIdx = newIdx;
-							Game::get().onWindowResized(newResolution);
-						}
+							RenderTarget& renderTarget = game.getRenderTarget();
+							if (renderTarget.getSize() != newResolution)
+							{
+								m_resolution = newResolution;
+								m_resolutionIdx = newIdx;
+								game.onWindowResized(newResolution);
+							}
+						});
 					}
 					else
 					{
@@ -97,9 +128,7 @@ void GameControlBar::show()
 
 	// Play stop buttons
 	{
-		bool hasGame = Game::tryGet()==nullptr ? false : true;
-
-		if (hasGame)
+		if (Editor::get().getGamesCount() > 0)
 		{
 			ImGui::SameLine();
 			if (ImGui::Button("Stop"))
@@ -107,12 +136,15 @@ void GameControlBar::show()
 				Editor::get().stopGame();
 			}
 
-			if (Game::get().isGameClockPaused())
+			if (Editor::get().getGameAtIndex(0).isGameClockPaused())
 			{
 				ImGui::SameLine();
 				if (ImGui::Button("Resume"))
 				{
-					Game::get().resumeGameClock();
+					Editor::get().visitGames([&](Game& game)
+					{
+						game.resumeGameClock();
+					});
 				}
 			}
 			else
@@ -120,7 +152,10 @@ void GameControlBar::show()
 				ImGui::SameLine();
 				if (ImGui::Button("Pause"))
 				{
-					Game::get().pauseGameClock();
+					Editor::get().visitGames([&](Game& game)
+					{
+						game.pauseGameClock();
+					});
 				}
 			}
 		}
@@ -129,13 +164,13 @@ void GameControlBar::show()
 			ImGui::SameLine();
 			if (ImGui::Button("Play"))
 			{
-				Editor::get().startGame();
+				Editor::get().startGame(m_numGames);
 			}
 		}
 	}
 
 	// Tip about how to get out of game focus
-	if (Editor::get().gameHasFocus())
+	if (Editor::get().anyGameHasFocus())
 	{
 		ImGui::SameLine();
 		ImGui::Text("Press ALT to release focus from game");

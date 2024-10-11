@@ -13,6 +13,7 @@ class Window
 	
 	CZ_DELETE_COPY_AND_MOVE(Window);
 	Window(bool& p_open, const std::string& title);
+	Window(const std::string& title);
 	Window();
 	virtual ~Window();
 

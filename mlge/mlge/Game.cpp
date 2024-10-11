@@ -44,10 +44,6 @@ Game::~Game()
 	CZ_LOG(Log, "Game destroyed");
 }
 
-void Game::processEvent(SDL_Event& /*evt*/)
-{
-}
-
 const std::string& Game::getBuildInfo() const
 {
 	return m_buildInfo;

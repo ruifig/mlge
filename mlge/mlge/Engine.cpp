@@ -19,11 +19,7 @@ namespace mlge
 
 Engine::~Engine()
 {
-	if (m_game)
-	{
-		delete m_game;
-		m_game = nullptr;
-	}
+	m_games.clear();
 
 	// Explicit delete, so everything gets destroyed before shutting down SDL
 	m_root = nullptr;
@@ -80,14 +76,9 @@ void Engine::processEvents()
 	{
 		processEventDelegate.broadcast(evt);
 
-		if (Game::tryGet())
-		{
-			Game::get().processEvent(evt);
-		}
-
 		if (evt.type == SDL_QUIT)
 		{
-			if (Game::tryGet())
+			if (gIsGame && Game::tryGet())
 			{
 				Game::get().requestShutdown();
 			}
@@ -96,14 +87,12 @@ void Engine::processEvents()
 		{
 			if (evt.window.event == SDL_WINDOWEVENT_CLOSE && evt.window.windowID == SDL_GetWindowID(Renderer::get().getSDLWindow()))
 			{
-				if (Game::tryGet())
+				if (gIsGame && Game::tryGet())
 				{
 					Game::get().requestShutdown();
 				}
 			}
 
-			// #RVF : Once I add support for multiple games in the editor, these needs to be forward these to the right Game
-			// instance. In short, from the windowID, it should get the game instance, and broadcast the event of that one. 
 			if (gIsGame && Game::tryGet())
 			{
 				if (evt.window.event == SDL_WINDOWEVENT_ENTER)
@@ -180,8 +169,8 @@ bool Engine::init(int argc, char* argv[])
 
 	if (gIsGame)
 	{
-		m_game = createGame().release();
-		Game::setCurrentInstance(m_game);
+		m_games.push_back(createGame());
+		Game::setCurrentInstance(static_cast<Game*>(m_games.back().get()));
 		if (!Game::get().init())
 		{
 			return false;

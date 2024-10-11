@@ -13,6 +13,7 @@
 #include "backends/imgui_impl_sdl2.h"
 #include "backends/imgui_impl_sdlrenderer2.h"
 
+#include "crazygaze/core/Algorithm.h"
 
 namespace mlge
 {
@@ -25,6 +26,15 @@ namespace mlge::editor
 
 Editor::~Editor()
 {
+	visitGamesInfo([](GameInfo& info)
+	{
+		if (info.game)
+		{
+			MLGE_SET_CURRENT_GAME_INSTANCE(info.game.get());
+			info.game = nullptr;
+		}
+	});
+
 	m_imGuiLayer.shutdown();
 	m_editorRenderTarget.reset();
 }
@@ -52,6 +62,16 @@ bool Editor::init()
 	SDL_SetWindowTitle(Renderer::get().getSDLWindow(), (std::string(getGameFolderName()) + " Editor").c_str());
 
 	return true;
+}
+
+void Editor::requestShutdown()
+{
+	m_shuttingDown = true;
+
+	visitGamesInfo([](GameInfo& info)
+	{
+		info.game->requestShutdown();
+	});
 }
 
 void Editor::onBeginFrame()
@@ -92,10 +112,13 @@ void Editor::onProcessEvent(SDL_Event& evt)
 	{
 		if (evt.key.keysym.scancode == SDL_SCANCODE_LALT)
 		{
-			if (evt.type == SDL_KEYUP && gameHasFocus())
+			if (evt.type == SDL_KEYUP)
 			{
-				CZ_LOG(Log, "Removing focus from game window");
-				setGameFocus(false);
+				if (anyGameHasFocus())
+				{
+					CZ_LOG(Log, "Removing focus from game windows");
+					setGameFocus(nullptr, false);
+				}
 			}
 		}
 	}
@@ -138,17 +161,31 @@ void Editor::onTick()
 		}
 	}
 
-	if (m_stopDeadline.has_value())
 	{
-		// If the game finished shutting down, or we reached the deadline, then run the final shutdown step
-		if (m_game->isShutdownFinished() || std::chrono::high_resolution_clock::now() > m_stopDeadline.value())
+
+		visitGamesInfo([](GameInfo& info)
 		{
-			m_game->shutdown();
-			m_game.reset();
-			Game::get().setCurrentInstance(nullptr);
-			m_stopDeadline.reset();
-		}
+			MLGE_SET_CURRENT_GAME_INSTANCE(info.game.get());
+
+			if (info.stopDeadline.has_value())
+			{
+				// If the game finished shutting down, or we reached the deadline, then run the final shutdown step
+				if (info.game->isShutdownFinished() || std::chrono::high_resolution_clock::now() > info.stopDeadline.value())
+				{
+					info.game->shutdown();
+					info.game.reset();
+					info.stopDeadline.reset();
+				}
+			}
+		});
+
+		// Remove any game entries that were shutdown
+		cz::remove_if(m_games_, [](const GameInfo& info)
+		{
+			return info.game == nullptr;
+		});
 	}
+
 }
 
 void Editor::showMenuFile()
@@ -249,72 +286,97 @@ void Editor::showMenu()
 
 }
 
-bool Editor::startGame()
+bool Editor::startGame(int count)
 {
-	if (m_game)
+	if (m_games_.size())
 	{
 		return false;
 	}
 
-	auto game = createGame();
-	Game::setCurrentInstance(game.get());
-	if (game->init())
+	auto startGameImpl = [this]() -> bool
 	{
-		m_game = std::move(game);
-		auto gameWindow = std::make_unique<GameWindow>();
-		m_gameWindow = gameWindow.get();
-		m_windows.emplace(std::move(gameWindow));
-		return true;
-	}
-	else
+		auto game = createGame();
+		MLGE_SET_CURRENT_GAME_INSTANCE(game.get());
+		if (game->init())
+		{
+			uint32_t id = findUnusedGameId();
+			m_games_.emplace_back();
+			m_games_.back().id = id;
+			m_games_.back().game = std::move(game);
+			auto gameWindow = std::make_unique<GameWindow>(m_games_.back().game.get(), id);
+			m_games_.back().gameWindow = gameWindow.get();
+
+			m_windows.emplace(std::move(gameWindow));
+			return true;
+		}
+		else
+		{
+			return false;
+		}
+	};
+
+	while(count--)
 	{
-		return false;
+		if (!startGameImpl())
+		{
+			return false;
+		}
 	}
+
+	return true;
 }
 
-bool Editor::stopGame()
+void Editor::stopGame()
 {
-	if (m_gameWindow)
+	visitGamesInfo([this](GameInfo& info)
 	{
-		auto it = m_windows.find(m_gameWindow);
+		// #RVF : We should probably only destroy the window once the game is confirmed shutdown (so we simulate what happens in non-editor builds)
+		//  Delete the Editor window controlling the game
+		auto it = m_windows.find(info.gameWindow);
 		if (it != m_windows.end())
 		{
 			m_windows.erase(it);
 		}
-		m_gameWindow = nullptr;
-	}
+		info.gameWindow = nullptr;
 
-	if (m_game)
-	{
-		m_game->requestShutdown();
+		// Request the game instance to shutdown
+		info.game->requestShutdown();
 		int maxShutdownDurationMs = static_cast<int>(Game::get().startShutdown() * 1000.0f);
 		// Tick the game until shutdown finishes or the deadline expires
-		m_stopDeadline = std::chrono::high_resolution_clock::now() + std::chrono::milliseconds(maxShutdownDurationMs);
-		return true;
-	}
-	else
-	{
-		return false;
-	}
+		info.stopDeadline = std::chrono::high_resolution_clock::now() + std::chrono::milliseconds(maxShutdownDurationMs);
+	});
 }
 
-
-// #RVF : Remove this if not used
-void Editor::setGameFocus(bool state)
+bool Editor::anyGameHasFocus() const
 {
-	if (!m_game)
+	bool hasFocus = false;
+	visitGamesInfo([&](const GameInfo& info)
 	{
-		return;
-	}
-
-	if (state != m_game->hasFocus())
-	{
-		m_game->onWindowFocus(state);
-
-		if (!state)
+		if (info.game->hasFocus())
 		{
-			SDL_ShowCursor(true);
+			hasFocus = true;
 		}
+	});
+
+	return hasFocus;
+}
+
+void Editor::setGameFocus(Game* game, bool state)
+{
+	visitGamesInfo([&](GameInfo& info)
+	{
+		if (game == nullptr || info.game.get() == game)
+		{
+			if (state != info.game->hasFocus())	
+			{
+				info.game->onWindowFocus(state);
+			}
+		}
+	});
+	
+	if (!state)
+	{
+		SDL_ShowCursor(true);
 	}
 
 	//SDL_SetWindowGrab(Renderer::get().getSDLWindow(), state ? SDL_TRUE : SDL_FALSE);
@@ -337,6 +399,7 @@ Window* Editor::findWindowByTag(void* tag)
 
 	return nullptr;
 }
+
 
 } // namespace mlge::Editor
 

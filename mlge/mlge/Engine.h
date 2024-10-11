@@ -10,6 +10,19 @@
 namespace mlge
 {
 
+/**
+ * Bare mininum to have in this header, so we can have std::unique_ptr<BaseGame>
+ */
+class BaseGame
+{
+  public:
+
+	BaseGame() = default;
+	virtual ~BaseGame() = default;
+
+	CZ_DELETE_COPY_AND_MOVE(BaseGame)
+};
+
 class Game;
 
 class Engine : public Singleton<Engine>
@@ -54,10 +67,7 @@ protected:
 	cz::SharedQueue<std::function<void()>> m_deferedTasks;
 	std::queue<std::function<void()>> m_swapDeferedTasks;
 
-	// This is only created if running a non-editor build or an editor build with -game.
-	// NOTE: Using a naked pointer because using a std::unique_ptr would require a dependency on the header
-	Game* m_game = nullptr;
-
+	std::vector<std::unique_ptr<BaseGame>> m_games;
 };
 
 

@@ -5,8 +5,10 @@
 #include "mlge/GameClock.h"
 #include "mlge/Delegates.h"
 #include "mlge/Paths.h"
+#include "mlge/Engine.h"
 
 #include "crazygaze/core/Singleton.h"
+#include "crazygaze/core/ScopeGuard.h"
 
 /**
  * A game should use this macro in a single CPP file
@@ -38,6 +40,17 @@
 	GameClass& getGame();              \
 	fs::path getGameRelativePath();
 
+#if MLGE_EDITOR
+	/**
+	 * This should only be used internally by the Editor code.
+	 * There is no need for the game to use this.
+	 * It sets the current game instance being processed, so the Editor can have multiple game instances.
+	 */
+	#define MLGE_SET_CURRENT_GAME_INSTANCE(game)                            \
+		Game* _previousGameInstance = Game::setCurrentInstance(game);       \
+		CZ_SCOPE_EXIT{Game::setCurrentInstance(_previousGameInstance); }
+#endif
+
 
 namespace mlge
 {
@@ -52,17 +65,16 @@ class PerformanceStats;
 namespace editor
 {
 	class Editor;
+	class GameWindow;
 }
 #endif
 
-class Game
+class Game : public BaseGame
 {
   public:
 
 	Game(std::string_view name);
 	virtual ~Game();
-
-	CZ_DELETE_COPY_AND_MOVE(Game)
 
 	/**
 	 * Gets the game instance currently being processed.
@@ -259,19 +271,20 @@ class Game
 
 	#if MLGE_EDITOR
 	friend class mlge::editor::Editor;
+	friend class mlge::editor::GameWindow;
 	#endif
 
-	static void setCurrentInstance(Game* instance)
+	static Game* setCurrentInstance(Game* instance)
 	{
+		Game* previous = ms_currentInstance;
 		ms_currentInstance = instance;
+		return previous;
 	}
 
 	/**
 	 * Called by the engine loop to tick the game using the game clock. Ends up calling tick(float deltaSeconds)
 	 */
 	void gameClockTick();
-
-	void processEvent(SDL_Event& evt);
 
 	std::string m_name;
 	std::string m_buildInfo;

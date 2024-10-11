@@ -45,7 +45,7 @@ void ImGuiLayer::shutdown()
 
 void ImGuiLayer::processEvent(SDL_Event& evt)
 {
-	if (Editor::get().gameHasFocus())
+	if (Editor::get().anyGameHasFocus())
 	{
 		return;
 	}
@@ -75,7 +75,7 @@ void ImGuiLayer::beginFrame()
 	ImGui_ImplSDL2_NewFrame();
 	ImGui::NewFrame();
 
-	if (Editor::get().gameHasFocus())
+	if (Editor::get().anyGameHasFocus())
 	{
 		ImGui::GetIO().ClearInputKeys();
 	}

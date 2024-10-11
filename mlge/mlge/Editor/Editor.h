@@ -22,44 +22,72 @@ class Editor : public Singleton<Editor>
 	~Editor();
 
 	bool init();
-	void requestShutdown()
-	{
-		m_shuttingDown = true;
-		if (m_game)
-		{
-			m_game->requestShutdown();
-		}
-	}
+	void requestShutdown();
 
 	bool isShuttingDown() const
 	{
 		return m_shuttingDown;
 	}
 
-	bool startGame();
-	bool stopGame();
+	bool startGame(int count);
+	void stopGame();
 
-	/**
-	 * Returns true if the game is running and has input focus
-	 */
-	bool gameHasFocus() const
-	{
-		return m_game && m_game->hasFocus();
-	}
-
-	/**
-	 * Returns true if the game is running (with focus or not)
-	 */
-	bool gameIsRunning() const
-	{
-		return m_game.get() ? true : false;
-	}
-
-	void setGameFocus(bool state);
+	bool anyGameHasFocus() const;
+	void setGameFocus(Game* game, bool state);
 
 	void addWindow(std::unique_ptr<Window> window);
 
 	Window* findWindowByTag(void* tag);
+
+	int getGamesCount() const
+	{
+		return static_cast<int>(m_games_.size());
+	}
+
+	Game& getGameAtIndex(int idx)
+	{
+		return *m_games_[static_cast<size_t>(idx)].game;
+	}
+
+	template<typename Visitor>
+	void visitGames(Visitor&& visitor)
+	{
+		for(GameInfo& info: m_games_)
+		{
+			MLGE_SET_CURRENT_GAME_INSTANCE(info.game.get());
+			visitor(*info.game);
+		}
+	}
+
+	template<typename Visitor>
+	void visitGames(Visitor&& visitor) const
+	{
+		for(const GameInfo& info: m_games_)
+		{
+			MLGE_SET_CURRENT_GAME_INSTANCE(info.game.get());
+			visitor(*info.game);
+		}
+	}
+
+	template<typename Visitor>
+	void visitGamesInfo(Visitor&& visitor)
+	{
+		for(GameInfo& info: m_games_)
+		{
+			MLGE_SET_CURRENT_GAME_INSTANCE(info.game.get());
+			visitor(info);
+		}
+	}
+
+	template<typename Visitor>
+	void visitGamesInfo(Visitor&& visitor) const
+	{
+		for(const GameInfo& info: m_games_)
+		{
+			MLGE_SET_CURRENT_GAME_INSTANCE(info.game.get());
+			visitor(info);
+		}
+	}
 
   protected:
 
@@ -87,17 +115,54 @@ class Editor : public Singleton<Editor>
 	bool m_shuttingDown = false;
 	GameClock m_clock;
 
-	std::unique_ptr<Game> m_game;
-	Window* m_gameWindow = nullptr;
+	struct GameInfo
+	{
+		uint32_t id = 0;
+		std::unique_ptr<Game> game;
+		// Editor window used to render the game
+		Window* gameWindow;
+
+		/**
+		 * When requesting the game to stop, we set this to shutdown deadline.
+		 * If the game doesn't fully stop by then, we kill it.
+		 */
+		std::optional<std::chrono::high_resolution_clock::time_point> stopDeadline;
+	};
+
+	std::vector<GameInfo> m_games_;
+	uint32_t findUnusedGameId() const
+	{
+		uint32_t id = 0;
+		bool used = true;
+		while(used)
+		{
+			used = false;
+			for(const GameInfo& info : m_games_)
+			{
+				if (info.id == id)
+				{
+					used = true;
+					break;
+				}
+			}
+
+			if (used)
+			{
+				id++;
+			}
+			else
+			{
+				break;
+			}
+		}
+
+		return id;
+	}
+
+
 
 	bool m_showConsole = true;
 	bool m_showAssetBrowser = true;
-
-	/**
-	 * When requesting the game to stop, we set this to shutdown deadline.
-	 * If the game doesn't fully stop by then, we kill it.
-	 */
-	std::optional<std::chrono::high_resolution_clock::time_point> m_stopDeadline;
 
 	ImGuiLayer m_imGuiLayer;
 	std::unique_ptr<RenderTarget> m_editorRenderTarget;
