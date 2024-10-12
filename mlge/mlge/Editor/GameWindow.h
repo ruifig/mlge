@@ -50,6 +50,9 @@ class GameWindow : public Window
 
 	DelegateHandle m_onProcessEventHandle;
 	void onProcessEvent(SDL_Event& evt);
+
+	std::vector<std::string> m_resolutions;
+	void showResolution(const char* resolutionStr);
 };
 
 } // namespace editor

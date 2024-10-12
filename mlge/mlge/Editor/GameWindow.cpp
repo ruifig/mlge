@@ -15,6 +15,11 @@ GameWindow::GameWindow(Game* game, uint32_t id)
 	: m_game(game)
 	, m_id(id)
 {
+	m_resolutions.push_back("320x240");
+	m_resolutions.push_back("640x480");
+	m_resolutions.push_back("1024x768");
+	m_resolutions.push_back("1280x720");
+
 	m_onProcessEventHandle = Engine::get().processEventDelegate.bind(this, &GameWindow::onProcessEvent);
 }
 
@@ -50,6 +55,48 @@ void GameWindow::onProcessEvent(SDL_Event& evt)
 	}
 }
 
+void GameWindow::showResolution(const char* resolutionStr)
+{
+	auto getSize = [](const std::string& str)
+	{
+		return Size{
+			atoi(std::string(str, 0, str.find('x')).c_str()),
+			atoi(std::string(str, str.find('x')+1).c_str())};
+	};
+
+	// Figure out if the game's resolution is one of the entries in the list
+	int resolutionIdx = -1;
+	for(size_t n = 0; n < m_resolutions.size(); n++)
+	{
+		if (m_resolutions[n] == resolutionStr)
+		{
+			resolutionIdx = static_cast<int>(n);
+			break;
+		}
+	}
+
+	if (ImGui::BeginCombo("Resolution", resolutionIdx == -1 ? nullptr : resolutionStr, ImGuiComboFlags_WidthFitPreview))
+	{
+		for (size_t n = 0; n < m_resolutions.size(); n++)
+		{
+			const bool isSelected = (resolutionIdx == static_cast<int>(n));
+			if (ImGui::Selectable(m_resolutions[n].c_str(), isSelected))
+			{
+				Size newResolution = getSize(m_resolutions[n]);
+
+				RenderTarget& renderTarget = m_game->getRenderTarget();
+				if (renderTarget.getSize() != newResolution)
+				{
+					m_game->onWindowResized(newResolution);
+				}
+			}
+		}
+
+		ImGui::EndCombo();
+	}
+
+}
+
 void GameWindow::show()
 {
 	// If this window is alive, then we must have a game running
@@ -73,13 +120,16 @@ void GameWindow::show()
 		return std::format("{:%H:%M:%S}:{:03d}", nowSecs, ms.count());
 	};
 
+	char resStr[16];
+	sprintf(resStr, "%dx%d", resX, resY);
+
 	char buf[256];
 	sprintf(
 		buf,
-		"Game %u - (%s) %dpx * %dpx, WallTime: %s, GameTime: %s ###GameWindow_%u",
+		"Game %u - (%s) %s , WallTime: %s, GameTime: %s ###GameWindow_%u",
 		m_id,
 		m_game->hasFocus() ? "FOCUS" : "NO FOCUS",
-		resX, resY,
+		resStr,
 		getTimestamp(m_game->getWallTimeSecs()).c_str(),
 		getTimestamp(m_game->getGameTimeSecs()).c_str(),
 		m_id);
@@ -100,8 +150,13 @@ void GameWindow::show()
 	ImGui::Begin(buf, nullptr, defaultFlags | noInputs);
 	{
 		ImGui::Checkbox("Resizable", &m_resizable);
+		ImGui::SameLine();
+		showResolution(resStr);
 
-		// The inner Button that actually shows the game and it's used to detect when we press the game to gain focus
+
+		//
+		// The inner Button that actually shows the game and it's used to detect when we click the game to gain focus
+		//
 		if (SDL_Texture* tex = renderTarget.getTexture())
 		{
 			ImVec2 size;

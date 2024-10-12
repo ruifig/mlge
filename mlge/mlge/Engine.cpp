@@ -189,9 +189,10 @@ void Engine::tick()
 		}
 	#endif
 
-	if (Game::tryGet())
+
+	for(auto&& game : m_games)
 	{
-		Game::get().gameClockTick();
+		static_cast<Game*>(game.get())->gameClockTick();
 	}
 }
 
@@ -306,6 +307,8 @@ bool Engine::run()
 		{
 			shuttingDown = Game::get().isShuttingDown();
 		}
+
+		editor::Window* wnd;
 
 	#if MLGE_EDITOR
 		if (editor::Editor::tryGet())
