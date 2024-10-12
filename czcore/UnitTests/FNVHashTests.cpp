@@ -3,6 +3,7 @@
 #include "TestUtils.h"
 
 using namespace cz;
+using namespace cz::hash;
 
 TEST_CASE("FNVHash", "[FNVHash]")
 {
