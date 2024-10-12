@@ -57,7 +57,6 @@ bool Editor::init()
 	m_onEndFrameHandle = Renderer::get().endFrameDelegate.bind(this, &Editor::onEndFrame);
 	m_onGameRenderFinishedHandle = Renderer::get().gameRenderFinishedDelegate.bind(this, &Editor::onGameRenderFinished);
 	m_onProcessEventHandle = Engine::get().processEventDelegate.bind(this, &Editor::onProcessEvent);
-	m_onTickHandle = Engine::get().tickDelegate.bind(this, &Editor::onTick);
 
 	SDL_SetWindowTitle(Renderer::get().getSDLWindow(), (std::string(getGameFolderName()) + " Editor").c_str());
 
@@ -141,7 +140,7 @@ void Editor::onProcessEvent(SDL_Event& evt)
 	}
 }
 
-void Editor::onTick()
+void Editor::tick()
 {
 	showMenu();
 	showImGuiDemoWindow();
@@ -286,7 +285,7 @@ void Editor::showMenu()
 
 }
 
-bool Editor::startGame(int count)
+bool Editor::startGame(uint32_t count)
 {
 	if (m_games_.size())
 	{

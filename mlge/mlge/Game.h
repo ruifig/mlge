@@ -61,6 +61,23 @@ class UIManager;
 class RenderQueue;
 class PerformanceStats;
 
+/**
+ * Defers a task for execution on the next tick of the current game
+ */
+template<typename TaskFunc>
+void deferTask(TaskFunc&& task)
+{
+	if (Game* game = Game::tryGet())
+	{
+		game->deferToNextTick(std::forward<TaskFunc>(task));
+	}
+	else
+	{
+		CZ_CHECK(false);
+	}
+}
+
+
 #if MLGE_EDITOR
 namespace editor
 {
@@ -248,6 +265,12 @@ class Game : public BaseGame
 		return *m_performanceStats;
 	}
 
+	template<typename TaskFunc>
+	void deferToNextTick(TaskFunc&& task)
+	{
+		m_deferedTasks.emplace(std::forward<TaskFunc>(task));
+	}
+
   protected:
 
 	// The order is important, because we need a specific destruction order (the C++ standards guarantees the objects are
@@ -299,6 +322,9 @@ class Game : public BaseGame
 
 	void onEndFrame();
 	DelegateHandle m_onEndFrameHandle;
+
+	cz::SharedQueue<std::function<void()>> m_deferedTasks;
+	std::queue<std::function<void()>> m_swapDeferedTasks;
 };
 
 } // namespace mlge

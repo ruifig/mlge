@@ -182,24 +182,18 @@ bool Engine::init(int argc, char* argv[])
 
 void Engine::tick()
 {
-	if (m_deferedTasks.popAll(m_swapDeferedTasks))
-	{
-		while(m_swapDeferedTasks.size())
+	#if MLGE_EDITOR
+		if (!gIsGame)
 		{
-			// Note the double ()(). Intentional.
-			m_swapDeferedTasks.front()();
-			m_swapDeferedTasks.pop();
+			editor::Editor::get().tick();
 		}
-	}
-
-	tickDelegate.broadcast();
+	#endif
 
 	if (Game::tryGet())
 	{
 		Game::get().gameClockTick();
 	}
 }
-
 
 namespace
 {

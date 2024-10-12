@@ -29,7 +29,7 @@ class Editor : public Singleton<Editor>
 		return m_shuttingDown;
 	}
 
-	bool startGame(int count);
+	bool startGame(uint32_t count);
 	void stopGame();
 
 	bool anyGameHasFocus() const;
@@ -91,6 +91,8 @@ class Editor : public Singleton<Editor>
 
   protected:
 
+	friend Engine;
+
 	void showMenu();
 	void showMenuWindow();
 	void showMenuFile();
@@ -108,8 +110,8 @@ class Editor : public Singleton<Editor>
 	DelegateHandle m_onGameRenderFinishedHandle;
 	void onProcessEvent(SDL_Event& evt);
 	DelegateHandle m_onProcessEventHandle;
-	void onTick();
-	DelegateHandle m_onTickHandle;
+
+	void tick();
 
 	std::set<std::unique_ptr<Window>, details::pointer_comp<Window>> m_windows;
 	bool m_shuttingDown = false;

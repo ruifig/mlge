@@ -37,13 +37,6 @@ public:
 	bool run();
 
 	MultiCastDelegate<SDL_Event&> processEventDelegate;
-	MultiCastDelegate<> tickDelegate;
-
-	template<typename TaskFunc>
-	void deferToNextTick(TaskFunc&& task)
-	{
-		m_deferedTasks.emplace(std::forward<TaskFunc>(task));
-	}
 
 protected:
 
@@ -64,19 +57,9 @@ protected:
 
 	bool m_sdlTTFInitialized = false;
 
-	// #MULTIPLE_STATES : These two should be at the game level, so they get processed with the game instance is set.
-	// If the Editor needs to make use of this, then create the same in the `Editor` class.
-	cz::SharedQueue<std::function<void()>> m_deferedTasks;
-	std::queue<std::function<void()>> m_swapDeferedTasks;
 
 	std::vector<std::unique_ptr<BaseGame>> m_games;
 };
 
-
-template<typename TaskFunc>
-void deferTask(TaskFunc&& task)
-{
-	Engine::get().deferToNextTick(std::forward<TaskFunc>(task));
-}
 
 } // namespace mlge

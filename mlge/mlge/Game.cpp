@@ -127,6 +127,16 @@ void Game::gameClockTick()
 	float deltaSeconds = m_clock.calcDeltaSeconds();
 	if (!m_clock.isPaused())
 	{
+		if (m_deferedTasks.popAll(m_swapDeferedTasks))
+		{
+			while(m_swapDeferedTasks.size())
+			{
+				// Note the double ()(). Intentional.
+				m_swapDeferedTasks.front()();
+				m_swapDeferedTasks.pop();
+			}
+		}
+
 		tick(deltaSeconds);
 	}
 }
