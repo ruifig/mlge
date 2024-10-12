@@ -64,6 +64,8 @@ protected:
 
 	bool m_sdlTTFInitialized = false;
 
+	// #MULTIPLE_STATES : These two should be at the game level, so they get processed with the game instance is set.
+	// If the Editor needs to make use of this, then create the same in the `Editor` class.
 	cz::SharedQueue<std::function<void()>> m_deferedTasks;
 	std::queue<std::function<void()>> m_swapDeferedTasks;
 
