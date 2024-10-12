@@ -198,10 +198,10 @@ namespace details
  * - Might not provide all the functions and/or operators std::shared_ptr provides
  * - IMPORTANT: Assumes memory for the object was allocated with BaseSharedPtrControlBlock::allocBlock. this means that when using
  *   the SharedPtr<T>::SharedPtr(U* ptr) constructor, care must be taken that "ptr" was allocated properly. You can do this by:
- *		- Using sakeShared<T>. E.g: SharedPtr<Foo> foo = makeShared<Foo>();
+ *		- Using makeShared<T>. E.g: SharedPtr<Foo> foo = makeShared<Foo>();
  *		- Using BaseSharedPtrControlBlock::allocBlock and placement new. e.g:
- *			SharedPtr<Foo> foo(new(details::BaseSharedPtrControlBlock::allocBlock<Foo>()) Foo);
- *	 The reason this constructor is provided is so that SharedPtr can be used with classes whose constructors are private/protected.
+ *			SharedPtr<Foo> foo(new (details::BaseSharedPtrControlBlock::allocBlock<Foo>()) Foo);
+ *			The reason this constructor is provided is so that SharedPtr can be used with classes whose constructors are private/protected.
  * 
  */
 template<typename T, typename Deleter = details::SharedPtrDefaultDeleter>
