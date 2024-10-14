@@ -40,18 +40,6 @@
 	GameClass& getGame();              \
 	fs::path getGameRelativePath();
 
-#if MLGE_EDITOR
-	/**
-	 * This should only be used internally by the Editor code.
-	 * There is no need for the game to use this.
-	 * It sets the current game instance being processed, so the Editor can have multiple game instances.
-	 */
-	#define MLGE_SET_CURRENT_GAME_INSTANCE(game)                            \
-		Game* _previousGameInstance = Game::setCurrentInstance(game);       \
-		CZ_SCOPE_EXIT{Game::setCurrentInstance(_previousGameInstance); }
-#endif
-
-
 namespace mlge
 {
 
@@ -101,7 +89,7 @@ class Game : public BaseGame
 	static Game& get()
 	{
 		CZ_CHECK(ms_currentInstance);
-		return *ms_currentInstance;
+		return *static_cast<Game*>(ms_currentInstance);
 	}
 
 	/**
@@ -109,7 +97,7 @@ class Game : public BaseGame
 	 */
 	static Game* tryGet()
 	{
-		return ms_currentInstance;
+		return static_cast<Game*>(ms_currentInstance);
 	}
 
 	/**
@@ -284,8 +272,6 @@ class Game : public BaseGame
 	 */
 	inline static constexpr float ms_maxShutdownTimeSec = 5.0f;
 
-	inline static Game* ms_currentInstance = nullptr;
-
 	Color m_bkgColour = Color::Black;
 
   private:
@@ -296,13 +282,6 @@ class Game : public BaseGame
 	friend class mlge::editor::Editor;
 	friend class mlge::editor::GameWindow;
 	#endif
-
-	static Game* setCurrentInstance(Game* instance)
-	{
-		Game* previous = ms_currentInstance;
-		ms_currentInstance = instance;
-		return previous;
-	}
 
 	/**
 	 * Called by the engine loop to tick the game using the game clock. Ends up calling tick(float deltaSeconds)

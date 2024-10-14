@@ -39,56 +39,6 @@ class Editor : public Singleton<Editor>
 
 	Window* findWindowByTag(void* tag);
 
-	int getGamesCount() const
-	{
-		return static_cast<int>(m_games_.size());
-	}
-
-	Game& getGameAtIndex(int idx)
-	{
-		return *m_games_[static_cast<size_t>(idx)].game;
-	}
-
-	template<typename Visitor>
-	void visitGames(Visitor&& visitor)
-	{
-		for(GameInfo& info: m_games_)
-		{
-			MLGE_SET_CURRENT_GAME_INSTANCE(info.game.get());
-			visitor(*info.game);
-		}
-	}
-
-	template<typename Visitor>
-	void visitGames(Visitor&& visitor) const
-	{
-		for(const GameInfo& info: m_games_)
-		{
-			MLGE_SET_CURRENT_GAME_INSTANCE(info.game.get());
-			visitor(*info.game);
-		}
-	}
-
-	template<typename Visitor>
-	void visitGamesInfo(Visitor&& visitor)
-	{
-		for(GameInfo& info: m_games_)
-		{
-			MLGE_SET_CURRENT_GAME_INSTANCE(info.game.get());
-			visitor(info);
-		}
-	}
-
-	template<typename Visitor>
-	void visitGamesInfo(Visitor&& visitor) const
-	{
-		for(const GameInfo& info: m_games_)
-		{
-			MLGE_SET_CURRENT_GAME_INSTANCE(info.game.get());
-			visitor(info);
-		}
-	}
-
   protected:
 
 	friend Engine;
@@ -116,52 +66,6 @@ class Editor : public Singleton<Editor>
 	std::set<std::unique_ptr<Window>, details::pointer_comp<Window>> m_windows;
 	bool m_shuttingDown = false;
 	GameClock m_clock;
-
-	struct GameInfo
-	{
-		uint32_t id = 0;
-		std::unique_ptr<Game> game;
-		// Editor window used to render the game
-		Window* gameWindow;
-
-		/**
-		 * When requesting the game to stop, we set this to shutdown deadline.
-		 * If the game doesn't fully stop by then, we kill it.
-		 */
-		std::optional<std::chrono::high_resolution_clock::time_point> stopDeadline;
-	};
-
-	std::vector<GameInfo> m_games_;
-	uint32_t findUnusedGameId() const
-	{
-		uint32_t id = 0;
-		bool used = true;
-		while(used)
-		{
-			used = false;
-			for(const GameInfo& info : m_games_)
-			{
-				if (info.id == id)
-				{
-					used = true;
-					break;
-				}
-			}
-
-			if (used)
-			{
-				id++;
-			}
-			else
-			{
-				break;
-			}
-		}
-
-		return id;
-	}
-
-
 
 	bool m_showConsole = true;
 	bool m_showAssetBrowser = true;

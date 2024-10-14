@@ -75,6 +75,8 @@ void GameControlBar::show()
 
 	}
 
+	uint32_t gamesCount = Engine::get().getGamesCount();
+
 	// Resolution selection
 	{
 		ImGui::SameLine(0.0f, spacing);
@@ -96,9 +98,9 @@ void GameControlBar::show()
 					Config::get().setGameValue("Engine", "resy", newResolution.h);
 					Config::get().save();
 
-					if (Editor::get().getGamesCount())
+					if (gamesCount)
 					{
-						Editor::get().visitGames([&](Game& game)
+						Engine::get().visitGames([&](Game& game)
 						{
 							RenderTarget& renderTarget = game.getRenderTarget();
 							if (renderTarget.getSize() != newResolution)
@@ -128,7 +130,7 @@ void GameControlBar::show()
 
 	// Play stop buttons
 	{
-		if (Editor::get().getGamesCount() > 0)
+		if (gamesCount)
 		{
 			ImGui::SameLine();
 			if (ImGui::Button("Stop"))
@@ -136,28 +138,6 @@ void GameControlBar::show()
 				Editor::get().stopGame();
 			}
 
-			if (Editor::get().getGameAtIndex(0).isGameClockPaused())
-			{
-				ImGui::SameLine();
-				if (ImGui::Button("Resume"))
-				{
-					Editor::get().visitGames([&](Game& game)
-					{
-						game.resumeGameClock();
-					});
-				}
-			}
-			else
-			{
-				ImGui::SameLine();
-				if (ImGui::Button("Pause"))
-				{
-					Editor::get().visitGames([&](Game& game)
-					{
-						game.pauseGameClock();
-					});
-				}
-			}
 		}
 		else
 		{

@@ -4,11 +4,21 @@
 #include "mlge/Delegates.h"
 #include "crazygaze/core/Singleton.h"
 #include "crazygaze/core/SharedQueue.h"
+#include "crazygaze/core/ScopeGuard.h"
 
 #include "mlge/Render/DXDebugLayer.h"
 
 namespace mlge
 {
+
+class Game;
+
+#if MLGE_EDITOR
+namespace editor
+{
+	class Window;
+}
+#endif
 
 /**
  * Bare mininum to have in this header, so we can have std::unique_ptr<BaseGame>
@@ -21,9 +31,28 @@ class BaseGame
 	virtual ~BaseGame() = default;
 
 	CZ_DELETE_COPY_AND_MOVE(BaseGame)
+
+	static BaseGame* setCurrentInstance(BaseGame* instance)
+	{
+		BaseGame* previous = ms_currentInstance;
+		ms_currentInstance = instance;
+		return previous;
+	}
+
+  protected:
+	inline static BaseGame* ms_currentInstance = nullptr;
 };
 
-class Game;
+#if MLGE_EDITOR
+	/**
+	 * This should only be used internally by the Editor code.
+	 * There is no need for the game to use this.
+	 * It sets the current game instance being processed, so the Editor can have multiple game instances.
+	 */
+	#define MLGE_SET_CURRENT_GAME_INSTANCE(game)                                 \
+		BaseGame* _previousGameInstance = BaseGame::setCurrentInstance(game);    \
+		CZ_SCOPE_EXIT{BaseGame::setCurrentInstance(_previousGameInstance); }
+#endif
 
 class Engine : public Singleton<Engine>
 {
@@ -37,6 +66,90 @@ public:
 	bool run();
 
 	MultiCastDelegate<SDL_Event&> processEventDelegate;
+
+	struct GameInfo
+	{
+		uint32_t id;
+		std::unique_ptr<BaseGame> game;
+		#if MLGE_EDITOR
+		editor::Window* editorWindow = nullptr;
+		#endif
+
+		/**
+		 * When requesting the game to stop, we set this to shutdown deadline.
+		 * If the game doesn't fully stop by then, we kill it.
+		 */
+		std::optional<std::chrono::high_resolution_clock::time_point> stopDeadline = {};
+	};
+
+#if MLGE_EDITOR
+	uint32_t getGamesCount() const
+	{
+		uint32_t res = 0;
+		for(auto&& info : m_games)
+		{
+			if (info.game)
+			{
+				res++;
+			}
+		}
+
+		return res;
+	}
+
+	template<typename Visitor>
+	void visitGames(Visitor&& visitor)
+	{
+		for(GameInfo& info: m_games)
+		{
+			if (info.game)
+			{
+				MLGE_SET_CURRENT_GAME_INSTANCE(info.game.get());
+				visitor(info.game.get());
+			}
+		}
+	}
+
+	template<typename Visitor>
+	void visitGames(Visitor&& visitor) const
+	{
+		for(const GameInfo& info: m_games)
+		{
+			if (info.game)
+			{
+				MLGE_SET_CURRENT_GAME_INSTANCE(info.game.get());
+				visitor(*info.game);
+			}
+		}
+	}
+
+	template<typename Visitor>
+	void visitGamesInfo(Visitor&& visitor)
+	{
+		for(GameInfo& info: m_games)
+		{
+			if (info.game)
+			{
+				MLGE_SET_CURRENT_GAME_INSTANCE(info.game.get());
+				visitor(info);
+			}
+		}
+	}
+
+	template<typename Visitor>
+	void visitGamesInfo(Visitor&& visitor) const
+	{
+		for(const GameInfo& info: m_games)
+		{
+			if (info.game)
+			{
+				MLGE_SET_CURRENT_GAME_INSTANCE(info.game.get());
+				visitor(info);
+			}
+		}
+	}
+
+#endif
 
 protected:
 
@@ -57,8 +170,36 @@ protected:
 
 	bool m_sdlTTFInitialized = false;
 
+	std::array<GameInfo, MLGE_EDITOR ? 10 : 1> m_games;
 
-	std::vector<std::unique_ptr<BaseGame>> m_games;
+	uint32_t findUnusedGameId() const
+	{
+		uint32_t id = 0;
+		bool used = true;
+		while(used)
+		{
+			used = false;
+			for(const GameInfo& info : m_games)
+			{
+				if (info.id == id)
+				{
+					used = true;
+					break;
+				}
+			}
+
+			if (used)
+			{
+				id++;
+			}
+			else
+			{
+				break;
+			}
+		}
+
+		return id;
+	}
 };
 
 

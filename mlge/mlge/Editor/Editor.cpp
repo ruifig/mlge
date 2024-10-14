@@ -1,5 +1,6 @@
 #include "mlge/Editor/Editor.h"
 
+
 #if MLGE_EDITOR
 
 #include "mlge/Editor/GameWindow.h"
@@ -26,15 +27,6 @@ namespace mlge::editor
 
 Editor::~Editor()
 {
-	visitGamesInfo([](GameInfo& info)
-	{
-		if (info.game)
-		{
-			MLGE_SET_CURRENT_GAME_INSTANCE(info.game.get());
-			info.game = nullptr;
-		}
-	});
-
 	m_imGuiLayer.shutdown();
 	m_editorRenderTarget.reset();
 }
@@ -325,6 +317,7 @@ bool Editor::startGame(uint32_t count)
 	return true;
 }
 
+// #MULTIPLE_INSTANCES : Refactor this to have the option to stop one or all games.
 void Editor::stopGame()
 {
 	visitGamesInfo([this](GameInfo& info)
@@ -346,6 +339,7 @@ void Editor::stopGame()
 	});
 }
 
+// #MULTIPLE_INSTANCES : Refactor/remove  this
 bool Editor::anyGameHasFocus() const
 {
 	bool hasFocus = false;
@@ -360,6 +354,7 @@ bool Editor::anyGameHasFocus() const
 	return hasFocus;
 }
 
+// #MULTIPLE_INSTANCES : Refactor/remove  this
 void Editor::setGameFocus(Game* game, bool state)
 {
 	visitGamesInfo([&](GameInfo& info)

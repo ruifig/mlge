@@ -19,7 +19,13 @@ namespace mlge
 
 Engine::~Engine()
 {
-	m_games.clear();
+	// NOTE: using "visit" so each game is set as "current" when we delete it.
+	visitGamesInfo([](GameInfo& info)
+	{
+		info.game = nullptr;
+	});
+
+	std::generate(m_games.begin(), m_games.end(), []{ return GameInfo(); });
 
 	// Explicit delete, so everything gets destroyed before shutting down SDL
 	m_root = nullptr;
@@ -169,8 +175,8 @@ bool Engine::init(int argc, char* argv[])
 
 	if (gIsGame)
 	{
-		m_games.push_back(createGame());
-		Game::setCurrentInstance(static_cast<Game*>(m_games.back().get()));
+		m_games[0].game = createGame();
+		MLGE_SET_CURRENT_GAME_INSTANCE(m_games[0].game.get());
 		if (!Game::get().init())
 		{
 			return false;
@@ -189,10 +195,12 @@ void Engine::tick()
 		}
 	#endif
 
-
-	for(auto&& game : m_games)
+	for(auto&& info : m_games)
 	{
-		static_cast<Game*>(game.get())->gameClockTick();
+		if (info.game)
+		{
+			static_cast<Game*>(info.game.get())->gameClockTick();
+		}
 	}
 }
 
@@ -308,15 +316,12 @@ bool Engine::run()
 			shuttingDown = Game::get().isShuttingDown();
 		}
 
-		editor::Window* wnd;
-
 	#if MLGE_EDITOR
 		if (editor::Editor::tryGet())
 		{
 			shuttingDown &= editor::Editor::get().isShuttingDown();
 		}
 	#endif
-
 
 		if (Game::tryGet())
 		{

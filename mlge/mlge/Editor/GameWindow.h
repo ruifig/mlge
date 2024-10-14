@@ -53,6 +53,8 @@ class GameWindow : public Window
 
 	std::vector<std::string> m_resolutions;
 	void showResolution(const char* resolutionStr);
+
+	void showStopAndPause();
 };
 
 } // namespace editor

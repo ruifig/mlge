@@ -94,7 +94,24 @@ void GameWindow::showResolution(const char* resolutionStr)
 
 		ImGui::EndCombo();
 	}
+}
 
+void GameWindow::showStopAndPause()
+{
+	if (m_game->isGameClockPaused())
+	{
+		if (ImGui::Button("Resume"))
+		{
+			m_game->resumeGameClock();
+		}
+	}
+	else
+	{
+		if (ImGui::Button("Pause"))
+		{
+			m_game->pauseGameClock();
+		}
+	}
 }
 
 void GameWindow::show()
@@ -152,6 +169,8 @@ void GameWindow::show()
 		ImGui::Checkbox("Resizable", &m_resizable);
 		ImGui::SameLine();
 		showResolution(resStr);
+		ImGui::SameLine();
+		showStopAndPause();
 
 
 		//
