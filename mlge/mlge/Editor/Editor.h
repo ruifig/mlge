@@ -29,7 +29,7 @@ class Editor : public Singleton<Editor>
 		return m_shuttingDown;
 	}
 
-	bool startGame(uint32_t count);
+	void startGames(uint32_t count);
 	void stopGame();
 
 	bool anyGameHasFocus() const;

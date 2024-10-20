@@ -9,6 +9,7 @@
 
 #include "crazygaze/core/ScopeGuard.h"
 #include "crazygaze/core/CommandLine.h"
+#include "crazygaze/core/Algorithm.h"
 
 #if MLGE_EDITOR
 	#include "mlge/Editor/Editor.h"
@@ -146,6 +147,39 @@ namespace details
 	}
 }
 
+Engine::GameInfo* Engine::createNewGame()
+{
+	// Find a free slot
+	GameInfo* info = nullptr;
+	for(GameInfo& i  : m_games)
+	{
+		if (i.game == nullptr)
+		{
+			info = &i;
+			break;
+		}
+	}
+
+	// No free game slot found
+	if (!info)
+	{
+		CZ_LOG(Error, "No available game slot.");
+		return nullptr;
+	}
+
+	std::unique_ptr<Game> game = createGame();
+	MLGE_SET_CURRENT_GAME_INSTANCE(game.get());
+	if (!game->init())
+	{
+		return nullptr;
+	}
+
+	*info = {};
+	info->id = findUnusedGameId();
+	info->game = std::move(game);
+	return info;
+}
+
 bool Engine::init(int argc, char* argv[])
 {
 	m_root = Root::create();
@@ -175,9 +209,7 @@ bool Engine::init(int argc, char* argv[])
 
 	if (gIsGame)
 	{
-		m_games[0].game = createGame();
-		MLGE_SET_CURRENT_GAME_INSTANCE(m_games[0].game.get());
-		if (!Game::get().init())
+		if (!createNewGame())
 		{
 			return false;
 		}
@@ -195,13 +227,22 @@ void Engine::tick()
 		}
 	#endif
 
-	for(auto&& info : m_games)
+
+	visitGames([](Game& game)
 	{
-		if (info.game)
+		game.gameClockTick();
+	});
+
+
+	// Reset slots that don't have a game
+	for(GameInfo& info : m_games)
+	{
+		if (info.game == nullptr)
 		{
-			static_cast<Game*>(info.game.get())->gameClockTick();
+			info = {};
 		}
 	}
+
 }
 
 namespace

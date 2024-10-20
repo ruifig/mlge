@@ -144,7 +144,7 @@ void GameControlBar::show()
 			ImGui::SameLine();
 			if (ImGui::Button("Play"))
 			{
-				Editor::get().startGame(m_numGames);
+				Editor::get().startGames(m_numGames);
 			}
 		}
 	}

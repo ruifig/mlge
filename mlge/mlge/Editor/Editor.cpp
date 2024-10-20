@@ -59,9 +59,9 @@ void Editor::requestShutdown()
 {
 	m_shuttingDown = true;
 
-	visitGamesInfo([](GameInfo& info)
+	Engine::get().visitGames([](Game& game)
 	{
-		info.game->requestShutdown();
+		game.requestShutdown();
 	});
 }
 
@@ -152,28 +152,23 @@ void Editor::tick()
 		}
 	}
 
-	{
 
-		visitGamesInfo([](GameInfo& info)
+	// #MULTIPLE_INSTANCES : Move game shutdown check to Engine
+	{
+		Engine::get().visitGamesInfo([](Engine::GameInfo& info)
 		{
-			MLGE_SET_CURRENT_GAME_INSTANCE(info.game.get());
+			Game* game = static_cast<Game*>(info.game.get());
 
 			if (info.stopDeadline.has_value())
 			{
 				// If the game finished shutting down, or we reached the deadline, then run the final shutdown step
-				if (info.game->isShutdownFinished() || std::chrono::high_resolution_clock::now() > info.stopDeadline.value())
+				if (game->isShutdownFinished() || std::chrono::high_resolution_clock::now() > info.stopDeadline.value())
 				{
-					info.game->shutdown();
+					game->shutdown();
 					info.game.reset();
 					info.stopDeadline.reset();
 				}
 			}
-		});
-
-		// Remove any game entries that were shutdown
-		cz::remove_if(m_games_, [](const GameInfo& info)
-		{
-			return info.game == nullptr;
 		});
 	}
 
@@ -277,63 +272,47 @@ void Editor::showMenu()
 
 }
 
-bool Editor::startGame(uint32_t count)
+void Editor::startGames(uint32_t count)
 {
-	if (m_games_.size())
+	if (Engine::get().getGamesCount())
 	{
-		return false;
+		return;
 	}
-
-	auto startGameImpl = [this]() -> bool
-	{
-		auto game = createGame();
-		MLGE_SET_CURRENT_GAME_INSTANCE(game.get());
-		if (game->init())
-		{
-			uint32_t id = findUnusedGameId();
-			m_games_.emplace_back();
-			m_games_.back().id = id;
-			m_games_.back().game = std::move(game);
-			auto gameWindow = std::make_unique<GameWindow>(m_games_.back().game.get(), id);
-			m_games_.back().gameWindow = gameWindow.get();
-
-			m_windows.emplace(std::move(gameWindow));
-			return true;
-		}
-		else
-		{
-			return false;
-		}
-	};
 
 	while(count--)
 	{
-		if (!startGameImpl())
+		if (Engine::GameInfo* info = Engine::get().createNewGame())
 		{
-			return false;
+			auto gameWindow = std::make_unique<GameWindow>(static_cast<Game*>(info->game.get()), info->id);
+			info->editorWindow = gameWindow.get();
+			m_windows.emplace(std::move(gameWindow));
+		}
+		else
+		{
+			break;
 		}
 	}
-
-	return true;
 }
 
 // #MULTIPLE_INSTANCES : Refactor this to have the option to stop one or all games.
 void Editor::stopGame()
 {
-	visitGamesInfo([this](GameInfo& info)
+	Engine::get().visitGamesInfo([this](Engine::GameInfo& info)
 	{
+		Game* game = static_cast<Game*>(info.game.get());
+
 		// #RVF : We should probably only destroy the window once the game is confirmed shutdown (so we simulate what happens in non-editor builds)
 		//  Delete the Editor window controlling the game
-		auto it = m_windows.find(info.gameWindow);
+		auto it = m_windows.find(info.editorWindow);
 		if (it != m_windows.end())
 		{
 			m_windows.erase(it);
 		}
-		info.gameWindow = nullptr;
+		info.editorWindow = nullptr;
 
 		// Request the game instance to shutdown
-		info.game->requestShutdown();
-		int maxShutdownDurationMs = static_cast<int>(Game::get().startShutdown() * 1000.0f);
+		game->requestShutdown();
+		int maxShutdownDurationMs = static_cast<int>(game->startShutdown() * 1000.0f);
 		// Tick the game until shutdown finishes or the deadline expires
 		info.stopDeadline = std::chrono::high_resolution_clock::now() + std::chrono::milliseconds(maxShutdownDurationMs);
 	});
@@ -343,9 +322,9 @@ void Editor::stopGame()
 bool Editor::anyGameHasFocus() const
 {
 	bool hasFocus = false;
-	visitGamesInfo([&](const GameInfo& info)
+	Engine::get().visitGames([&](const Game& game)
 	{
-		if (info.game->hasFocus())
+		if (game.hasFocus())
 		{
 			hasFocus = true;
 		}
@@ -357,13 +336,13 @@ bool Editor::anyGameHasFocus() const
 // #MULTIPLE_INSTANCES : Refactor/remove  this
 void Editor::setGameFocus(Game* game, bool state)
 {
-	visitGamesInfo([&](GameInfo& info)
+	Engine::get().visitGames([&](Game& game_)
 	{
-		if (game == nullptr || info.game.get() == game)
+		if (game == nullptr || &game_ == game)
 		{
-			if (state != info.game->hasFocus())	
+			if (state != game_.hasFocus())	
 			{
-				info.game->onWindowFocus(state);
+				game_.onWindowFocus(state);
 			}
 		}
 	});

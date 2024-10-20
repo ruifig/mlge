@@ -17,11 +17,12 @@ class Game;
 namespace editor
 {
 	class Window;
+	class Editor;
 }
 #endif
 
 /**
- * Bare mininum to have in this header, so we can have std::unique_ptr<BaseGame>
+ * Bare minimum to have in this header, so we can have std::unique_ptr<BaseGame>
  */
 class BaseGame
 {
@@ -105,7 +106,8 @@ public:
 			if (info.game)
 			{
 				MLGE_SET_CURRENT_GAME_INSTANCE(info.game.get());
-				visitor(info.game.get());
+				Game* game = static_cast<Game*>(info.game.get());
+				visitor(*game);
 			}
 		}
 	}
@@ -118,7 +120,8 @@ public:
 			if (info.game)
 			{
 				MLGE_SET_CURRENT_GAME_INSTANCE(info.game.get());
-				visitor(*info.game);
+				Game* game = static_cast<Game*>(info.game.get());
+				visitor(*game);
 			}
 		}
 	}
@@ -149,6 +152,7 @@ public:
 		}
 	}
 
+	friend editor::Editor;
 #endif
 
 protected:
@@ -181,7 +185,7 @@ protected:
 			used = false;
 			for(const GameInfo& info : m_games)
 			{
-				if (info.id == id)
+				if (info.game && info.id == id)
 				{
 					used = true;
 					break;
@@ -200,6 +204,12 @@ protected:
 
 		return id;
 	}
+
+	/**
+	* Creates a new game and adds it to the games list.
+	* Returns the GameInfo if the game was added, nullptr if it failed.
+	*/
+	GameInfo* createNewGame();
 };
 
 
