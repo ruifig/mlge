@@ -6,8 +6,15 @@ namespace
 	ADebugText* gDebugText = nullptr;
 }
 
+
+// #RVF : I think this can end up being called from the Ludeo SDK's network thread, which is a problem.
+// I need to verify that and think about what to do.
 void addDebugTextImpl(const Color& color, const std::string& str)
 {
+	// #MULTIPLE_INSTANCES: Remove this:
+	BaseGame* game = Game::tryGet() ? Game::tryGet() : Engine::get().tryGetFirstGame();
+	MLGE_SET_CURRENT_GAME_INSTANCE(game);
+
 	if (gDebugText)
 	{
 		gDebugText->addEntry(color, str);

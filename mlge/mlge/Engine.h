@@ -98,6 +98,19 @@ public:
 		return res;
 	}
 
+	BaseGame* tryGetFirstGame()
+	{
+		for(GameInfo& info: m_games)
+		{
+			if (info.game)
+			{
+				return info.game.get();
+			}
+		}
+
+		return nullptr;
+	}
+
 	template<typename Visitor>
 	void visitGames(Visitor&& visitor)
 	{

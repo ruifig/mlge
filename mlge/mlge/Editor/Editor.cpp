@@ -318,7 +318,7 @@ void Editor::stopGame()
 	});
 }
 
-// #MULTIPLE_INSTANCES : Refactor/remove  this
+// #MULTIPLE_INSTANCES : Refactor/remove this
 bool Editor::anyGameHasFocus() const
 {
 	bool hasFocus = false;
@@ -333,7 +333,7 @@ bool Editor::anyGameHasFocus() const
 	return hasFocus;
 }
 
-// #MULTIPLE_INSTANCES : Refactor/remove  this
+// #MULTIPLE_INSTANCES : Refactor/remove this
 void Editor::setGameFocus(Game* game, bool state)
 {
 	Engine::get().visitGames([&](Game& game_)

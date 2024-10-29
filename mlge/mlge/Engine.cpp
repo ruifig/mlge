@@ -81,48 +81,70 @@ void Engine::processEvents()
 
 	while(SDL_PollEvent(&evt))
 	{
-		processEventDelegate.broadcast(evt);
+
+		// #MULTIPLE_INSTANCES: Fix this. I'm setting the game as current because at the time of writing, there is code in the game(s) that subscribes
+		// to this
+
+		{
+			MLGE_SET_CURRENT_GAME_INSTANCE(tryGetFirstGame());
+			processEventDelegate.broadcast(evt);
+		}
 
 		if (evt.type == SDL_QUIT)
 		{
-			if (gIsGame && Game::tryGet())
+			if (gIsGame)
 			{
-				Game::get().requestShutdown();
+				visitGames([](Game& game)
+				{
+					game.requestShutdown();
+				});
 			}
 		}
 		else if (evt.type == SDL_WINDOWEVENT)
 		{
 			if (evt.window.event == SDL_WINDOWEVENT_CLOSE && evt.window.windowID == SDL_GetWindowID(Renderer::get().getSDLWindow()))
 			{
-				if (gIsGame && Game::tryGet())
+				if (gIsGame)
 				{
-					Game::get().requestShutdown();
+					visitGames([](Game& game)
+					{
+						game.requestShutdown();
+					});
 				}
 			}
 
-			if (gIsGame && Game::tryGet())
+			if (gIsGame)
 			{
-				if (evt.window.event == SDL_WINDOWEVENT_ENTER)
+				visitGames([&evt](Game& game)
 				{
-					Game::get().onWindowEnter(true);
-				}
-				if (evt.window.event == SDL_WINDOWEVENT_LEAVE)
-				{
-					Game::get().onWindowEnter(false);
-				}
-				else if (evt.window.event == SDL_WINDOWEVENT_RESIZED)
-				{
-					Game::get().onWindowResized({evt.window.data1, evt.window.data2});
-				}
+					if (evt.window.event == SDL_WINDOWEVENT_ENTER)
+					{
+						game.onWindowEnter(true);
+					}
+					if (evt.window.event == SDL_WINDOWEVENT_LEAVE)
+					{
+						game.onWindowEnter(false);
+					}
+					else if (evt.window.event == SDL_WINDOWEVENT_RESIZED)
+					{
+						game.onWindowResized({evt.window.data1, evt.window.data2});
+					}
+				});
 			}
 
 			if (gIsGame && evt.window.event == SDL_WINDOWEVENT_FOCUS_GAINED)
 			{
-				Game::get().onWindowFocus(true);
+				visitGames([](Game& game)
+				{
+					game.onWindowFocus(true);
+				});
 			}
 			else if (gIsGame && evt.window.event == SDL_WINDOWEVENT_FOCUS_LOST)
 			{
-				Game::get().onWindowFocus(false);
+				visitGames([](Game& game)
+				{
+					game.onWindowFocus(false);
+				});
 			}
 
 		}
@@ -131,7 +153,10 @@ void Engine::processEvents()
 			Game::MouseMotionEvent gameEvt;
 			gameEvt.pos = {evt.motion.x, evt.motion.y};
 			gameEvt.rel = {evt.motion.xrel, evt.motion.yrel};
-			Game::get().onMouseMotion(gameEvt);
+			visitGames([&gameEvt](Game& game)
+			{
+				game.onMouseMotion(gameEvt);
+			});
 		}
 
 	}
@@ -168,10 +193,13 @@ Engine::GameInfo* Engine::createNewGame()
 	}
 
 	std::unique_ptr<Game> game = createGame();
-	MLGE_SET_CURRENT_GAME_INSTANCE(game.get());
-	if (!game->init())
+
 	{
-		return nullptr;
+		MLGE_SET_CURRENT_GAME_INSTANCE(game.get());
+		if (!game->init())
+		{
+			return nullptr;
+		}
 	}
 
 	*info = {};
@@ -352,10 +380,10 @@ bool Engine::run()
 		Renderer::get().render();
 
 		// We initiate shutdown if both the game and editor want to shutdown
-		if (Game::tryGet())
+		visitGames([&](Game& game)
 		{
-			shuttingDown = Game::get().isShuttingDown();
-		}
+			shuttingDown &= game.isShuttingDown();
+		});
 
 	#if MLGE_EDITOR
 		if (editor::Editor::tryGet())
@@ -364,10 +392,10 @@ bool Engine::run()
 		}
 	#endif
 
-		if (Game::tryGet())
+		visitGames([&](Game& game)
 		{
 			PerformanceStats::get().tick();
-		}
+		});
 
 	} while(shuttingDown == false);
 

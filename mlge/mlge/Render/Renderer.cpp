@@ -139,10 +139,10 @@ void Renderer::draw()
 
 	endFrameDelegate.broadcast();
 
-	if (Game::tryGet())
+	Engine::get().visitGames([](Game& game)
 	{
-		RenderQueue::get().render();
-	}
+		game.getRenderQueue().render();
+	});
 
 	gameRenderFinishedDelegate.broadcast();
 
