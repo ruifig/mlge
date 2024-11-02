@@ -98,6 +98,11 @@ struct FPoint : public SDL_FPoint
 		return (fabs(x - other.x) < epsilon) && (fabs(y - other.y) < epsilon);
 	}
 
+	bool isExactlyEqual(const FPoint& other) const
+	{
+		return x == other.x && y == other.y;
+	}
+
 	/**
 	 * Converts to integer coordinates, rounding halfway cases away from zero
 	 */
@@ -369,6 +374,7 @@ struct Color : public SDL_Color
 template<typename T>
 bool isEqual(T a, T b, T epsilon = details::MathTraits<T>::Epsilon)
 {
+	static_assert(std::is_floating_point_v<T>);
 	return (fabs(a - b) < epsilon);
 }
 
