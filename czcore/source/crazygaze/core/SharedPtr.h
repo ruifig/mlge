@@ -12,7 +12,7 @@ will only be deallocated once the Control Block is also gone.
 This means that any code holding a raw pointer for an object that was already destroyed but still has WeakPtrs will likely still
 point to the partially correct data (depending on the object's destructor).
 
-For example, this cod is a bug, but will still work correctly:
+For example, this code is a bug, but will still work correctly:
 
 ```
 struct MyFoo
