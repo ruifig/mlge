@@ -60,6 +60,11 @@ class Renderer : public Singleton<Renderer>
 		return m_frameNumber;
 	}
 
+	const std::string& getRenderingAPIName() const
+	{
+		return m_renderingAPIName;
+	}
+
 	MultiCastDelegate<> beginFrameDelegate;
 	MultiCastDelegate<> endFrameDelegate;
 	MultiCastDelegate<> gameRenderFinishedDelegate;
@@ -68,6 +73,7 @@ class Renderer : public Singleton<Renderer>
 
 	void draw();
 
+	std::string m_renderingAPIName;
 	SDLUniquePtr<SDL_Window> m_sdlWindow;
 	SDLUniquePtr<SDL_Renderer> m_sdlRenderer;
 	RenderTarget* m_renderTarget = nullptr;

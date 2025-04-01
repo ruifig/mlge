@@ -71,9 +71,15 @@ void PerformanceStats::render(RenderGroup /*group*/)
 	int x = 5;
 	Rect rect(x, 0, renderTargetSize.w - x, textRenderer.getFontHeight());
 
+	// These show the actual FPS calculations (as perceived by the player).
+	{
+		textRenderer.setArea(rect);
+		textRenderer.render(std::format("{}", Renderer::get().getRenderingAPIName()));
+	}
 
 	// These show the actual FPS calculations (as perceived by the player).
 	{
+		rect.translate({0, textRenderer.getFontHeight()});
 		textRenderer.setArea(rect);
 		textRenderer.render(std::format(
 			"FPS: {:3.0f}, MS: {:4.1f}, Variance: {:3.2f}",

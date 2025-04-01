@@ -100,6 +100,7 @@ bool Renderer::init()
 		SDL_RendererInfo info{};
 		SDL_GetRendererInfo(m_sdlRenderer.get(), &info);
 		CZ_LOG(Log, "RendererInfo: Name={}, flags={}", info.name, info.flags);
+		m_renderingAPIName = info.name;
 	}
 
 	DXDebugLayer::get().setD3DDebug(*m_sdlRenderer);
