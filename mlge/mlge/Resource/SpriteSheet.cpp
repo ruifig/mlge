@@ -9,13 +9,13 @@ namespace mlge
 //////////////////////////////////////////////////////////////////////////
 ObjectPtr<MResource> MSpriteSheetDefinition::create() const
 {
-	auto fullpath = m_root->path / file;
+	auto fullpath = std::filesystem::absolute(m_root->path / file);
 	Size sheetSize;
 
 	SDLUniquePtr<SDL_Surface> surface(IMG_Load(fullpath.string().c_str()));
 	if (!surface)
 	{
-		CZ_LOG(Error, "Failed to load surface {} from file{}. ec={}", name, narrow(file.native()), SDL_GetError());
+		CZ_LOG(Error, "Failed to load surface {} from file '{}'. ec={}", name, narrow(file.native()), SDL_GetError());
 		return nullptr;
 	}
 
@@ -27,7 +27,7 @@ ObjectPtr<MResource> MSpriteSheetDefinition::create() const
 	res->m_texture.reset(SDL_CreateTextureFromSurface(Renderer::get().getSDLRenderer(), surface.get()));
 	if (!res->m_texture)
 	{
-		CZ_LOG(Error, "Failed to create texture {} from surface loaded from file{}. ec={}", name, narrow(file.native()), SDL_GetError());
+		CZ_LOG(Error, "Failed to create texture {} from surface loaded from file '{}'. ec={}", name, narrow(file.native()), SDL_GetError());
 		return nullptr;
 	}
 

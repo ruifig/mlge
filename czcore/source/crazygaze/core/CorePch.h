@@ -17,6 +17,7 @@
 #include <filesystem>
 #include <variant>
 #include <queue>
+#include <string_view>
 
 CZ_THIRD_PARTY_INCLUDES_START
 #include "utf8.h"

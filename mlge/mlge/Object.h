@@ -157,7 +157,7 @@ class Class;
  *	- C++ constructor is called
  *	- The "virtual bool preConstruct()" is called.
  *		- If it returns false, object creation is considered as failed.
- *	- If any parameters are passed to createObject<T>, then a "bool construct(...)" that method is called with those parameters.
+ *	- If any parameters are passed to createObject<T>, then a "bool construct(...)" method is called with those parameters.
  *		- If it returns false, object creation is considered as failed.
  *		- createObject<T> will forward any parameters to T::construct, so construct can take any parameters T wants, and thus you
  *		  can think of T::construct as the actual C++ constructor.
