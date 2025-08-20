@@ -53,6 +53,7 @@ octet_iterator utf16to8_lenient (u16bit_iterator start, u16bit_iterator end, oct
 	return result;
 }
 
+
 } // unnamed namespace
 
 std::wstring widen(std::string_view str)
@@ -125,45 +126,13 @@ bool asciiStrEqualsCi(std::string_view str1, std::string_view str2)
 	return true;
 }
 
-std::vector<std::string> stringSplitIntoLinesVector(const char* textbuffer, size_t buffersize)
+std::vector<std::string> stringSplitIntoLinesVector(std::string_view text, bool dropEmptyLines)
 {
-	if (textbuffer == nullptr)
-	{
-		return {};
-	}
-
 	std::vector<std::string> lines;
-	const char* s = textbuffer;
-
-	while (*s != 0 && s < textbuffer + buffersize)
+	for(auto l : StringLineSplit(text, dropEmptyLines))
 	{
-		const char* ptrToChar = s;
-		while (!(*s == 0 || *s == 0xA || *s == 0xD))
-		{
-			s++;
-		}
-
-		auto numchars = s - ptrToChar;
-		lines.emplace_back(ptrToChar, ptrToChar + numchars);
-
-		// New lines format are:
-		// Unix		: 0xA
-		// Mac		: 0xD
-		// Windows	: 0xD 0xA
-		// If windows format a new line has 0xD 0xA, so we need to skip one extra character
-		if (*s == 0xD && *(s + 1) == 0xA)
-		{
-			s++;
-		}
-
-		if (*s == 0)
-		{
-			break;
-		}
-
-		s++;  // skip the newline character
+		lines.emplace_back(l);
 	}
-
 	return lines;
 }
 
@@ -179,6 +148,48 @@ bool whitespaceCharacter(int ch)
 		ch==0xD;    // carriage return
 }
 
+void StringLineSplit::Iterator::advanceImpl()
+{
+	if (m_pos >= m_str.size())
+	{
+		m_pos = std::string_view::npos;
+		m_current = {};
+		return;
+	}
+
+	size_t start = m_pos;
+	size_t len = 0;
+
+	// Find next line ending
+	while (m_pos < m_str.size())
+	{
+		char c = m_str[m_pos];
+		if (c == '\n' || c == '\r')
+		{
+			break;
+		}
+		++m_pos;
+	}
+
+	len = m_pos - start;
+	m_current = m_str.substr(start, len);
+
+	// Handle EOLs: \n, \r, \r\n
+	if (m_pos < m_str.size())
+	{
+		if (m_str[m_pos] == '\r')
+		{
+			++m_pos;
+			if (m_pos < m_str.size() && m_str[m_pos] == '\n')
+			{
+				++m_pos;
+			}
+		}
+		else if (m_str[m_pos] == '\n')
+		{
+			++m_pos;
+		}
+	}
+}
+
 } // namespace cz
-
-

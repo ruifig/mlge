@@ -14,10 +14,12 @@
 		CZ_CONCATENATE(str,__LINE__)
 #endif
 
+#define CZ_DELETE_COPY(Class)     \
+	Class(const Class&) = delete; \
+	Class& operator=(const Class&) = delete;
 
-#define CZ_DELETE_COPY_AND_MOVE(Class)         \
-	Class(Class&&) = delete;                   \
-	Class(const Class&) = delete;              \
-	Class& operator=(Class&&) = delete;        \
-	Class& operator=(const Class&&) = delete;
-
+#define CZ_DELETE_COPY_AND_MOVE(Class)       \
+	Class(const Class&) = delete;            \
+	Class(Class&&) = delete;                 \
+	Class& operator=(const Class&) = delete; \
+	Class& operator=(Class&&) = delete;

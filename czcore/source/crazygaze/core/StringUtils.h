@@ -49,7 +49,7 @@ std::string narrow(std::u32string_view str);
 
 
  /**
-  * Returns tru if the specified character is a whitespace character
+  * Returns true if the specified character is a whitespace character
   */
 bool whitespaceCharacter(int a);
 
@@ -101,9 +101,114 @@ bool asciiStrEqualsCi(std::string_view str1, std::string_view str2);
 
 /**
  * Splits a string into lines and puts them into a vector
+ * This allocated memory for each line, so consider using `StringLineSplit` instead.
  */
-std::vector<std::string> stringSplitIntoLinesVector(const char* textbuffer, size_t buffersize);
+std::vector<std::string> stringSplitIntoLinesVector(std::string_view text, bool dropEmptyLines = true);
+
+/*
+ * Utility that given a std::string_view, it allows iterating through lines
+ *
+ * E.g:
+ *
+ *	for(auto l : StringLineSplit(mystr))
+ *	{
+ *		CZ_LOG(Main, Log, "{}", l);
+ *	}
+ *
+ * NOTE: The constructor allows specifying if empty lines should be reported, or skipped
+ * 
+ */
+class StringLineSplit
+{
+  public:
+	class Iterator
+	{
+	  public:
+		using value_type = std::string_view;
+		using difference_type = std::ptrdiff_t;
+		using iterator_category = std::input_iterator_tag;
+		using pointer = const std::string_view*;
+		using reference = const std::string_view&;
+
+		Iterator() = default;
+
+		Iterator(std::string_view str, size_t pos, bool dropEmptyLines)
+			: m_str(str)
+			, m_pos(pos)
+			, m_dropEmptyLines(dropEmptyLines)
+		{
+			advance();
+		}
+
+		reference operator*() const
+		{
+			return m_current;
+		}
+		pointer operator->() const
+		{
+			return &m_current;
+		}
+
+		Iterator& operator++()
+		{
+			advance();
+			return *this;
+		}
+
+		Iterator operator++(int)
+		{
+			Iterator tmp = *this;
+			++(*this);
+			return tmp;
+		}
+
+		bool operator==(const Iterator& other) const
+		{
+			return m_pos == other.m_pos && m_str.data() == other.m_str.data();
+		}
+
+		bool operator!=(const Iterator& other) const
+		{
+			return !(*this == other);
+		}
+
+	  private:
+
+		void advance()
+		{
+			advanceImpl();
+			while (m_pos != std::string_view::npos && m_dropEmptyLines && m_current.size() == 0)
+			{
+				advanceImpl();
+			}
+		}
+		
+		void advanceImpl();
+
+		std::string_view m_str;
+		size_t m_pos = 0;
+		std::string_view m_current;
+		bool m_dropEmptyLines;
+	};
+
+	explicit StringLineSplit(std::string_view str, bool dropEmptyLines = true)
+		: m_str(str)
+		, m_dropEmptyLines(dropEmptyLines)
+	{
+	}
+
+	Iterator begin() const
+	{
+		return Iterator(m_str, 0, m_dropEmptyLines);
+	}
+	Iterator end() const
+	{
+		return Iterator(m_str, std::string_view::npos, m_dropEmptyLines);
+	}
+
+  private:
+	std::string_view m_str;
+	bool m_dropEmptyLines;
+};
 
 } // namespace cz
-
-

@@ -1,12 +1,7 @@
 #pragma once
 
 #include "mlge/PreSetup.h"
-
-#define CZ_DELETE_COPY_AND_MOVE(Class)       \
-	Class(Class&&) = delete;                   \
-	Class(const Class&) = delete;              \
-	Class& operator=(Class&&) = delete;        \
-	Class& operator=(const Class&&) = delete; 
+#include "crazygaze/core/Common.h"
 
 namespace mlge
 {

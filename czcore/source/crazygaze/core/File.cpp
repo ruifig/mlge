@@ -107,6 +107,36 @@ size_t File::read(void* buffer, size_t bytes)
 	return read(buffer, bytes, 1) * bytes;
 }
 
+File::Buffer File::readAllImpl(const fs::path& path, bool raiseError)
+{
+	std::unique_ptr<File> in = openImpl(path, Mode::Read, raiseError);
+	if (!in)
+	{
+		return {};
+	}
+
+	size_t dataSize = in->size();
+	Buffer buffer(dataSize);
+	if (!buffer.ptr)
+	{
+		return {};
+	}
+
+	if (in->read(buffer.ptr, dataSize) != dataSize)
+	{
+		if (raiseError)
+		{
+			CZ_LOG(Error, "Failed to read file contents");
+		}
+		return {};
+	}
+	else
+	{
+		buffer.size = dataSize;
+		return buffer;
+	}
+}
+
 bool File::eof() const
 {
 	return (feof(m_handle)==0) ? false : true;
@@ -155,4 +185,3 @@ size_t File::size()
 }
 
 } // namespace cz
-

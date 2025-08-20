@@ -116,7 +116,81 @@ class File
 		return m_handle;
 	}
 
+	/*!
+	 * Helper structure to make it easier to load an entire file into a memory buffer.
+	 */
+	struct Buffer
+	{
+		CZ_DELETE_COPY(Buffer);
+
+		// Since 0 is a valid size (the file is empty), we use max() to signify there was an error
+		inline static constexpr size_t InvalidSize = std::numeric_limits<size_t>::max();
+
+		Buffer(size_t size)
+		{
+			ptr = reinterpret_cast<char*>(malloc(size));
+			// IMPORTANT: `size` is intentionally NOT set here, so the caller code can set it ONLY if there was no error
+		}
+
+		Buffer() = default;
+
+		Buffer(Buffer&& other)
+		{
+			std::swap(ptr, other.ptr);
+			std::swap(size, other.size);
+		}
+
+		~Buffer()
+		{
+			free(ptr);
+		}
+
+		Buffer& operator=(Buffer&& other)
+		{
+			free(ptr);
+			ptr = other.ptr;
+			size = other.size;
+			other.ptr = nullptr;
+			other.size = InvalidSize;
+			return *this;
+		}
+
+		bool isValid() const
+		{
+			return size != InvalidSize;
+		}
+
+		operator bool() const
+		{
+			return isValid();
+		}
+
+		std::string_view to_string_view() const
+		{
+			return std::string_view(ptr, size);
+		}
+
+		char* ptr = nullptr;
+		size_t size = InvalidSize;
+	};
+
+	/*!
+	 * Reads the entire contents of a file into a buffer
+	 */
+	static Buffer readAll(const fs::path& path, bool logErrors = true)
+	{
+		return readAllImpl(path, logErrors);
+	}
+
+	static Buffer try_readAll(const fs::path& path)
+	{
+		return readAllImpl(path, false);
+	}
+
 protected:
+
+	static Buffer readAllImpl(const fs::path& path, bool raiseError);
+
 	static std::unique_ptr<File> openImpl(const fs::path& path, Mode mode, bool raiseError);
 	fs::path m_path;
 	FILE* m_handle = nullptr;
@@ -134,6 +208,4 @@ public:
 };
 
 } // namespace cz
-
-
 
