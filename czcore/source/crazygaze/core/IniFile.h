@@ -19,15 +19,15 @@ struct IniFile
 		/**
 		 * Looks for an existing entry. If it doesn't exist, it returns nullptr
 		 */
-		const Entry* tryGetEntry(const char* key) const;
+		const Entry* tryGetEntry(std::string_view key) const;
 
 		/**
 		 * Looks for for an entry. If it doesn't exist, it creates one.
 		 */
-		Entry& getEntry(const char* key);
+		Entry& getEntry(std::string_view key);
 
 		template<typename T>
-		void setValue(const char* key, const T& value)
+		void setValue(std::string_view key, const T& value)
 		{
 			Entry& entry = getEntry(key);
 
@@ -42,7 +42,7 @@ struct IniFile
 		}
 
 		template<typename T>
-		bool getValue(const char* key, T& dst) const
+		bool getValue(std::string_view key, T& dst) const
 		{
 			const Entry* entry = tryGetEntry(key);
 			if (!entry)
@@ -64,7 +64,7 @@ struct IniFile
 			}
 		}
 
-		inline bool getValue(const char* key, std::string& dst)
+		inline bool getValue(std::string_view key, std::string& dst)
 		{
 			const Entry* entry = tryGetEntry(key);
 			if (!entry)
@@ -90,16 +90,16 @@ struct IniFile
 	 * Finds a section.
 	 * Returns nullptr if it doesn't exist
 	 */
-	const Section* tryGetSection(const char* name) const;
+	const Section* tryGetSection(std::string_view name) const;
 
 	/**
 	 * Finds a section.
 	 * If it doesn't exist, then it is created
 	 */
-	Section& getSection(const char* name);
+	Section& getSection(std::string_view name);
 
 	template<typename T>
-	bool getValue(const char* section, const char* key, T& dst) const
+	bool getValue(std::string_view section, std::string_view key, T& dst) const
 	{
 		if (const Section* s = tryGetSection(section))
 		{
@@ -112,7 +112,7 @@ struct IniFile
 	}
 
 	template<typename T>
-	void setValue(const char* section, const char* key, const T& value)
+	void setValue(std::string_view section, std::string_view key, const T& value)
 	{
 		getSection(section).setValue(key, value);
 	}
