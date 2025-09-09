@@ -42,6 +42,7 @@ void ADebugText::addEntry(const Color& color, const std::string& str)
 		MTextRenderComponent* comp = addNewComponent<MTextRenderComponent>().get();
 		comp->setFont(m_font);
 		comp->setPtSize(m_fontSize);
+		comp->setRenderGroup(RenderGroup::OverlayDebug);
 
 		comp->setAlignment(HAlign::Right, VAlign::Bottom);
 		m_entries.back().comp = comp;

@@ -18,7 +18,10 @@ class AActor : public MObject
 	MLGE_OBJECT_INTERNALS(AActor, MObject)
 
   public:
+
 	virtual ~AActor();
+
+	virtual bool preConstruct() override;
 	virtual void tick(float deltaSeconds);
 
 	const FPoint& getPosition() const

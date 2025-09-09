@@ -9,6 +9,12 @@ AActor::~AActor()
 {
 }
 
+bool AActor::preConstruct()
+{
+	return Super::preConstruct();
+}
+
+
 void AActor::tick(float deltaSeconds)
 {
 	MLGE_PROFILE_SCOPE(mlge_Actor_tick);
