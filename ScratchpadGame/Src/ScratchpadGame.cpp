@@ -9,8 +9,6 @@
 #include "crazygaze/core/CommandLine.h"
 
 using namespace mlge;
-using namespace std::literals::chrono_literals;
-
 
 MLGE_IMPLEMENT_GAME(ScratchpadGame, "ScratchpadGame");
 

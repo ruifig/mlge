@@ -5,7 +5,6 @@
 #include "mlge/Text.h"
 
 using namespace mlge;
-using namespace std::literals::chrono_literals;
 
 #define addDebugText(fmtStr, ...)                                          \
 	{                                                                      \

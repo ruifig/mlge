@@ -8,7 +8,6 @@
 #include "mlge/FlipbookComponent.h"
 
 using namespace mlge;
-using namespace std::literals::chrono_literals;
 
 /**
  * Component that moves the ships.

@@ -9,8 +9,6 @@
 #include "crazygaze/core/Logging.h"
 #include "timestamp.h"
 
-using namespace std::literals::chrono_literals;
-
 namespace mlge
 {
 
