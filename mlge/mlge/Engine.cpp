@@ -210,6 +210,8 @@ Engine::GameInfo* Engine::createNewGame()
 
 bool Engine::init(int argc, char* argv[])
 {
+	// Set the working directory to the executable's folder
+	fs::current_path(getProcessPath());
 	m_root = Root::create();
 
 	// This needs to be initialized before Root, so the other singletons can query the command line
