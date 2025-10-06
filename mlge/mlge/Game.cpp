@@ -149,9 +149,14 @@ void Game::tick(float deltaSeconds)
 	m_ui->tick(deltaSeconds);
 }
 
-void Game::requestShutdown()
+void Game::requestExpectedShutdown()
 {
 	m_shuttingDown = true;
+}
+
+void Game::requestShutdownWithError()
+{
+	m_shuttingDown = false;
 }
 
 float Game::startShutdown()

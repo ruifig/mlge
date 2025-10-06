@@ -134,7 +134,14 @@ class Game : public BaseGame
 	 * Causes the game to initiate shutdown. 
 	 * Any game system(s) that want to cause the game to shutdown gracefully should call this
 	 */
-	 virtual void requestShutdown();
+	 virtual void requestExpectedShutdown();
+
+	 /**
+	  * Causes the game to initiate a shutdown
+	  * This will cause the process to return an error on error. 
+	  * This is mostly useful for automation, so any process launcher knows the game shutdown because of a problem.
+	  */
+	 virtual void requestShutdownWithError();
 
 	/**
 	 * Called when any systems in the game or engine request a shutdown (by calling requestShutdown())
@@ -185,7 +192,12 @@ class Game : public BaseGame
 
 	bool isShuttingDown() const
 	{
-		return m_shuttingDown;
+		return m_shuttingDown.has_value();
+	}
+
+	bool getShutdownValue() const
+	{
+		return m_shuttingDown.value_or(true);
 	}
 
 	double getGameTimeSecs() const
@@ -290,7 +302,8 @@ class Game : public BaseGame
 
 	std::string m_name;
 	std::string m_buildInfo;
-	bool m_shuttingDown = false;
+	// If set, then a shutdown was request, and the value specifies if its expected (true), or because of some error (false)
+	std::optional<bool> m_shuttingDown;
 
 	ObjectPtr<MLevel> m_level;
 

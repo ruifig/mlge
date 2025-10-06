@@ -61,7 +61,7 @@ void Editor::requestShutdown()
 
 	Engine::get().visitGames([](Game& game)
 	{
-		game.requestShutdown();
+		game.requestExpectedShutdown();
 	});
 }
 
@@ -311,7 +311,7 @@ void Editor::stopGame()
 		info.editorWindow = nullptr;
 
 		// Request the game instance to shutdown
-		game->requestShutdown();
+		game->requestExpectedShutdown();
 		int maxShutdownDurationMs = static_cast<int>(game->startShutdown() * 1000.0f);
 		// Tick the game until shutdown finishes or the deadline expires
 		info.stopDeadline = std::chrono::high_resolution_clock::now() + std::chrono::milliseconds(maxShutdownDurationMs);

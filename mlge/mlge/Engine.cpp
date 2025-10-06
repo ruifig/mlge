@@ -96,7 +96,7 @@ void Engine::processEvents()
 			{
 				visitGames([](Game& game)
 				{
-					game.requestShutdown();
+					game.requestExpectedShutdown();
 				});
 			}
 		}
@@ -108,7 +108,7 @@ void Engine::processEvents()
 				{
 					visitGames([](Game& game)
 					{
-						game.requestShutdown();
+						game.requestExpectedShutdown();
 					});
 				}
 			}
@@ -198,6 +198,7 @@ Engine::GameInfo* Engine::createNewGame()
 		MLGE_SET_CURRENT_GAME_INSTANCE(game.get());
 		if (!game->init())
 		{
+			game = nullptr;
 			return nullptr;
 		}
 	}
@@ -403,6 +404,11 @@ bool Engine::run()
 
 	CZ_LOG(Log, "Starting shutdown...");
 
+
+	// #MULTIPLE_INSTANCES: Remove this:
+	BaseGame* game = Game::tryGet() ? Game::tryGet() : Engine::get().tryGetFirstGame();
+	MLGE_SET_CURRENT_GAME_INSTANCE(game);
+
 	// Start the shutdown.
 	if (Game::tryGet())
 	{
@@ -434,8 +440,7 @@ bool Engine::run()
 		Game::get().shutdown();
 	}
 
-
-	return true;
+	return Game::get().getShutdownValue();
 }
 
 } // namespace mlge
