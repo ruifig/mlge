@@ -50,17 +50,25 @@ struct IniFile
 				return false;
 			}
 			
-			std::istringstream is{ entry->value };
-			T val;
-			char c;
-			if ((is >> std::boolalpha >> val) && !(is >> c))
+			if constexpr(std::is_same_v<T, std::string>)
 			{
-				dst = val;
+				dst = entry->value;
 				return true;
 			}
 			else
 			{
-				return false;
+				std::istringstream is{ entry->value };
+				T val;
+				char c;
+				if ((is >> std::boolalpha >> val) && !(is >> c))
+				{
+					dst = val;
+					return true;
+				}
+				else
+				{
+					return false;
+				}
 			}
 		}
 
