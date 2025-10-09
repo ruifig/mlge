@@ -210,5 +210,15 @@ public:
 
 };
 
+
+/*!
+ * Saves content to a text file.
+ *
+ * \param saveOnlyIfChanged
+ *	Instead of saving to the file straight away, it first loads the existing contents, compares them, and only saves
+ *	the new data if it changed. This is to avoid changing the file timestamps.
+ */
+bool saveTextFile(const fs::path& path, std::string_view contents, bool saveOnlyIfChanged);
+
 } // namespace cz
 

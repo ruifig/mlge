@@ -17,8 +17,6 @@ std::string narrow(std::u32string_view str);
  */
  std::wstring widen(std::string_view str);
 
-
-
 /**
  * Using this, so we can use std::string as a key to the map, but not having to allocate a std::string every time we need to do a
  * lookup.
@@ -98,6 +96,22 @@ static inline StringType trim(const StringType& s)
  * Only the characters 'ABCDEFGHIJKLMNOPQRSTUVWXYZ' are converted for comparison.
  */
 bool asciiStrEqualsCi(std::string_view str1, std::string_view str2);
+
+/*!
+ * Given a string_view as input, it replaces all occurences of `from` with `to`
+ */
+std::string replace(std::string_view input, std::string_view from, std::string_view to);
+
+enum class EOL
+{
+	Windows,
+	Linux,
+};
+
+/*!
+ * Changes the EOLs of the specified string
+ */
+std::string changeEOL(std::string_view str, EOL eol);
 
 /**
  * Splits a string into lines and puts them into a vector
