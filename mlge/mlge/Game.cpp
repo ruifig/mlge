@@ -35,6 +35,8 @@ Game::Game(std::string_view name)
 
 	m_buildInfo = std::format("{} v{}, GitHash:{}, Build type:{}, Build timestamp:{} UTC",
 		m_name, "0.0.0", git_short_hash_str, buildType, build_time_str);
+
+	CZ_LOG(Log, "{}", m_buildInfo);
 }
 
 Game::~Game()
