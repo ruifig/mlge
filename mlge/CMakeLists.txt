@@ -125,7 +125,6 @@ target_link_libraries(mlge PUBLIC
 	dxguid
 	d3d12
 
-	$<$<OR:$<CONFIG:Debug>,$<CONFIG:Development>>:Remotery>
 	$<$<OR:$<CONFIG:Debug>,$<CONFIG:Development>>:imgui>
 
 	timestamp

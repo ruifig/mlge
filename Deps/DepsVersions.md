@@ -9,6 +9,10 @@
 * Commit cd58ac42dee3ec856df88462f1e0f29be9e6a6d6 , Oct 30, 2022
 * It contains some custom changes. Search for LUDEO in the entire folder
 
+# czcore
+
+* https://github.com/ruifig/czcore
+
 # imgui
 
 * https://github.com/ocornut/imgui
@@ -22,7 +26,6 @@
 # SDL
 * https://github.com/libsdl-org/SDL/releases
 * Version 2.30.7
-
 
 # utfcpp
 
