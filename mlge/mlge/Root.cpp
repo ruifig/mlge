@@ -23,7 +23,6 @@ struct RootImpl : public Root
 	CommandLine cmdLine;
 	FileLogOutput fileLogOutput;
 	Config config;
-	Profiler profiler;
 	Renderer renderer;
 	ResourceManager resourceManager;
 #if MLGE_EDITOR
@@ -42,8 +41,6 @@ struct RootImpl : public Root
 			return false;
 		}
 		
-		profiler.init();
-
 		if (!renderer.init())
 		{
 			return false;

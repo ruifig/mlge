@@ -32,7 +32,6 @@ set(ALL_FILES
 	"mlge/PerformanceStats.cpp"
 	"mlge/PerformanceStats.h"
 	"mlge/PreSetup.h"
-	"mlge/Profiler.cpp"
 	"mlge/Profiler.h"
 	"mlge/RenderComponent.cpp"
 	"mlge/RenderComponent.h"
