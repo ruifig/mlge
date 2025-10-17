@@ -667,20 +667,52 @@ Nor would this
     </Expression>
     <OverallResult success="true" skips="0"/>
   </TestCase>
-  <TestCase name="#2615 - Throwing in constructor generator fails test case but does not abort" tags="[!shouldfail]" filename="tests/<exe-name>/UsageTests/Generators.tests.cpp" >
-    <Exception filename="tests/<exe-name>/UsageTests/Generators.tests.cpp" >
-      failure to init
-    </Exception>
+  <TestCase name="#2615 - Throwing in constructor generator fails test case but does not abort" tags="[!shouldfail][generators][regression]" filename="tests/<exe-name>/UsageTests/Generators.tests.cpp" >
+    <Expression success="false" filename="tests/<exe-name>/UsageTests/Generators.tests.cpp" >
+      <Original>
+        {Unknown expression after the reported line}
+      </Original>
+      <Expanded>
+        {Unknown expression after the reported line}
+      </Expanded>
+      <Exception filename="tests/<exe-name>/UsageTests/Generators.tests.cpp" >
+        failure to init
+      </Exception>
+    </Expression>
+    <OverallResult success="true" skips="0"/>
+  </TestCase>
+  <TestCase name="#3001: Enum-based bitfields can be captured" filename="tests/<exe-name>/UsageTests/Compilation.tests.cpp" >
+    <Expression success="true" type="REQUIRE" filename="tests/<exe-name>/UsageTests/Compilation.tests.cpp" >
+      <Original>
+        bf.e == 1
+      </Original>
+      <Expanded>
+        1 == 1
+      </Expanded>
+    </Expression>
+    <Expression success="true" type="REQUIRE" filename="tests/<exe-name>/UsageTests/Compilation.tests.cpp" >
+      <Original>
+        1 == bf.e
+      </Original>
+      <Expanded>
+        1 == 1
+      </Expanded>
+    </Expression>
     <OverallResult success="true" skips="0"/>
   </TestCase>
   <TestCase name="#748 - captures with unexpected exceptions" tags="[!shouldfail][!throws][.][failing]" filename="tests/<exe-name>/UsageTests/Exception.tests.cpp" >
     <Section name="outside assertions" filename="tests/<exe-name>/UsageTests/Exception.tests.cpp" >
-      <Info filename="tests/<exe-name>/UsageTests/Exception.tests.cpp" >
-        answer := 42
-      </Info>
-      <Exception filename="tests/<exe-name>/UsageTests/Exception.tests.cpp" >
-        expected exception
-      </Exception>
+      <Expression success="false" filename="tests/<exe-name>/UsageTests/Exception.tests.cpp" >
+        <Original>
+          {Unknown expression after the reported line}
+        </Original>
+        <Expanded>
+          {Unknown expression after the reported line}
+        </Expanded>
+        <Exception filename="tests/<exe-name>/UsageTests/Exception.tests.cpp" >
+          expected exception
+        </Exception>
+      </Expression>
       <OverallResults successes="0" failures="0" expectedFailures="1" skipped="false"/>
     </Section>
     <Section name="inside REQUIRE_NOTHROW" filename="tests/<exe-name>/UsageTests/Exception.tests.cpp" >
@@ -2056,6 +2088,56 @@ Nor would this
     </Expression>
     <OverallResult success="true" skips="0"/>
   </TestCase>
+  <TestCase name="A TEST_CASE_PERSISTENT_FIXTURE based test run that fails" tags="[.][class][failing]" filename="tests/<exe-name>/UsageTests/Class.tests.cpp" >
+    <Section name="First partial run" filename="tests/<exe-name>/UsageTests/Class.tests.cpp" >
+      <Expression success="true" type="REQUIRE" filename="tests/<exe-name>/UsageTests/Class.tests.cpp" >
+        <Original>
+          m_a++ == 0
+        </Original>
+        <Expanded>
+          0 == 0
+        </Expanded>
+      </Expression>
+      <OverallResults successes="1" failures="0" expectedFailures="0" skipped="false"/>
+    </Section>
+    <Section name="Second partial run" filename="tests/<exe-name>/UsageTests/Class.tests.cpp" >
+      <Expression success="false" type="REQUIRE" filename="tests/<exe-name>/UsageTests/Class.tests.cpp" >
+        <Original>
+          m_a == 0
+        </Original>
+        <Expanded>
+          1 == 0
+        </Expanded>
+      </Expression>
+      <OverallResults successes="0" failures="1" expectedFailures="0" skipped="false"/>
+    </Section>
+    <OverallResult success="false" skips="0"/>
+  </TestCase>
+  <TestCase name="A TEST_CASE_PERSISTENT_FIXTURE based test run that succeeds" tags="[class]" filename="tests/<exe-name>/UsageTests/Class.tests.cpp" >
+    <Section name="First partial run" filename="tests/<exe-name>/UsageTests/Class.tests.cpp" >
+      <Expression success="true" type="REQUIRE" filename="tests/<exe-name>/UsageTests/Class.tests.cpp" >
+        <Original>
+          m_a++ == 0
+        </Original>
+        <Expanded>
+          0 == 0
+        </Expanded>
+      </Expression>
+      <OverallResults successes="1" failures="0" expectedFailures="0" skipped="false"/>
+    </Section>
+    <Section name="Second partial run" filename="tests/<exe-name>/UsageTests/Class.tests.cpp" >
+      <Expression success="true" type="REQUIRE" filename="tests/<exe-name>/UsageTests/Class.tests.cpp" >
+        <Original>
+          m_a == 1
+        </Original>
+        <Expanded>
+          1 == 1
+        </Expanded>
+      </Expression>
+      <OverallResults successes="1" failures="0" expectedFailures="0" skipped="false"/>
+    </Section>
+    <OverallResult success="true" skips="0"/>
+  </TestCase>
   <TestCase name="A Template product test case - Foo&lt;float>" tags="[product][template]" filename="tests/<exe-name>/UsageTests/Misc.tests.cpp" >
     <Expression success="true" type="REQUIRE" filename="tests/<exe-name>/UsageTests/Misc.tests.cpp" >
       <Original>
@@ -2150,7 +2232,9 @@ Nor would this
         d == 1.23_a
       </Original>
       <Expanded>
-        1.23 == Approx( 1.23 )
+        1.22999999999999998
+==
+Approx( 1.22999999999999998 )
       </Expanded>
     </Expression>
     <Expression success="true" type="REQUIRE" filename="tests/<exe-name>/UsageTests/Approx.tests.cpp" >
@@ -2158,7 +2242,9 @@ Nor would this
         d != 1.22_a
       </Original>
       <Expanded>
-        1.23 != Approx( 1.22 )
+        1.22999999999999998
+!=
+Approx( 1.21999999999999997 )
       </Expanded>
     </Expression>
     <Expression success="true" type="REQUIRE" filename="tests/<exe-name>/UsageTests/Approx.tests.cpp" >
@@ -2166,7 +2252,9 @@ Nor would this
         -d == -1.23_a
       </Original>
       <Expanded>
-        -1.23 == Approx( -1.23 )
+        -1.22999999999999998
+==
+Approx( -1.22999999999999998 )
       </Expanded>
     </Expression>
     <Expression success="true" type="REQUIRE" filename="tests/<exe-name>/UsageTests/Approx.tests.cpp" >
@@ -2174,7 +2262,9 @@ Nor would this
         d == 1.2_a .epsilon(.1)
       </Original>
       <Expanded>
-        1.23 == Approx( 1.2 )
+        1.22999999999999998
+==
+Approx( 1.19999999999999996 )
       </Expanded>
     </Expression>
     <Expression success="true" type="REQUIRE" filename="tests/<exe-name>/UsageTests/Approx.tests.cpp" >
@@ -2182,7 +2272,9 @@ Nor would this
         d != 1.2_a .epsilon(.001)
       </Original>
       <Expanded>
-        1.23 != Approx( 1.2 )
+        1.22999999999999998
+!=
+Approx( 1.19999999999999996 )
       </Expanded>
     </Expression>
     <Expression success="true" type="REQUIRE" filename="tests/<exe-name>/UsageTests/Approx.tests.cpp" >
@@ -2190,7 +2282,7 @@ Nor would this
         d == 1_a .epsilon(.3)
       </Original>
       <Expanded>
-        1.23 == Approx( 1.0 )
+        1.22999999999999998 == Approx( 1.0 )
       </Expanded>
     </Expression>
     <OverallResult success="true" skips="0"/>
@@ -2264,7 +2356,7 @@ Nor would this
         100.3 != Approx(100.0)
       </Original>
       <Expanded>
-        100.3 != Approx( 100.0 )
+        100.29999999999999716 != Approx( 100.0 )
       </Expanded>
     </Expression>
     <Expression success="true" type="REQUIRE" filename="tests/<exe-name>/UsageTests/Approx.tests.cpp" >
@@ -2272,7 +2364,7 @@ Nor would this
         100.3 == Approx(100.0).margin(0.5)
       </Original>
       <Expanded>
-        100.3 == Approx( 100.0 )
+        100.29999999999999716 == Approx( 100.0 )
       </Expanded>
     </Expression>
     <OverallResult success="true" skips="0"/>
@@ -2432,7 +2524,9 @@ Nor would this
         divide( 22, 7 ) == Approx( 3.141 ).epsilon( 0.001 )
       </Original>
       <Expanded>
-        3.1428571429 == Approx( 3.141 )
+        3.14285714285714279
+==
+Approx( 3.14100000000000001 )
       </Expanded>
     </Expression>
     <Expression success="true" type="REQUIRE" filename="tests/<exe-name>/UsageTests/Approx.tests.cpp" >
@@ -2440,7 +2534,9 @@ Nor would this
         divide( 22, 7 ) != Approx( 3.141 ).epsilon( 0.0001 )
       </Original>
       <Expanded>
-        3.1428571429 != Approx( 3.141 )
+        3.14285714285714279
+!=
+Approx( 3.14100000000000001 )
       </Expanded>
     </Expression>
     <OverallResult success="true" skips="0"/>
@@ -2451,7 +2547,9 @@ Nor would this
         d != Approx( 1.231 )
       </Original>
       <Expanded>
-        1.23 != Approx( 1.231 )
+        1.22999999999999998
+!=
+Approx( 1.23100000000000009 )
       </Expanded>
     </Expression>
     <Expression success="true" type="REQUIRE" filename="tests/<exe-name>/UsageTests/Approx.tests.cpp" >
@@ -2459,7 +2557,9 @@ Nor would this
         d == Approx( 1.231 ).epsilon( 0.1 )
       </Original>
       <Expanded>
-        1.23 == Approx( 1.231 )
+        1.22999999999999998
+==
+Approx( 1.23100000000000009 )
       </Expanded>
     </Expression>
     <OverallResult success="true" skips="0"/>
@@ -2470,7 +2570,9 @@ Nor would this
         1.23f == Approx( 1.23f )
       </Original>
       <Expanded>
-        1.23f == Approx( 1.2300000191 )
+        1.230000019f
+==
+Approx( 1.23000001907348633 )
       </Expanded>
     </Expression>
     <Expression success="true" type="REQUIRE" filename="tests/<exe-name>/UsageTests/Approx.tests.cpp" >
@@ -2532,7 +2634,9 @@ Nor would this
         1.234f == Approx( dMedium )
       </Original>
       <Expanded>
-        1.234f == Approx( 1.234 )
+        1.233999968f
+==
+Approx( 1.23399999999999999 )
       </Expanded>
     </Expression>
     <Expression success="true" type="REQUIRE" filename="tests/<exe-name>/UsageTests/Approx.tests.cpp" >
@@ -2540,7 +2644,9 @@ Nor would this
         dMedium == Approx( 1.234f )
       </Original>
       <Expanded>
-        1.234 == Approx( 1.2339999676 )
+        1.23399999999999999
+==
+Approx( 1.23399996757507324 )
       </Expanded>
     </Expression>
     <OverallResult success="true" skips="0"/>
@@ -2626,6 +2732,58 @@ Nor would this
       <Expanded>
         !(Val: 1 ^ Val: 1)
       </Expanded>
+    </Expression>
+    <OverallResult success="true" skips="0"/>
+  </TestCase>
+  <TestCase name="Assertions can be nested - CHECK" tags="[!shouldfail][assertions]" filename="tests/<exe-name>/IntrospectiveTests/AssertionHandler.tests.cpp" >
+    <Expression success="false" type="REQUIRE" filename="tests/<exe-name>/IntrospectiveTests/AssertionHandler.tests.cpp" >
+      <Original>
+        i > 10
+      </Original>
+      <Expanded>
+        2 > 10
+      </Expanded>
+    </Expression>
+    <Expression success="false" type="CHECK" filename="tests/<exe-name>/IntrospectiveTests/AssertionHandler.tests.cpp" >
+      <Original>
+        foo( 2 ) == 2
+      </Original>
+      <Expanded>
+        foo( 2 ) == 2
+      </Expanded>
+      <Exception filename="tests/<exe-name>/IntrospectiveTests/AssertionHandler.tests.cpp" >
+        { nested assertion failed }
+      </Exception>
+    </Expression>
+    <Expression success="true" type="CHECK" filename="tests/<exe-name>/IntrospectiveTests/AssertionHandler.tests.cpp" >
+      <Original>
+        true
+      </Original>
+      <Expanded>
+        true
+      </Expanded>
+    </Expression>
+    <OverallResult success="true" skips="0"/>
+  </TestCase>
+  <TestCase name="Assertions can be nested - REQUIRE" tags="[!shouldfail][assertions]" filename="tests/<exe-name>/IntrospectiveTests/AssertionHandler.tests.cpp" >
+    <Expression success="false" type="REQUIRE" filename="tests/<exe-name>/IntrospectiveTests/AssertionHandler.tests.cpp" >
+      <Original>
+        i > 10
+      </Original>
+      <Expanded>
+        2 > 10
+      </Expanded>
+    </Expression>
+    <Expression success="false" type="REQUIRE" filename="tests/<exe-name>/IntrospectiveTests/AssertionHandler.tests.cpp" >
+      <Original>
+        foo( 2 ) == 2
+      </Original>
+      <Expanded>
+        foo( 2 ) == 2
+      </Expanded>
+      <Exception filename="tests/<exe-name>/IntrospectiveTests/AssertionHandler.tests.cpp" >
+        { nested assertion failed }
+      </Exception>
     </Expression>
     <OverallResult success="true" skips="0"/>
   </TestCase>
@@ -2911,13 +3069,13 @@ Nor would this
   </TestCase>
   <TestCase name="CAPTURE can deal with complex expressions involving commas" tags="[capture][messages]" filename="tests/<exe-name>/UsageTests/Message.tests.cpp" >
     <Info filename="tests/<exe-name>/UsageTests/Message.tests.cpp" >
-      std::vector&lt;int>{1, 2, 3}[0, 1, 2] := 3
+      custom_index_op&lt;int>{1, 2, 3}[0, 1, 2] := 0
     </Info>
     <Info filename="tests/<exe-name>/UsageTests/Message.tests.cpp" >
-      std::vector&lt;int>{1, 2, 3}[(0, 1)] := 2
+      custom_index_op&lt;int>{1, 2, 3}[(0, 1)] := 0
     </Info>
     <Info filename="tests/<exe-name>/UsageTests/Message.tests.cpp" >
-      std::vector&lt;int>{1, 2, 3}[0] := 1
+      custom_index_op&lt;int>{1, 2, 3}[0] := 0
     </Info>
     <Info filename="tests/<exe-name>/UsageTests/Message.tests.cpp" >
       (helper_1436&lt;int, int>{12, -12}) := { 12, -12 }
@@ -2999,6 +3157,48 @@ Nor would this
       <OverallResults successes="1" failures="0" expectedFailures="0" skipped="false"/>
     </Section>
     <OverallResult success="true" skips="0"/>
+  </TestCase>
+  <TestCase name="Captures do not leave block with an exception" tags="[.][capture][failing][messages]" filename="tests/<exe-name>/UsageTests/Message.tests.cpp" >
+    <Info filename="tests/<exe-name>/UsageTests/Message.tests.cpp" >
+      a := 1
+    </Info>
+    <Expression success="false" type="REQUIRE" filename="tests/<exe-name>/UsageTests/Message.tests.cpp" >
+      <Original>
+        false
+      </Original>
+      <Expanded>
+        false
+      </Expanded>
+    </Expression>
+    <OverallResult success="false" skips="0"/>
+  </TestCase>
+  <TestCase name="Captures outlive section end" tags="[.][failing][info][messages]" filename="tests/<exe-name>/UsageTests/Message.tests.cpp" >
+    <Section name="Dummy section" filename="tests/<exe-name>/UsageTests/Message.tests.cpp" >
+      <Info filename="tests/<exe-name>/UsageTests/Message.tests.cpp" >
+        a := 1
+      </Info>
+      <Expression success="true" type="CHECK" filename="tests/<exe-name>/UsageTests/Message.tests.cpp" >
+        <Original>
+          true
+        </Original>
+        <Expanded>
+          true
+        </Expanded>
+      </Expression>
+      <OverallResults successes="1" failures="0" expectedFailures="0" skipped="false"/>
+    </Section>
+    <Info filename="tests/<exe-name>/UsageTests/Message.tests.cpp" >
+      a := 1
+    </Info>
+    <Expression success="false" type="REQUIRE" filename="tests/<exe-name>/UsageTests/Message.tests.cpp" >
+      <Original>
+        false
+      </Original>
+      <Expanded>
+        false
+      </Expanded>
+    </Expression>
+    <OverallResult success="false" skips="0"/>
   </TestCase>
   <TestCase name="CaseInsensitiveEqualsTo is case insensitive" tags="[comparisons][string-case]" filename="tests/<exe-name>/IntrospectiveTests/Details.tests.cpp" >
     <Section name="Degenerate cases" filename="tests/<exe-name>/IntrospectiveTests/Details.tests.cpp" >
@@ -3142,34 +3342,34 @@ Nor would this
     <Section name="Specifically escaped" filename="tests/<exe-name>/UsageTests/ToStringGeneral.tests.cpp" >
       <Expression success="true" type="CHECK" filename="tests/<exe-name>/UsageTests/ToStringGeneral.tests.cpp" >
         <Original>
-          tab == '\t'
+          ::Catch::Detail::stringify('\t') == "'\\t'"
         </Original>
         <Expanded>
-          '\t' == '\t'
+          "'\t'" == "'\t'"
         </Expanded>
       </Expression>
       <Expression success="true" type="CHECK" filename="tests/<exe-name>/UsageTests/ToStringGeneral.tests.cpp" >
         <Original>
-          newline == '\n'
+          ::Catch::Detail::stringify('\n') == "'\\n'"
         </Original>
         <Expanded>
-          '\n' == '\n'
+          "'\n'" == "'\n'"
         </Expanded>
       </Expression>
       <Expression success="true" type="CHECK" filename="tests/<exe-name>/UsageTests/ToStringGeneral.tests.cpp" >
         <Original>
-          carr_return == '\r'
+          ::Catch::Detail::stringify('\r') == "'\\r'"
         </Original>
         <Expanded>
-          '\r' == '\r'
+          "'\r'" == "'\r'"
         </Expanded>
       </Expression>
       <Expression success="true" type="CHECK" filename="tests/<exe-name>/UsageTests/ToStringGeneral.tests.cpp" >
         <Original>
-          form_feed == '\f'
+          ::Catch::Detail::stringify('\f') == "'\\f'"
         </Original>
         <Expanded>
-          '\f' == '\f'
+          "'\f'" == "'\f'"
         </Expanded>
       </Expression>
       <OverallResults successes="4" failures="0" expectedFailures="0" skipped="false"/>
@@ -3177,89 +3377,108 @@ Nor would this
     <Section name="General chars" filename="tests/<exe-name>/UsageTests/ToStringGeneral.tests.cpp" >
       <Expression success="true" type="CHECK" filename="tests/<exe-name>/UsageTests/ToStringGeneral.tests.cpp" >
         <Original>
-          space == ' '
+          ::Catch::Detail::stringify( ' ' ) == "' '"
         </Original>
         <Expanded>
-          ' ' == ' '
+          "' '" == "' '"
         </Expanded>
       </Expression>
-      <Expression success="true" type="REQUIRE" filename="tests/<exe-name>/UsageTests/ToStringGeneral.tests.cpp" >
+      <Expression success="true" type="CHECK" filename="tests/<exe-name>/UsageTests/ToStringGeneral.tests.cpp" >
         <Original>
-          c == chars[i]
+          ::Catch::Detail::stringify( 'A' ) == "'A'"
         </Original>
         <Expanded>
-          'a' == 'a'
+          "'A'" == "'A'"
         </Expanded>
       </Expression>
-      <Expression success="true" type="REQUIRE" filename="tests/<exe-name>/UsageTests/ToStringGeneral.tests.cpp" >
+      <Expression success="true" type="CHECK" filename="tests/<exe-name>/UsageTests/ToStringGeneral.tests.cpp" >
         <Original>
-          c == chars[i]
+          ::Catch::Detail::stringify( 'z' ) == "'z'"
         </Original>
         <Expanded>
-          'z' == 'z'
+          "'z'" == "'z'"
         </Expanded>
       </Expression>
-      <Expression success="true" type="REQUIRE" filename="tests/<exe-name>/UsageTests/ToStringGeneral.tests.cpp" >
-        <Original>
-          c == chars[i]
-        </Original>
-        <Expanded>
-          'A' == 'A'
-        </Expanded>
-      </Expression>
-      <Expression success="true" type="REQUIRE" filename="tests/<exe-name>/UsageTests/ToStringGeneral.tests.cpp" >
-        <Original>
-          c == chars[i]
-        </Original>
-        <Expanded>
-          'Z' == 'Z'
-        </Expanded>
-      </Expression>
-      <OverallResults successes="5" failures="0" expectedFailures="0" skipped="false"/>
+      <OverallResults successes="3" failures="0" expectedFailures="0" skipped="false"/>
     </Section>
     <Section name="Low ASCII" filename="tests/<exe-name>/UsageTests/ToStringGeneral.tests.cpp" >
       <Expression success="true" type="CHECK" filename="tests/<exe-name>/UsageTests/ToStringGeneral.tests.cpp" >
         <Original>
-          null_terminator == '\0'
+          ::Catch::Detail::stringify( '\0' ) == "0"
         </Original>
         <Expanded>
-          0 == 0
+          "0" == "0"
         </Expanded>
       </Expression>
-      <Expression success="true" type="REQUIRE" filename="tests/<exe-name>/UsageTests/ToStringGeneral.tests.cpp" >
+      <Expression success="true" type="CHECK" filename="tests/<exe-name>/UsageTests/ToStringGeneral.tests.cpp" >
         <Original>
-          c == i
+          ::Catch::Detail::stringify( static_cast&lt;char>(2) ) == "2"
         </Original>
         <Expanded>
-          2 == 2
+          "2" == "2"
         </Expanded>
       </Expression>
-      <Expression success="true" type="REQUIRE" filename="tests/<exe-name>/UsageTests/ToStringGeneral.tests.cpp" >
+      <Expression success="true" type="CHECK" filename="tests/<exe-name>/UsageTests/ToStringGeneral.tests.cpp" >
         <Original>
-          c == i
+          ::Catch::Detail::stringify( static_cast&lt;char>(5) ) == "5"
         </Original>
         <Expanded>
-          3 == 3
+          "5" == "5"
         </Expanded>
       </Expression>
-      <Expression success="true" type="REQUIRE" filename="tests/<exe-name>/UsageTests/ToStringGeneral.tests.cpp" >
-        <Original>
-          c == i
-        </Original>
-        <Expanded>
-          4 == 4
-        </Expanded>
-      </Expression>
-      <Expression success="true" type="REQUIRE" filename="tests/<exe-name>/UsageTests/ToStringGeneral.tests.cpp" >
-        <Original>
-          c == i
-        </Original>
-        <Expanded>
-          5 == 5
-        </Expanded>
-      </Expression>
-      <OverallResults successes="5" failures="0" expectedFailures="0" skipped="false"/>
+      <OverallResults successes="3" failures="0" expectedFailures="0" skipped="false"/>
     </Section>
+    <OverallResult success="true" skips="0"/>
+  </TestCase>
+  <TestCase name="Clara::Arg does not crash on incomplete input" tags="[arg][clara][compilation]" filename="tests/<exe-name>/IntrospectiveTests/Clara.tests.cpp" >
+    <Expression success="true" type="CHECK" filename="tests/<exe-name>/IntrospectiveTests/Clara.tests.cpp" >
+      <Original>
+        name.empty()
+      </Original>
+      <Expanded>
+        true
+      </Expanded>
+    </Expression>
+    <Expression success="true" type="CHECK" filename="tests/<exe-name>/IntrospectiveTests/Clara.tests.cpp" >
+      <Original>
+        result
+      </Original>
+      <Expanded>
+        {?}
+      </Expanded>
+    </Expression>
+    <Expression success="true" type="CHECK" filename="tests/<exe-name>/IntrospectiveTests/Clara.tests.cpp" >
+      <Original>
+        result.type() == Catch::Clara::Detail::ResultType::Ok
+      </Original>
+      <Expanded>
+        0 == 0
+      </Expanded>
+    </Expression>
+    <Expression success="true" type="CHECK" filename="tests/<exe-name>/IntrospectiveTests/Clara.tests.cpp" >
+      <Original>
+        parsed.type() == Catch::Clara::ParseResultType::NoMatch
+      </Original>
+      <Expanded>
+        1 == 1
+      </Expanded>
+    </Expression>
+    <Expression success="true" type="CHECK" filename="tests/<exe-name>/IntrospectiveTests/Clara.tests.cpp" >
+      <Original>
+        parsed.remainingTokens().count() == 2
+      </Original>
+      <Expanded>
+        2 == 2
+      </Expanded>
+    </Expression>
+    <Expression success="true" type="CHECK" filename="tests/<exe-name>/IntrospectiveTests/Clara.tests.cpp" >
+      <Original>
+        name.empty()
+      </Original>
+      <Expanded>
+        true
+      </Expanded>
+    </Expression>
     <OverallResult success="true" skips="0"/>
   </TestCase>
   <TestCase name="Clara::Arg supports single-arg parse the way Opt does" tags="[arg][clara][compilation]" filename="tests/<exe-name>/IntrospectiveTests/Clara.tests.cpp" >
@@ -3658,6 +3877,65 @@ C
       </Original>
       <Expanded>
         { 1, 2 } == { 1, 2 }
+      </Expanded>
+    </Expression>
+    <OverallResult success="true" skips="0"/>
+  </TestCase>
+  <TestCase name="Comparing (and stringifying) volatile pointers works" tags="[volatile]" filename="tests/<exe-name>/UsageTests/Misc.tests.cpp" >
+    <Expression success="true" type="REQUIRE_FALSE" filename="tests/<exe-name>/UsageTests/Misc.tests.cpp" >
+      <Original>
+        !(ptr)
+      </Original>
+      <Expanded>
+        !0
+      </Expanded>
+    </Expression>
+    <Expression success="true" type="REQUIRE" filename="tests/<exe-name>/UsageTests/Misc.tests.cpp" >
+      <Original>
+        ptr == ptr
+      </Original>
+      <Expanded>
+        0 == 0
+      </Expanded>
+    </Expression>
+    <Expression success="true" type="REQUIRE_FALSE" filename="tests/<exe-name>/UsageTests/Misc.tests.cpp" >
+      <Original>
+        !(ptr != ptr)
+      </Original>
+      <Expanded>
+        !(0 != 0)
+      </Expanded>
+    </Expression>
+    <Expression success="true" type="REQUIRE_FALSE" filename="tests/<exe-name>/UsageTests/Misc.tests.cpp" >
+      <Original>
+        !(ptr &lt; ptr)
+      </Original>
+      <Expanded>
+        !(0 &lt; 0)
+      </Expanded>
+    </Expression>
+    <Expression success="true" type="REQUIRE" filename="tests/<exe-name>/UsageTests/Misc.tests.cpp" >
+      <Original>
+        ptr &lt;= ptr
+      </Original>
+      <Expanded>
+        0 &lt;= 0
+      </Expanded>
+    </Expression>
+    <Expression success="true" type="REQUIRE_FALSE" filename="tests/<exe-name>/UsageTests/Misc.tests.cpp" >
+      <Original>
+        !(ptr > ptr)
+      </Original>
+      <Expanded>
+        !(0 > 0)
+      </Expanded>
+    </Expression>
+    <Expression success="true" type="REQUIRE" filename="tests/<exe-name>/UsageTests/Misc.tests.cpp" >
+      <Original>
+        ptr >= ptr
+      </Original>
+      <Expanded>
+        0 >= 0
       </Expanded>
     </Expression>
     <OverallResult success="true" skips="0"/>
@@ -4322,7 +4600,7 @@ C
         101.000001 != Approx(100).epsilon(0.01)
       </Original>
       <Expanded>
-        101.000001 != Approx( 100.0 )
+        101.00000099999999748 != Approx( 100.0 )
       </Expanded>
     </Expression>
     <Expression success="true" type="REQUIRE" filename="tests/<exe-name>/UsageTests/Approx.tests.cpp" >
@@ -4400,7 +4678,7 @@ C
     </Expression>
     <OverallResult success="false" skips="0"/>
   </TestCase>
-  <TestCase name="Enums can quickly have stringification enabled using REGISTER_ENUM" filename="tests/<exe-name>/UsageTests/EnumToString.tests.cpp" >
+  <TestCase name="Enums can quickly have stringification enabled using CATCH_REGISTER_ENUM" filename="tests/<exe-name>/UsageTests/EnumToString.tests.cpp" >
     <Expression success="true" type="REQUIRE" filename="tests/<exe-name>/UsageTests/EnumToString.tests.cpp" >
       <Original>
         stringify( EnumClass3::Value1 ) == "Value1"
@@ -4445,7 +4723,7 @@ C
     </Expression>
     <OverallResult success="true" skips="0"/>
   </TestCase>
-  <TestCase name="Enums in namespaces can quickly have stringification enabled using REGISTER_ENUM" filename="tests/<exe-name>/UsageTests/EnumToString.tests.cpp" >
+  <TestCase name="Enums in namespaces can quickly have stringification enabled using CATCH_REGISTER_ENUM" filename="tests/<exe-name>/UsageTests/EnumToString.tests.cpp" >
     <Expression success="true" type="REQUIRE" filename="tests/<exe-name>/UsageTests/EnumToString.tests.cpp" >
       <Original>
         stringify( Bikeshed::Colours::Red ) == "Red"
@@ -4470,7 +4748,7 @@ C
         101.01 != Approx(100).epsilon(0.01)
       </Original>
       <Expanded>
-        101.01 != Approx( 100.0 )
+        101.01000000000000512 != Approx( 100.0 )
       </Expanded>
     </Expression>
     <OverallResult success="true" skips="0"/>
@@ -4505,7 +4783,9 @@ C
         data.float_nine_point_one == Approx( 9.11f )
       </Original>
       <Expanded>
-        9.1f == Approx( 9.1099996567 )
+        9.100000381f
+==
+Approx( 9.10999965667724609 )
       </Expanded>
     </Expression>
     <Expression success="false" type="CHECK" filename="tests/<exe-name>/UsageTests/Condition.tests.cpp" >
@@ -4513,7 +4793,7 @@ C
         data.float_nine_point_one == Approx( 9.0f )
       </Original>
       <Expanded>
-        9.1f == Approx( 9.0 )
+        9.100000381f == Approx( 9.0 )
       </Expanded>
     </Expression>
     <Expression success="false" type="CHECK" filename="tests/<exe-name>/UsageTests/Condition.tests.cpp" >
@@ -4521,7 +4801,7 @@ C
         data.float_nine_point_one == Approx( 1 )
       </Original>
       <Expanded>
-        9.1f == Approx( 1.0 )
+        9.100000381f == Approx( 1.0 )
       </Expanded>
     </Expression>
     <Expression success="false" type="CHECK" filename="tests/<exe-name>/UsageTests/Condition.tests.cpp" >
@@ -4529,7 +4809,7 @@ C
         data.float_nine_point_one == Approx( 0 )
       </Original>
       <Expanded>
-        9.1f == Approx( 0.0 )
+        9.100000381f == Approx( 0.0 )
       </Expanded>
     </Expression>
     <Expression success="false" type="CHECK" filename="tests/<exe-name>/UsageTests/Condition.tests.cpp" >
@@ -4537,7 +4817,9 @@ C
         data.double_pi == Approx( 3.1415 )
       </Original>
       <Expanded>
-        3.1415926535 == Approx( 3.1415 )
+        3.14159265350000005
+==
+Approx( 3.14150000000000018 )
       </Expanded>
     </Expression>
     <Expression success="false" type="CHECK" filename="tests/<exe-name>/UsageTests/Condition.tests.cpp" >
@@ -4577,7 +4859,9 @@ C
         x == Approx( 1.301 )
       </Original>
       <Expanded>
-        1.3 == Approx( 1.301 )
+        1.30000000000000027
+==
+Approx( 1.30099999999999993 )
       </Expanded>
     </Expression>
     <OverallResult success="true" skips="0"/>
@@ -4596,7 +4880,9 @@ C
         data.float_nine_point_one == Approx( 9.1f )
       </Original>
       <Expanded>
-        9.1f == Approx( 9.1000003815 )
+        9.100000381f
+==
+Approx( 9.10000038146972656 )
       </Expanded>
     </Expression>
     <Expression success="true" type="REQUIRE" filename="tests/<exe-name>/UsageTests/Condition.tests.cpp" >
@@ -4604,7 +4890,9 @@ C
         data.double_pi == Approx( 3.1415926535 )
       </Original>
       <Expanded>
-        3.1415926535 == Approx( 3.1415926535 )
+        3.14159265350000005
+==
+Approx( 3.14159265350000005 )
       </Expanded>
     </Expression>
     <Expression success="true" type="REQUIRE" filename="tests/<exe-name>/UsageTests/Condition.tests.cpp" >
@@ -4636,7 +4924,9 @@ C
         x == Approx( 1.3 )
       </Original>
       <Expanded>
-        1.3 == Approx( 1.3 )
+        1.30000000000000027
+==
+Approx( 1.30000000000000004 )
       </Expanded>
     </Expression>
     <OverallResult success="true" skips="0"/>
@@ -4890,6 +5180,19 @@ C
     </Section>
     <OverallResult success="true" skips="0"/>
   </TestCase>
+  <TestCase name="Exception thrown inside stringify does not fail the test" tags="[toString]" filename="tests/<exe-name>/IntrospectiveTests/ToString.tests.cpp" >
+    <Expression success="true" type="CHECK" filename="tests/<exe-name>/IntrospectiveTests/ToString.tests.cpp" >
+      <Original>
+        tos == tos
+      </Original>
+      <Expanded>
+        { stringification failed with an exception: "Invalid" }
+==
+{ stringification failed with an exception: "Invalid" }
+      </Expanded>
+    </Expression>
+    <OverallResult success="true" skips="0"/>
+  </TestCase>
   <TestCase name="Exceptions matchers" tags="[!throws][exceptions][matchers]" filename="tests/<exe-name>/UsageTests/Matchers.tests.cpp" >
     <Expression success="true" type="REQUIRE_THROWS_MATCHES" filename="tests/<exe-name>/UsageTests/Matchers.tests.cpp" >
       <Original>
@@ -4963,6 +5266,23 @@ C
       This is a failure
     </Failure>
     <OverallResult success="false" skips="0"/>
+  </TestCase>
+  <TestCase name="FAIL can be nested in assertion" tags="[!shouldfail][assertions]" filename="tests/<exe-name>/IntrospectiveTests/AssertionHandler.tests.cpp" >
+    <Failure filename="tests/<exe-name>/IntrospectiveTests/AssertionHandler.tests.cpp" >
+      Throw a Catch::TestFailureException
+    </Failure>
+    <Expression success="false" type="CHECK_NOTHROW" filename="tests/<exe-name>/IntrospectiveTests/AssertionHandler.tests.cpp" >
+      <Original>
+        do_fail()
+      </Original>
+      <Expanded>
+        do_fail()
+      </Expanded>
+      <Exception filename="tests/<exe-name>/IntrospectiveTests/AssertionHandler.tests.cpp" >
+        { nested assertion failed }
+      </Exception>
+    </Expression>
+    <OverallResult success="true" skips="0"/>
   </TestCase>
   <TestCase name="FAIL does not require an argument" tags="[.][failing][messages]" filename="tests/<exe-name>/UsageTests/Message.tests.cpp" >
     <Failure filename="tests/<exe-name>/UsageTests/Message.tests.cpp" />
@@ -5038,7 +5358,7 @@ C
           10., WithinRel( 11.1, 0.1 )
         </Original>
         <Expanded>
-          10.0 and 11.1 are within 10% of each other
+          10.0 and 11.09999999999999964 are within 10% of each other
         </Expanded>
       </Expression>
       <Expression success="true" type="REQUIRE_THAT" filename="tests/<exe-name>/UsageTests/Matchers.tests.cpp" >
@@ -5046,7 +5366,7 @@ C
           10., !WithinRel( 11.2, 0.1 )
         </Original>
         <Expanded>
-          10.0 not and 11.2 are within 10% of each other
+          10.0 not and 11.19999999999999929 are within 10% of each other
         </Expanded>
       </Expression>
       <Expression success="true" type="REQUIRE_THAT" filename="tests/<exe-name>/UsageTests/Matchers.tests.cpp" >
@@ -5054,7 +5374,7 @@ C
           1., !WithinRel( 0., 0.99 )
         </Original>
         <Expanded>
-          1.0 not and 0 are within 99% of each other
+          1.0 not and 0.0 are within 99% of each other
         </Expanded>
       </Expression>
       <Expression success="true" type="REQUIRE_THAT" filename="tests/<exe-name>/UsageTests/Matchers.tests.cpp" >
@@ -5062,7 +5382,7 @@ C
           -0., WithinRel( 0. )
         </Original>
         <Expanded>
-          -0.0 and 0 are within 2.22045e-12% of each other
+          -0.0 and 0.0 are within 2.22045e-12% of each other
         </Expanded>
       </Expression>
       <Section name="Some subnormal values" filename="tests/<exe-name>/UsageTests/Matchers.tests.cpp" >
@@ -5071,7 +5391,7 @@ C
             v1, WithinRel( v2 )
           </Original>
           <Expanded>
-            0.0 and 2.22507e-308 are within 2.22045e-12% of each other
+            0.0 and 0.0 are within 2.22045e-12% of each other
           </Expanded>
         </Expression>
         <OverallResults successes="1" failures="0" expectedFailures="0" skipped="false"/>
@@ -5100,7 +5420,7 @@ C
           0., !WithinAbs( 1., 0.99 )
         </Original>
         <Expanded>
-          0.0 not is within 0.99 of 1.0
+          0.0 not is within 0.98999999999999999 of 1.0
         </Expanded>
       </Expression>
       <Expression success="true" type="REQUIRE_THAT" filename="tests/<exe-name>/UsageTests/Matchers.tests.cpp" >
@@ -5108,7 +5428,7 @@ C
           0., !WithinAbs( 1., 0.99 )
         </Original>
         <Expanded>
-          0.0 not is within 0.99 of 1.0
+          0.0 not is within 0.98999999999999999 of 1.0
         </Expanded>
       </Expression>
       <Expression success="true" type="REQUIRE_THAT" filename="tests/<exe-name>/UsageTests/Matchers.tests.cpp" >
@@ -5140,7 +5460,7 @@ C
           -10., WithinAbs( -9.6, 0.5 )
         </Original>
         <Expanded>
-          -10.0 is within 0.5 of -9.6
+          -10.0 is within 0.5 of -9.59999999999999964
         </Expanded>
       </Expression>
       <OverallResults successes="8" failures="0" expectedFailures="0" skipped="false"/>
@@ -5159,7 +5479,7 @@ C
           nextafter( 1., 2. ), WithinULP( 1., 1 )
         </Original>
         <Expanded>
-          1.0 is within 1 ULPs of 1.0000000000000000e+00 ([9.9999999999999989e-01, 1.0000000000000002e+00])
+          1.00000000000000022 is within 1 ULPs of 1.0000000000000000e+00 ([9.9999999999999989e-01, 1.0000000000000002e+00])
         </Expanded>
       </Expression>
       <Expression success="true" type="REQUIRE_THAT" filename="tests/<exe-name>/UsageTests/Matchers.tests.cpp" >
@@ -5226,7 +5546,7 @@ C
           0.0001, WithinAbs( 0., 0.001 ) || WithinRel( 0., 0.1 )
         </Original>
         <Expanded>
-          0.0001 ( is within 0.001 of 0.0 or and 0 are within 10% of each other )
+          0.0001 ( is within 0.001 of 0.0 or and 0.0 are within 10% of each other )
         </Expanded>
       </Expression>
       <OverallResults successes="3" failures="0" expectedFailures="0" skipped="false"/>
@@ -5302,7 +5622,7 @@ C
           10.f, WithinRel( 11.1f, 0.1f )
         </Original>
         <Expanded>
-          10.0f and 11.1 are within 10% of each other
+          10.0f and 11.10000038146972656 are within 10% of each other
         </Expanded>
       </Expression>
       <Expression success="true" type="REQUIRE_THAT" filename="tests/<exe-name>/UsageTests/Matchers.tests.cpp" >
@@ -5310,7 +5630,7 @@ C
           10.f, !WithinRel( 11.2f, 0.1f )
         </Original>
         <Expanded>
-          10.0f not and 11.2 are within 10% of each other
+          10.0f not and 11.19999980926513672 are within 10% of each other
         </Expanded>
       </Expression>
       <Expression success="true" type="REQUIRE_THAT" filename="tests/<exe-name>/UsageTests/Matchers.tests.cpp" >
@@ -5318,7 +5638,7 @@ C
           1.f, !WithinRel( 0.f, 0.99f )
         </Original>
         <Expanded>
-          1.0f not and 0 are within 99% of each other
+          1.0f not and 0.0 are within 99% of each other
         </Expanded>
       </Expression>
       <Expression success="true" type="REQUIRE_THAT" filename="tests/<exe-name>/UsageTests/Matchers.tests.cpp" >
@@ -5326,7 +5646,7 @@ C
           -0.f, WithinRel( 0.f )
         </Original>
         <Expanded>
-          -0.0f and 0 are within 0.00119209% of each other
+          -0.0f and 0.0 are within 0.00119209% of each other
         </Expanded>
       </Expression>
       <Section name="Some subnormal values" filename="tests/<exe-name>/UsageTests/Matchers.tests.cpp" >
@@ -5335,7 +5655,7 @@ C
             v1, WithinRel( v2 )
           </Original>
           <Expanded>
-            0.0f and 1.17549e-38 are within 0.00119209% of each other
+            0.0f and 0.0 are within 0.00119209% of each other
           </Expanded>
         </Expression>
         <OverallResults successes="1" failures="0" expectedFailures="0" skipped="false"/>
@@ -5364,7 +5684,7 @@ C
           0.f, !WithinAbs( 1.f, 0.99f )
         </Original>
         <Expanded>
-          0.0f not is within 0.9900000095 of 1.0
+          0.0f not is within 0.99000000953674316 of 1.0
         </Expanded>
       </Expression>
       <Expression success="true" type="REQUIRE_THAT" filename="tests/<exe-name>/UsageTests/Matchers.tests.cpp" >
@@ -5372,7 +5692,7 @@ C
           0.f, !WithinAbs( 1.f, 0.99f )
         </Original>
         <Expanded>
-          0.0f not is within 0.9900000095 of 1.0
+          0.0f not is within 0.99000000953674316 of 1.0
         </Expanded>
       </Expression>
       <Expression success="true" type="REQUIRE_THAT" filename="tests/<exe-name>/UsageTests/Matchers.tests.cpp" >
@@ -5412,7 +5732,7 @@ C
           -10.f, WithinAbs( -9.6f, 0.5f )
         </Original>
         <Expanded>
-          -10.0f is within 0.5 of -9.6000003815
+          -10.0f is within 0.5 of -9.60000038146972656
         </Expanded>
       </Expression>
       <OverallResults successes="9" failures="0" expectedFailures="0" skipped="false"/>
@@ -5439,7 +5759,7 @@ C
           nextafter( 1.f, 2.f ), WithinULP( 1.f, 1 )
         </Original>
         <Expanded>
-          1.0f is within 1 ULPs of 1.00000000e+00f ([9.99999940e-01, 1.00000012e+00])
+          1.000000119f is within 1 ULPs of 1.00000000e+00f ([9.99999940e-01, 1.00000012e+00])
         </Expanded>
       </Expression>
       <Expression success="true" type="REQUIRE_THAT" filename="tests/<exe-name>/UsageTests/Matchers.tests.cpp" >
@@ -5506,7 +5826,7 @@ C
           0.0001f, WithinAbs( 0.f, 0.001f ) || WithinRel( 0.f, 0.1f )
         </Original>
         <Expanded>
-          0.0001f ( is within 0.001 of 0.0 or and 0 are within 10% of each other )
+          0.0001f ( is within 0.00100000004749745 of 0.0 or and 0.0 are within 10% of each other )
         </Expanded>
       </Expression>
       <OverallResults successes="3" failures="0" expectedFailures="0" skipped="false"/>
@@ -5581,6 +5901,41 @@ C
       </Expression>
       <OverallResults successes="1" failures="0" expectedFailures="0" skipped="false"/>
     </Section>
+    <OverallResult success="true" skips="0"/>
+  </TestCase>
+  <TestCase name="GENERATE can combine literals and generators" tags="[generators]" filename="tests/<exe-name>/UsageTests/Generators.tests.cpp" >
+    <Expression success="true" type="REQUIRE" filename="tests/<exe-name>/UsageTests/Generators.tests.cpp" >
+      <Original>
+        i % 2 == 0
+      </Original>
+      <Expanded>
+        0 == 0
+      </Expanded>
+    </Expression>
+    <Expression success="true" type="REQUIRE" filename="tests/<exe-name>/UsageTests/Generators.tests.cpp" >
+      <Original>
+        i % 2 == 0
+      </Original>
+      <Expanded>
+        0 == 0
+      </Expanded>
+    </Expression>
+    <Expression success="true" type="REQUIRE" filename="tests/<exe-name>/UsageTests/Generators.tests.cpp" >
+      <Original>
+        i % 2 == 0
+      </Original>
+      <Expanded>
+        0 == 0
+      </Expanded>
+    </Expression>
+    <Expression success="true" type="REQUIRE" filename="tests/<exe-name>/UsageTests/Generators.tests.cpp" >
+      <Original>
+        i % 2 == 0
+      </Original>
+      <Expanded>
+        0 == 0
+      </Expanded>
+    </Expression>
     <OverallResult success="true" skips="0"/>
   </TestCase>
   <TestCase name="Generators -- adapters" tags="[generators][generic]" filename="tests/<exe-name>/UsageTests/Generators.tests.cpp" >
@@ -6561,6 +6916,44 @@ C
       </Section>
       <OverallResults successes="2" failures="0" expectedFailures="0" skipped="false"/>
     </Section>
+    <Section name="Filter generator" filename="tests/<exe-name>/IntrospectiveTests/GeneratorsImpl.tests.cpp" >
+      <Section name="Out-of-line predicates are copied into the generator" filename="tests/<exe-name>/IntrospectiveTests/GeneratorsImpl.tests.cpp" >
+        <Expression success="true" type="REQUIRE" filename="tests/<exe-name>/IntrospectiveTests/GeneratorsImpl.tests.cpp" >
+          <Original>
+            gen.get() == 1
+          </Original>
+          <Expanded>
+            1 == 1
+          </Expanded>
+        </Expression>
+        <Expression success="true" type="REQUIRE" filename="tests/<exe-name>/IntrospectiveTests/GeneratorsImpl.tests.cpp" >
+          <Original>
+            gen.next()
+          </Original>
+          <Expanded>
+            true
+          </Expanded>
+        </Expression>
+        <Expression success="true" type="REQUIRE" filename="tests/<exe-name>/IntrospectiveTests/GeneratorsImpl.tests.cpp" >
+          <Original>
+            gen.get() == 3
+          </Original>
+          <Expanded>
+            3 == 3
+          </Expanded>
+        </Expression>
+        <Expression success="true" type="REQUIRE_FALSE" filename="tests/<exe-name>/IntrospectiveTests/GeneratorsImpl.tests.cpp" >
+          <Original>
+            !(gen.next())
+          </Original>
+          <Expanded>
+            !false
+          </Expanded>
+        </Expression>
+        <OverallResults successes="4" failures="0" expectedFailures="0" skipped="false"/>
+      </Section>
+      <OverallResults successes="4" failures="0" expectedFailures="0" skipped="false"/>
+    </Section>
     <Section name="Take generator" filename="tests/<exe-name>/IntrospectiveTests/GeneratorsImpl.tests.cpp" >
       <Section name="Take less" filename="tests/<exe-name>/IntrospectiveTests/GeneratorsImpl.tests.cpp" >
         <Expression success="true" type="REQUIRE" filename="tests/<exe-name>/IntrospectiveTests/GeneratorsImpl.tests.cpp" >
@@ -7271,7 +7664,9 @@ C
                 gen.get() == Approx(expected)
               </Original>
               <Expanded>
-                -0.9 == Approx( -0.9 )
+                -0.90000000000000002
+==
+Approx( -0.90000000000000002 )
               </Expanded>
             </Expression>
             <Info filename="tests/<exe-name>/IntrospectiveTests/GeneratorsImpl.tests.cpp" >
@@ -7293,7 +7688,9 @@ C
                 gen.get() == Approx(expected)
               </Original>
               <Expanded>
-                -0.8 == Approx( -0.8 )
+                -0.80000000000000004
+==
+Approx( -0.80000000000000004 )
               </Expanded>
             </Expression>
             <Info filename="tests/<exe-name>/IntrospectiveTests/GeneratorsImpl.tests.cpp" >
@@ -7315,7 +7712,9 @@ C
                 gen.get() == Approx(expected)
               </Original>
               <Expanded>
-                -0.7 == Approx( -0.7 )
+                -0.70000000000000007
+==
+Approx( -0.70000000000000007 )
               </Expanded>
             </Expression>
             <Info filename="tests/<exe-name>/IntrospectiveTests/GeneratorsImpl.tests.cpp" >
@@ -7337,7 +7736,9 @@ C
                 gen.get() == Approx(expected)
               </Original>
               <Expanded>
-                -0.6 == Approx( -0.6 )
+                -0.60000000000000009
+==
+Approx( -0.60000000000000009 )
               </Expanded>
             </Expression>
             <Info filename="tests/<exe-name>/IntrospectiveTests/GeneratorsImpl.tests.cpp" >
@@ -7359,7 +7760,9 @@ C
                 gen.get() == Approx(expected)
               </Original>
               <Expanded>
-                -0.5 == Approx( -0.5 )
+                -0.50000000000000011
+==
+Approx( -0.50000000000000011 )
               </Expanded>
             </Expression>
             <Info filename="tests/<exe-name>/IntrospectiveTests/GeneratorsImpl.tests.cpp" >
@@ -7381,7 +7784,9 @@ C
                 gen.get() == Approx(expected)
               </Original>
               <Expanded>
-                -0.4 == Approx( -0.4 )
+                -0.40000000000000013
+==
+Approx( -0.40000000000000013 )
               </Expanded>
             </Expression>
             <Info filename="tests/<exe-name>/IntrospectiveTests/GeneratorsImpl.tests.cpp" >
@@ -7403,7 +7808,9 @@ C
                 gen.get() == Approx(expected)
               </Original>
               <Expanded>
-                -0.3 == Approx( -0.3 )
+                -0.30000000000000016
+==
+Approx( -0.30000000000000016 )
               </Expanded>
             </Expression>
             <Info filename="tests/<exe-name>/IntrospectiveTests/GeneratorsImpl.tests.cpp" >
@@ -7425,7 +7832,9 @@ C
                 gen.get() == Approx(expected)
               </Original>
               <Expanded>
-                -0.2 == Approx( -0.2 )
+                -0.20000000000000015
+==
+Approx( -0.20000000000000015 )
               </Expanded>
             </Expression>
             <Info filename="tests/<exe-name>/IntrospectiveTests/GeneratorsImpl.tests.cpp" >
@@ -7447,7 +7856,9 @@ C
                 gen.get() == Approx(expected)
               </Original>
               <Expanded>
-                -0.1 == Approx( -0.1 )
+                -0.10000000000000014
+==
+Approx( -0.10000000000000014 )
               </Expanded>
             </Expression>
             <Info filename="tests/<exe-name>/IntrospectiveTests/GeneratorsImpl.tests.cpp" >
@@ -7469,7 +7880,9 @@ C
                 gen.get() == Approx(expected)
               </Original>
               <Expanded>
-                -0.0 == Approx( -0.0 )
+                -0.00000000000000014
+==
+Approx( -0.00000000000000014 )
               </Expanded>
             </Expression>
             <Info filename="tests/<exe-name>/IntrospectiveTests/GeneratorsImpl.tests.cpp" >
@@ -7491,7 +7904,9 @@ C
                 gen.get() == Approx(expected)
               </Original>
               <Expanded>
-                0.1 == Approx( 0.1 )
+                0.09999999999999987
+==
+Approx( 0.09999999999999987 )
               </Expanded>
             </Expression>
             <Info filename="tests/<exe-name>/IntrospectiveTests/GeneratorsImpl.tests.cpp" >
@@ -7513,7 +7928,9 @@ C
                 gen.get() == Approx(expected)
               </Original>
               <Expanded>
-                0.2 == Approx( 0.2 )
+                0.19999999999999987
+==
+Approx( 0.19999999999999987 )
               </Expanded>
             </Expression>
             <Info filename="tests/<exe-name>/IntrospectiveTests/GeneratorsImpl.tests.cpp" >
@@ -7535,7 +7952,9 @@ C
                 gen.get() == Approx(expected)
               </Original>
               <Expanded>
-                0.3 == Approx( 0.3 )
+                0.29999999999999988
+==
+Approx( 0.29999999999999988 )
               </Expanded>
             </Expression>
             <Info filename="tests/<exe-name>/IntrospectiveTests/GeneratorsImpl.tests.cpp" >
@@ -7557,7 +7976,9 @@ C
                 gen.get() == Approx(expected)
               </Original>
               <Expanded>
-                0.4 == Approx( 0.4 )
+                0.39999999999999991
+==
+Approx( 0.39999999999999991 )
               </Expanded>
             </Expression>
             <Info filename="tests/<exe-name>/IntrospectiveTests/GeneratorsImpl.tests.cpp" >
@@ -7579,7 +8000,9 @@ C
                 gen.get() == Approx(expected)
               </Original>
               <Expanded>
-                0.5 == Approx( 0.5 )
+                0.49999999999999989
+==
+Approx( 0.49999999999999989 )
               </Expanded>
             </Expression>
             <Info filename="tests/<exe-name>/IntrospectiveTests/GeneratorsImpl.tests.cpp" >
@@ -7601,7 +8024,9 @@ C
                 gen.get() == Approx(expected)
               </Original>
               <Expanded>
-                0.6 == Approx( 0.6 )
+                0.59999999999999987
+==
+Approx( 0.59999999999999987 )
               </Expanded>
             </Expression>
             <Info filename="tests/<exe-name>/IntrospectiveTests/GeneratorsImpl.tests.cpp" >
@@ -7623,7 +8048,9 @@ C
                 gen.get() == Approx(expected)
               </Original>
               <Expanded>
-                0.7 == Approx( 0.7 )
+                0.69999999999999984
+==
+Approx( 0.69999999999999984 )
               </Expanded>
             </Expression>
             <Info filename="tests/<exe-name>/IntrospectiveTests/GeneratorsImpl.tests.cpp" >
@@ -7645,7 +8072,9 @@ C
                 gen.get() == Approx(expected)
               </Original>
               <Expanded>
-                0.8 == Approx( 0.8 )
+                0.79999999999999982
+==
+Approx( 0.79999999999999982 )
               </Expanded>
             </Expression>
             <Info filename="tests/<exe-name>/IntrospectiveTests/GeneratorsImpl.tests.cpp" >
@@ -7667,7 +8096,9 @@ C
                 gen.get() == Approx(expected)
               </Original>
               <Expanded>
-                0.9 == Approx( 0.9 )
+                0.8999999999999998
+==
+Approx( 0.8999999999999998 )
               </Expanded>
             </Expression>
             <Info filename="tests/<exe-name>/IntrospectiveTests/GeneratorsImpl.tests.cpp" >
@@ -7686,7 +8117,7 @@ C
                 gen.get() == Approx( rangeEnd )
               </Original>
               <Expanded>
-                1.0 == Approx( 1.0 )
+                0.99999999999999978 == Approx( 1.0 )
               </Expanded>
             </Expression>
             <Expression success="true" type="REQUIRE_FALSE" filename="tests/<exe-name>/IntrospectiveTests/GeneratorsImpl.tests.cpp" >
@@ -7739,7 +8170,9 @@ C
                 gen.get() == Approx(expected)
               </Original>
               <Expanded>
-                -0.7 == Approx( -0.7 )
+                -0.69999999999999996
+==
+Approx( -0.69999999999999996 )
               </Expanded>
             </Expression>
             <Info filename="tests/<exe-name>/IntrospectiveTests/GeneratorsImpl.tests.cpp" >
@@ -7761,7 +8194,9 @@ C
                 gen.get() == Approx(expected)
               </Original>
               <Expanded>
-                -0.4 == Approx( -0.4 )
+                -0.39999999999999997
+==
+Approx( -0.39999999999999997 )
               </Expanded>
             </Expression>
             <Info filename="tests/<exe-name>/IntrospectiveTests/GeneratorsImpl.tests.cpp" >
@@ -7783,7 +8218,9 @@ C
                 gen.get() == Approx(expected)
               </Original>
               <Expanded>
-                -0.1 == Approx( -0.1 )
+                -0.09999999999999998
+==
+Approx( -0.09999999999999998 )
               </Expanded>
             </Expression>
             <Info filename="tests/<exe-name>/IntrospectiveTests/GeneratorsImpl.tests.cpp" >
@@ -7805,7 +8242,9 @@ C
                 gen.get() == Approx(expected)
               </Original>
               <Expanded>
-                0.2 == Approx( 0.2 )
+                0.20000000000000001
+==
+Approx( 0.20000000000000001 )
               </Expanded>
             </Expression>
             <Info filename="tests/<exe-name>/IntrospectiveTests/GeneratorsImpl.tests.cpp" >
@@ -7891,7 +8330,9 @@ C
                 gen.get() == Approx(expected)
               </Original>
               <Expanded>
-                -0.7 == Approx( -0.7 )
+                -0.69999999999999996
+==
+Approx( -0.69999999999999996 )
               </Expanded>
             </Expression>
             <Info filename="tests/<exe-name>/IntrospectiveTests/GeneratorsImpl.tests.cpp" >
@@ -7913,7 +8354,9 @@ C
                 gen.get() == Approx(expected)
               </Original>
               <Expanded>
-                -0.4 == Approx( -0.4 )
+                -0.39999999999999997
+==
+Approx( -0.39999999999999997 )
               </Expanded>
             </Expression>
             <Info filename="tests/<exe-name>/IntrospectiveTests/GeneratorsImpl.tests.cpp" >
@@ -7935,7 +8378,9 @@ C
                 gen.get() == Approx(expected)
               </Original>
               <Expanded>
-                -0.1 == Approx( -0.1 )
+                -0.09999999999999998
+==
+Approx( -0.09999999999999998 )
               </Expanded>
             </Expression>
             <Info filename="tests/<exe-name>/IntrospectiveTests/GeneratorsImpl.tests.cpp" >
@@ -7957,7 +8402,9 @@ C
                 gen.get() == Approx(expected)
               </Original>
               <Expanded>
-                0.2 == Approx( 0.2 )
+                0.20000000000000001
+==
+Approx( 0.20000000000000001 )
               </Expanded>
             </Expression>
             <Info filename="tests/<exe-name>/IntrospectiveTests/GeneratorsImpl.tests.cpp" >
@@ -8261,7 +8708,9 @@ C
         d >= Approx( 1.22 )
       </Original>
       <Expanded>
-        1.23 >= Approx( 1.22 )
+        1.22999999999999998
+>=
+Approx( 1.21999999999999997 )
       </Expanded>
     </Expression>
     <Expression success="true" type="REQUIRE" filename="tests/<exe-name>/UsageTests/Approx.tests.cpp" >
@@ -8269,7 +8718,9 @@ C
         d >= Approx( 1.23 )
       </Original>
       <Expanded>
-        1.23 >= Approx( 1.23 )
+        1.22999999999999998
+>=
+Approx( 1.22999999999999998 )
       </Expanded>
     </Expression>
     <Expression success="true" type="REQUIRE_FALSE" filename="tests/<exe-name>/UsageTests/Approx.tests.cpp" >
@@ -8277,7 +8728,9 @@ C
         !(d >= Approx( 1.24 ))
       </Original>
       <Expanded>
-        !(1.23 >= Approx( 1.24 ))
+        !(1.22999999999999998
+>=
+Approx( 1.23999999999999999 ))
       </Expanded>
     </Expression>
     <Expression success="true" type="REQUIRE" filename="tests/<exe-name>/UsageTests/Approx.tests.cpp" >
@@ -8285,7 +8738,9 @@ C
         d >= Approx( 1.24 ).epsilon(0.1)
       </Original>
       <Expanded>
-        1.23 >= Approx( 1.24 )
+        1.22999999999999998
+>=
+Approx( 1.23999999999999999 )
       </Expanded>
     </Expression>
     <OverallResult success="true" skips="0"/>
@@ -8370,6 +8825,18 @@ C
       </Expanded>
     </Expression>
     <OverallResult success="true" skips="0"/>
+  </TestCase>
+  <TestCase name="INFO and UNSCOPED_INFO can stream multiple arguments" tags="[.][failing][info][messages]" filename="tests/<exe-name>/UsageTests/Message.tests.cpp" >
+    <Info filename="tests/<exe-name>/UsageTests/Message.tests.cpp" >
+      This info has multiple parts.
+    </Info>
+    <Info filename="tests/<exe-name>/UsageTests/Message.tests.cpp" >
+      This unscoped info has multiple parts.
+    </Info>
+    <Failure filename="tests/<exe-name>/UsageTests/Message.tests.cpp" >
+      Show infos!
+    </Failure>
+    <OverallResult success="false" skips="0"/>
   </TestCase>
   <TestCase name="INFO and WARN do not abort tests" tags="[.][messages]" filename="tests/<exe-name>/UsageTests/Message.tests.cpp" >
     <Info filename="tests/<exe-name>/UsageTests/Message.tests.cpp" >
@@ -8619,6 +9086,20 @@ C
     </Expression>
     <OverallResult success="false" skips="0"/>
   </TestCase>
+  <TestCase name="Incomplete AssertionHandler" tags="[!shouldfail][assertion-handler]" filename="tests/<exe-name>/IntrospectiveTests/AssertionHandler.tests.cpp" >
+    <Expression success="false" type="REQUIRE" filename="tests/<exe-name>/IntrospectiveTests/AssertionHandler.tests.cpp" >
+      <Original>
+        Dummy
+      </Original>
+      <Expanded>
+        Dummy
+      </Expanded>
+      <Exception filename="tests/<exe-name>/IntrospectiveTests/AssertionHandler.tests.cpp" >
+        Exception translation was disabled by CATCH_CONFIG_FAST_COMPILE
+      </Exception>
+    </Expression>
+    <OverallResult success="true" skips="0"/>
+  </TestCase>
   <TestCase name="Inequality checks that should fail" tags="[!shouldfail][.][failing]" filename="tests/<exe-name>/UsageTests/Condition.tests.cpp" >
     <Expression success="false" type="CHECK" filename="tests/<exe-name>/UsageTests/Condition.tests.cpp" >
       <Original>
@@ -8633,7 +9114,9 @@ C
         data.float_nine_point_one != Approx( 9.1f )
       </Original>
       <Expanded>
-        9.1f != Approx( 9.1000003815 )
+        9.100000381f
+!=
+Approx( 9.10000038146972656 )
       </Expanded>
     </Expression>
     <Expression success="false" type="CHECK" filename="tests/<exe-name>/UsageTests/Condition.tests.cpp" >
@@ -8641,7 +9124,9 @@ C
         data.double_pi != Approx( 3.1415926535 )
       </Original>
       <Expanded>
-        3.1415926535 != Approx( 3.1415926535 )
+        3.14159265350000005
+!=
+Approx( 3.14159265350000005 )
       </Expanded>
     </Expression>
     <Expression success="false" type="CHECK" filename="tests/<exe-name>/UsageTests/Condition.tests.cpp" >
@@ -8684,7 +9169,9 @@ C
         data.float_nine_point_one != Approx( 9.11f )
       </Original>
       <Expanded>
-        9.1f != Approx( 9.1099996567 )
+        9.100000381f
+!=
+Approx( 9.10999965667724609 )
       </Expanded>
     </Expression>
     <Expression success="true" type="REQUIRE" filename="tests/<exe-name>/UsageTests/Condition.tests.cpp" >
@@ -8692,7 +9179,7 @@ C
         data.float_nine_point_one != Approx( 9.0f )
       </Original>
       <Expanded>
-        9.1f != Approx( 9.0 )
+        9.100000381f != Approx( 9.0 )
       </Expanded>
     </Expression>
     <Expression success="true" type="REQUIRE" filename="tests/<exe-name>/UsageTests/Condition.tests.cpp" >
@@ -8700,7 +9187,7 @@ C
         data.float_nine_point_one != Approx( 1 )
       </Original>
       <Expanded>
-        9.1f != Approx( 1.0 )
+        9.100000381f != Approx( 1.0 )
       </Expanded>
     </Expression>
     <Expression success="true" type="REQUIRE" filename="tests/<exe-name>/UsageTests/Condition.tests.cpp" >
@@ -8708,7 +9195,7 @@ C
         data.float_nine_point_one != Approx( 0 )
       </Original>
       <Expanded>
-        9.1f != Approx( 0.0 )
+        9.100000381f != Approx( 0.0 )
       </Expanded>
     </Expression>
     <Expression success="true" type="REQUIRE" filename="tests/<exe-name>/UsageTests/Condition.tests.cpp" >
@@ -8716,7 +9203,9 @@ C
         data.double_pi != Approx( 3.1415 )
       </Original>
       <Expanded>
-        3.1415926535 != Approx( 3.1415 )
+        3.14159265350000005
+!=
+Approx( 3.14150000000000018 )
       </Expanded>
     </Expression>
     <Expression success="true" type="REQUIRE" filename="tests/<exe-name>/UsageTests/Condition.tests.cpp" >
@@ -8753,6 +9242,277 @@ C
     </Expression>
     <OverallResult success="true" skips="0"/>
   </TestCase>
+  <TestCase name="JsonWriter" tags="[JSON][JsonWriter]" filename="tests/<exe-name>/IntrospectiveTests/Json.tests.cpp" >
+    <Section name="Newly constructed JsonWriter does nothing" filename="tests/<exe-name>/IntrospectiveTests/Json.tests.cpp" >
+      <Expression success="true" type="REQUIRE" filename="tests/<exe-name>/IntrospectiveTests/Json.tests.cpp" >
+        <Original>
+          stream.str() == ""
+        </Original>
+        <Expanded>
+          "" == ""
+        </Expanded>
+      </Expression>
+      <OverallResults successes="1" failures="0" expectedFailures="0" skipped="false"/>
+    </Section>
+    <Section name="Calling writeObject will create an empty pair of braces" filename="tests/<exe-name>/IntrospectiveTests/Json.tests.cpp" >
+      <Expression success="true" type="REQUIRE" filename="tests/<exe-name>/IntrospectiveTests/Json.tests.cpp" >
+        <Original>
+          stream.str() == "{\n}"
+        </Original>
+        <Expanded>
+          "{
+}"
+==
+"{
+}"
+        </Expanded>
+      </Expression>
+      <OverallResults successes="1" failures="0" expectedFailures="0" skipped="false"/>
+    </Section>
+    <Section name="Calling writeObject with key will create an object to write the value" filename="tests/<exe-name>/IntrospectiveTests/Json.tests.cpp" >
+      <Expression success="true" type="REQUIRE_THAT" filename="tests/<exe-name>/IntrospectiveTests/Json.tests.cpp" >
+        <Original>
+          stream.str(), ContainsSubstring( "\"int\": 1," ) &amp;&amp; ContainsSubstring( "\"double\": 1.5," ) &amp;&amp; ContainsSubstring( "\"true\": true," ) &amp;&amp; ContainsSubstring( "\"false\": false," ) &amp;&amp; ContainsSubstring( "\"string\": \"this is a string\"," ) &amp;&amp; ContainsSubstring( "\"array\": [\n    1,\n    2\n  ]\n}" )
+        </Original>
+        <Expanded>
+          "{
+  "int": 1,
+  "double": 1.5,
+  "true": true,
+  "false": false,
+  "string": "this is a string",
+  "array": [
+    1,
+    2
+  ]
+}" ( contains: ""int": 1," and contains: ""double": 1.5," and contains: ""true": true," and contains: ""false": false," and contains: ""string": "this is a string"," and contains: ""array": [
+    1,
+    2
+  ]
+}" )
+        </Expanded>
+      </Expression>
+      <OverallResults successes="1" failures="0" expectedFailures="0" skipped="false"/>
+    </Section>
+    <Section name="nesting objects" filename="tests/<exe-name>/IntrospectiveTests/Json.tests.cpp" >
+      <Expression success="true" type="REQUIRE_THAT" filename="tests/<exe-name>/IntrospectiveTests/Json.tests.cpp" >
+        <Original>
+          stream.str(), ContainsSubstring( "\"empty_object\": {\n  }," ) &amp;&amp; ContainsSubstring( "\"fully_object\": {\n    \"key\": 1\n  }" )
+        </Original>
+        <Expanded>
+          "{
+  "empty_object": {
+  },
+  "fully_object": {
+    "key": 1
+  }
+}" ( contains: ""empty_object": {
+  }," and contains: ""fully_object": {
+    "key": 1
+  }" )
+        </Expanded>
+      </Expression>
+      <OverallResults successes="1" failures="0" expectedFailures="0" skipped="false"/>
+    </Section>
+    <Section name="Calling writeArray will create an empty pair of braces" filename="tests/<exe-name>/IntrospectiveTests/Json.tests.cpp" >
+      <Expression success="true" type="REQUIRE" filename="tests/<exe-name>/IntrospectiveTests/Json.tests.cpp" >
+        <Original>
+          stream.str() == "[\n]"
+        </Original>
+        <Expanded>
+          "[
+]"
+==
+"[
+]"
+        </Expanded>
+      </Expression>
+      <OverallResults successes="1" failures="0" expectedFailures="0" skipped="false"/>
+    </Section>
+    <Section name="Calling writeArray creates array to write the values to" filename="tests/<exe-name>/IntrospectiveTests/Json.tests.cpp" >
+      <Expression success="true" type="REQUIRE" filename="tests/<exe-name>/IntrospectiveTests/Json.tests.cpp" >
+        <Original>
+          stream.str() == "[\n  1,\n  1.5,\n  true,\n  false,\n  \"this is a string\",\n  {\n    \"object\": 42\n  },\n  [\n    \"array\",\n    42.5\n  ]\n]"
+        </Original>
+        <Expanded>
+          "[
+  1,
+  1.5,
+  true,
+  false,
+  "this is a string",
+  {
+    "object": 42
+  },
+  [
+    "array",
+    42.5
+  ]
+]"
+==
+"[
+  1,
+  1.5,
+  true,
+  false,
+  "this is a string",
+  {
+    "object": 42
+  },
+  [
+    "array",
+    42.5
+  ]
+]"
+        </Expanded>
+      </Expression>
+      <OverallResults successes="1" failures="0" expectedFailures="0" skipped="false"/>
+    </Section>
+    <Section name="Moved from JsonObjectWriter shall not insert superfluous brace" filename="tests/<exe-name>/IntrospectiveTests/Json.tests.cpp" >
+      <Expression success="true" type="REQUIRE" filename="tests/<exe-name>/IntrospectiveTests/Json.tests.cpp" >
+        <Original>
+          stream.str() == "{\n}"
+        </Original>
+        <Expanded>
+          "{
+}"
+==
+"{
+}"
+        </Expanded>
+      </Expression>
+      <OverallResults successes="1" failures="0" expectedFailures="0" skipped="false"/>
+    </Section>
+    <Section name="Moved from JsonArrayWriter shall not insert superfluous bracket" filename="tests/<exe-name>/IntrospectiveTests/Json.tests.cpp" >
+      <Expression success="true" type="REQUIRE" filename="tests/<exe-name>/IntrospectiveTests/Json.tests.cpp" >
+        <Original>
+          stream.str() == "[\n]"
+        </Original>
+        <Expanded>
+          "[
+]"
+==
+"[
+]"
+        </Expanded>
+      </Expression>
+      <OverallResults successes="1" failures="0" expectedFailures="0" skipped="false"/>
+    </Section>
+    <Section name="Custom class shall be quoted" filename="tests/<exe-name>/IntrospectiveTests/Json.tests.cpp" >
+      <Expression success="true" type="REQUIRE" filename="tests/<exe-name>/IntrospectiveTests/Json.tests.cpp" >
+        <Original>
+          stream.str() == "\"custom\""
+        </Original>
+        <Expanded>
+          ""custom"" == ""custom""
+        </Expanded>
+      </Expression>
+      <OverallResults successes="1" failures="0" expectedFailures="0" skipped="false"/>
+    </Section>
+    <OverallResult success="true" skips="0"/>
+  </TestCase>
+  <TestCase name="JsonWriter escapes characters in strings properly" tags="[JsonWriter]" filename="tests/<exe-name>/IntrospectiveTests/Json.tests.cpp" >
+    <Section name="Quote in a string is escaped" filename="tests/<exe-name>/IntrospectiveTests/Json.tests.cpp" >
+      <Expression success="true" type="REQUIRE" filename="tests/<exe-name>/IntrospectiveTests/Json.tests.cpp" >
+        <Original>
+          sstream.str() == "\"\\\"\""
+        </Original>
+        <Expanded>
+          ""\""" == ""\"""
+        </Expanded>
+      </Expression>
+      <OverallResults successes="1" failures="0" expectedFailures="0" skipped="false"/>
+    </Section>
+    <Section name="Backslash in a string is escaped" filename="tests/<exe-name>/IntrospectiveTests/Json.tests.cpp" >
+      <Expression success="true" type="REQUIRE" filename="tests/<exe-name>/IntrospectiveTests/Json.tests.cpp" >
+        <Original>
+          sstream.str() == "\"\\\\\""
+        </Original>
+        <Expanded>
+          ""\\"" == ""\\""
+        </Expanded>
+      </Expression>
+      <OverallResults successes="1" failures="0" expectedFailures="0" skipped="false"/>
+    </Section>
+    <Section name="Forward slash in a string is **not** escaped" filename="tests/<exe-name>/IntrospectiveTests/Json.tests.cpp" >
+      <Expression success="true" type="REQUIRE" filename="tests/<exe-name>/IntrospectiveTests/Json.tests.cpp" >
+        <Original>
+          sstream.str() == "\"/\""
+        </Original>
+        <Expanded>
+          ""/"" == ""/""
+        </Expanded>
+      </Expression>
+      <OverallResults successes="1" failures="0" expectedFailures="0" skipped="false"/>
+    </Section>
+    <Section name="Backspace in a string is escaped" filename="tests/<exe-name>/IntrospectiveTests/Json.tests.cpp" >
+      <Expression success="true" type="REQUIRE" filename="tests/<exe-name>/IntrospectiveTests/Json.tests.cpp" >
+        <Original>
+          sstream.str() == "\"\\b\""
+        </Original>
+        <Expanded>
+          ""\b"" == ""\b""
+        </Expanded>
+      </Expression>
+      <OverallResults successes="1" failures="0" expectedFailures="0" skipped="false"/>
+    </Section>
+    <Section name="Formfeed in a string is escaped" filename="tests/<exe-name>/IntrospectiveTests/Json.tests.cpp" >
+      <Expression success="true" type="REQUIRE" filename="tests/<exe-name>/IntrospectiveTests/Json.tests.cpp" >
+        <Original>
+          sstream.str() == "\"\\f\""
+        </Original>
+        <Expanded>
+          ""\f"" == ""\f""
+        </Expanded>
+      </Expression>
+      <OverallResults successes="1" failures="0" expectedFailures="0" skipped="false"/>
+    </Section>
+    <Section name="linefeed in a string is escaped" filename="tests/<exe-name>/IntrospectiveTests/Json.tests.cpp" >
+      <Expression success="true" type="REQUIRE" filename="tests/<exe-name>/IntrospectiveTests/Json.tests.cpp" >
+        <Original>
+          sstream.str() == "\"\\n\""
+        </Original>
+        <Expanded>
+          ""\n"" == ""\n""
+        </Expanded>
+      </Expression>
+      <OverallResults successes="1" failures="0" expectedFailures="0" skipped="false"/>
+    </Section>
+    <Section name="carriage return in a string is escaped" filename="tests/<exe-name>/IntrospectiveTests/Json.tests.cpp" >
+      <Expression success="true" type="REQUIRE" filename="tests/<exe-name>/IntrospectiveTests/Json.tests.cpp" >
+        <Original>
+          sstream.str() == "\"\\r\""
+        </Original>
+        <Expanded>
+          ""\r"" == ""\r""
+        </Expanded>
+      </Expression>
+      <OverallResults successes="1" failures="0" expectedFailures="0" skipped="false"/>
+    </Section>
+    <Section name="tab in a string is escaped" filename="tests/<exe-name>/IntrospectiveTests/Json.tests.cpp" >
+      <Expression success="true" type="REQUIRE" filename="tests/<exe-name>/IntrospectiveTests/Json.tests.cpp" >
+        <Original>
+          sstream.str() == "\"\\t\""
+        </Original>
+        <Expanded>
+          ""\t"" == ""\t""
+        </Expanded>
+      </Expression>
+      <OverallResults successes="1" failures="0" expectedFailures="0" skipped="false"/>
+    </Section>
+    <Section name="combination of characters is escaped" filename="tests/<exe-name>/IntrospectiveTests/Json.tests.cpp" >
+      <Expression success="true" type="REQUIRE" filename="tests/<exe-name>/IntrospectiveTests/Json.tests.cpp" >
+        <Original>
+          sstream.str() == "\"\\\\/\\t\\r\\n\""
+        </Original>
+        <Expanded>
+          ""\\/\t\r\n"" == ""\\/\t\r\n""
+        </Expanded>
+      </Expression>
+      <OverallResults successes="1" failures="0" expectedFailures="0" skipped="false"/>
+    </Section>
+    <OverallResult success="true" skips="0"/>
+  </TestCase>
   <TestCase name="Lambdas in assertions" filename="tests/<exe-name>/UsageTests/Compilation.tests.cpp" >
     <Expression success="true" type="REQUIRE" filename="tests/<exe-name>/UsageTests/Compilation.tests.cpp" >
       <Original>
@@ -8770,7 +9530,9 @@ C
         d &lt;= Approx( 1.24 )
       </Original>
       <Expanded>
-        1.23 &lt;= Approx( 1.24 )
+        1.22999999999999998
+&lt;=
+Approx( 1.23999999999999999 )
       </Expanded>
     </Expression>
     <Expression success="true" type="REQUIRE" filename="tests/<exe-name>/UsageTests/Approx.tests.cpp" >
@@ -8778,7 +9540,9 @@ C
         d &lt;= Approx( 1.23 )
       </Original>
       <Expanded>
-        1.23 &lt;= Approx( 1.23 )
+        1.22999999999999998
+&lt;=
+Approx( 1.22999999999999998 )
       </Expanded>
     </Expression>
     <Expression success="true" type="REQUIRE_FALSE" filename="tests/<exe-name>/UsageTests/Approx.tests.cpp" >
@@ -8786,7 +9550,9 @@ C
         !(d &lt;= Approx( 1.22 ))
       </Original>
       <Expanded>
-        !(1.23 &lt;= Approx( 1.22 ))
+        !(1.22999999999999998
+&lt;=
+Approx( 1.21999999999999997 ))
       </Expanded>
     </Expression>
     <Expression success="true" type="REQUIRE" filename="tests/<exe-name>/UsageTests/Approx.tests.cpp" >
@@ -8794,7 +9560,9 @@ C
         d &lt;= Approx( 1.22 ).epsilon(0.1)
       </Original>
       <Expanded>
-        1.23 &lt;= Approx( 1.22 )
+        1.22999999999999998
+&lt;=
+Approx( 1.21999999999999997 )
       </Expanded>
     </Expression>
     <OverallResult success="true" skips="0"/>
@@ -9325,7 +10093,7 @@ C
         data.float_nine_point_one &lt; 9
       </Original>
       <Expanded>
-        9.1f &lt; 9
+        9.100000381f &lt; 9
       </Expanded>
     </Expression>
     <Expression success="false" type="CHECK" filename="tests/<exe-name>/UsageTests/Condition.tests.cpp" >
@@ -9333,7 +10101,7 @@ C
         data.float_nine_point_one > 10
       </Original>
       <Expanded>
-        9.1f > 10
+        9.100000381f > 10
       </Expanded>
     </Expression>
     <Expression success="false" type="CHECK" filename="tests/<exe-name>/UsageTests/Condition.tests.cpp" >
@@ -9341,7 +10109,7 @@ C
         data.float_nine_point_one > 9.2
       </Original>
       <Expanded>
-        9.1f > 9.2
+        9.100000381f > 9.19999999999999929
       </Expanded>
     </Expression>
     <Expression success="false" type="CHECK" filename="tests/<exe-name>/UsageTests/Condition.tests.cpp" >
@@ -9480,7 +10248,7 @@ C
         data.float_nine_point_one > 9
       </Original>
       <Expanded>
-        9.1f > 9
+        9.100000381f > 9
       </Expanded>
     </Expression>
     <Expression success="true" type="REQUIRE" filename="tests/<exe-name>/UsageTests/Condition.tests.cpp" >
@@ -9488,7 +10256,7 @@ C
         data.float_nine_point_one &lt; 10
       </Original>
       <Expanded>
-        9.1f &lt; 10
+        9.100000381f &lt; 10
       </Expanded>
     </Expression>
     <Expression success="true" type="REQUIRE" filename="tests/<exe-name>/UsageTests/Condition.tests.cpp" >
@@ -9496,7 +10264,7 @@ C
         data.float_nine_point_one &lt; 9.2
       </Original>
       <Expanded>
-        9.1f &lt; 9.2
+        9.100000381f &lt; 9.19999999999999929
       </Expanded>
     </Expression>
     <Expression success="true" type="REQUIRE" filename="tests/<exe-name>/UsageTests/Condition.tests.cpp" >
@@ -11231,7 +11999,9 @@ C
             config.benchmarkConfidenceInterval == Catch::Approx(0.99)
           </Original>
           <Expanded>
-            0.99 == Approx( 0.99 )
+            0.98999999999999999
+==
+Approx( 0.98999999999999999 )
           </Expanded>
         </Expression>
         <OverallResults successes="2" failures="0" expectedFailures="0" skipped="false"/>
@@ -11657,6 +12427,120 @@ C
 1 test case
 
 " ( contains: "fake test name" and contains: "fakeTestTag" )
+        </Expanded>
+      </Expression>
+      <OverallResults successes="1" failures="0" expectedFailures="0" skipped="false"/>
+    </Section>
+    <Expression success="true" type="REQUIRE_FALSE" filename="tests/<exe-name>/IntrospectiveTests/Reporters.tests.cpp" >
+      <Original>
+        !(factories.empty())
+      </Original>
+      <Expanded>
+        !false
+      </Expanded>
+    </Expression>
+    <Section name="JSON reporter lists tags" filename="tests/<exe-name>/IntrospectiveTests/Reporters.tests.cpp" >
+      <Info filename="tests/<exe-name>/IntrospectiveTests/Reporters.tests.cpp" >
+        Tested reporter: JSON
+      </Info>
+      <Expression success="true" type="REQUIRE_THAT" filename="tests/<exe-name>/IntrospectiveTests/Reporters.tests.cpp" >
+        <Original>
+          listingString, ContainsSubstring("fakeTag"s)
+        </Original>
+        <Expanded>
+          "{
+  "version": 1,
+  "metadata": {
+    "name": "",
+    "rng-seed": 1234,
+    "catch2-version": "<version>"
+  },
+  "listings": {
+    "tags": [
+      {
+        "aliases": [
+          "fakeTag"
+        ],
+        "count": 1
+      }
+    ]" contains: "fakeTag"
+        </Expanded>
+      </Expression>
+      <OverallResults successes="1" failures="0" expectedFailures="0" skipped="false"/>
+    </Section>
+    <Expression success="true" type="REQUIRE_FALSE" filename="tests/<exe-name>/IntrospectiveTests/Reporters.tests.cpp" >
+      <Original>
+        !(factories.empty())
+      </Original>
+      <Expanded>
+        !false
+      </Expanded>
+    </Expression>
+    <Section name="JSON reporter lists reporters" filename="tests/<exe-name>/IntrospectiveTests/Reporters.tests.cpp" >
+      <Info filename="tests/<exe-name>/IntrospectiveTests/Reporters.tests.cpp" >
+        Tested reporter: JSON
+      </Info>
+      <Expression success="true" type="REQUIRE_THAT" filename="tests/<exe-name>/IntrospectiveTests/Reporters.tests.cpp" >
+        <Original>
+          listingString, ContainsSubstring("fake reporter"s)
+        </Original>
+        <Expanded>
+          "{
+  "version": 1,
+  "metadata": {
+    "name": "",
+    "rng-seed": 1234,
+    "catch2-version": "<version>"
+  },
+  "listings": {
+    "reporters": [
+      {
+        "name": "fake reporter",
+        "description": "fake description"
+      }
+    ]" contains: "fake reporter"
+        </Expanded>
+      </Expression>
+      <OverallResults successes="1" failures="0" expectedFailures="0" skipped="false"/>
+    </Section>
+    <Expression success="true" type="REQUIRE_FALSE" filename="tests/<exe-name>/IntrospectiveTests/Reporters.tests.cpp" >
+      <Original>
+        !(factories.empty())
+      </Original>
+      <Expanded>
+        !false
+      </Expanded>
+    </Expression>
+    <Section name="JSON reporter lists tests" filename="tests/<exe-name>/IntrospectiveTests/Reporters.tests.cpp" >
+      <Info filename="tests/<exe-name>/IntrospectiveTests/Reporters.tests.cpp" >
+        Tested reporter: JSON
+      </Info>
+      <Expression success="true" type="REQUIRE_THAT" filename="tests/<exe-name>/IntrospectiveTests/Reporters.tests.cpp" >
+        <Original>
+          listingString, ContainsSubstring( "fake test name"s ) &amp;&amp; ContainsSubstring( "fakeTestTag"s )
+        </Original>
+        <Expanded>
+          "{
+  "version": 1,
+  "metadata": {
+    "name": "",
+    "rng-seed": 1234,
+    "catch2-version": "<version>"
+  },
+  "listings": {
+    "tests": [
+      {
+        "name": "fake test name",
+        "class-name": "",
+        "tags": [
+          "fakeTestTag"
+        ],
+        "source-location": {
+          "filename": "fake-file.cpp",
+          "line": 123456789
+        }
+      }
+    ]" ( contains: "fake test name" and contains: "fakeTestTag" )
         </Expanded>
       </Expression>
       <OverallResults successes="1" failures="0" expectedFailures="0" skipped="false"/>
@@ -12246,6 +13130,73 @@ All available test cases:
     </Section>
     <OverallResult success="true" skips="0"/>
   </TestCase>
+  <TestCase name="Scoped message applies to all assertions in scope" tags="[.][failing][info][messages]" filename="tests/<exe-name>/UsageTests/Message.tests.cpp" >
+    <Info filename="tests/<exe-name>/UsageTests/Message.tests.cpp" >
+      This will be reported multiple times
+    </Info>
+    <Expression success="false" type="CHECK" filename="tests/<exe-name>/UsageTests/Message.tests.cpp" >
+      <Original>
+        false
+      </Original>
+      <Expanded>
+        false
+      </Expanded>
+    </Expression>
+    <Info filename="tests/<exe-name>/UsageTests/Message.tests.cpp" >
+      This will be reported multiple times
+    </Info>
+    <Expression success="false" type="CHECK" filename="tests/<exe-name>/UsageTests/Message.tests.cpp" >
+      <Original>
+        false
+      </Original>
+      <Expanded>
+        false
+      </Expanded>
+    </Expression>
+    <OverallResult success="false" skips="0"/>
+  </TestCase>
+  <TestCase name="Scoped messages do not leave block with an exception" tags="[.][failing][info][messages]" filename="tests/<exe-name>/UsageTests/Message.tests.cpp" >
+    <Info filename="tests/<exe-name>/UsageTests/Message.tests.cpp" >
+      Should be in scope at the end
+    </Info>
+    <Expression success="false" type="REQUIRE" filename="tests/<exe-name>/UsageTests/Message.tests.cpp" >
+      <Original>
+        false
+      </Original>
+      <Expanded>
+        false
+      </Expanded>
+    </Expression>
+    <OverallResult success="false" skips="0"/>
+  </TestCase>
+  <TestCase name="Scoped messages outlive section end" tags="[.][failing][info][messages]" filename="tests/<exe-name>/UsageTests/Message.tests.cpp" >
+    <Section name="Dummy section" filename="tests/<exe-name>/UsageTests/Message.tests.cpp" >
+      <Info filename="tests/<exe-name>/UsageTests/Message.tests.cpp" >
+        Should survive a section end
+      </Info>
+      <Expression success="true" type="CHECK" filename="tests/<exe-name>/UsageTests/Message.tests.cpp" >
+        <Original>
+          true
+        </Original>
+        <Expanded>
+          true
+        </Expanded>
+      </Expression>
+      <OverallResults successes="1" failures="0" expectedFailures="0" skipped="false"/>
+    </Section>
+    <Info filename="tests/<exe-name>/UsageTests/Message.tests.cpp" >
+      Should survive a section end
+    </Info>
+    <Expression success="false" type="REQUIRE" filename="tests/<exe-name>/UsageTests/Message.tests.cpp" >
+      <Original>
+        false
+      </Original>
+      <Expanded>
+        false
+      </Expanded>
+    </Expression>
+    <OverallResult success="false" skips="0"/>
+  </TestCase>
   <TestCase name="Sends stuff to stdout and stderr" tags="[.]" filename="tests/<exe-name>/UsageTests/Misc.tests.cpp" >
     <OverallResult success="false" skips="0">
       <StdOut>
@@ -12263,7 +13214,9 @@ A string sent to stderr via clog
         d == Approx( 1.23 )
       </Original>
       <Expanded>
-        1.23 == Approx( 1.23 )
+        1.22999999999999998
+==
+Approx( 1.22999999999999998 )
       </Expanded>
     </Expression>
     <Expression success="true" type="REQUIRE" filename="tests/<exe-name>/UsageTests/Approx.tests.cpp" >
@@ -12271,7 +13224,9 @@ A string sent to stderr via clog
         d != Approx( 1.22 )
       </Original>
       <Expanded>
-        1.23 != Approx( 1.22 )
+        1.22999999999999998
+!=
+Approx( 1.21999999999999997 )
       </Expanded>
     </Expression>
     <Expression success="true" type="REQUIRE" filename="tests/<exe-name>/UsageTests/Approx.tests.cpp" >
@@ -12279,7 +13234,9 @@ A string sent to stderr via clog
         d != Approx( 1.24 )
       </Original>
       <Expanded>
-        1.23 != Approx( 1.24 )
+        1.22999999999999998
+!=
+Approx( 1.23999999999999999 )
       </Expanded>
     </Expression>
     <Expression success="true" type="REQUIRE" filename="tests/<exe-name>/UsageTests/Approx.tests.cpp" >
@@ -12287,7 +13244,9 @@ A string sent to stderr via clog
         d == 1.23_a
       </Original>
       <Expanded>
-        1.23 == Approx( 1.23 )
+        1.22999999999999998
+==
+Approx( 1.22999999999999998 )
       </Expanded>
     </Expression>
     <Expression success="true" type="REQUIRE" filename="tests/<exe-name>/UsageTests/Approx.tests.cpp" >
@@ -12295,7 +13254,9 @@ A string sent to stderr via clog
         d != 1.22_a
       </Original>
       <Expanded>
-        1.23 != Approx( 1.22 )
+        1.22999999999999998
+!=
+Approx( 1.21999999999999997 )
       </Expanded>
     </Expression>
     <Expression success="true" type="REQUIRE" filename="tests/<exe-name>/UsageTests/Approx.tests.cpp" >
@@ -12303,7 +13264,9 @@ A string sent to stderr via clog
         Approx( d ) == 1.23
       </Original>
       <Expanded>
-        Approx( 1.23 ) == 1.23
+        Approx( 1.22999999999999998 )
+==
+1.22999999999999998
       </Expanded>
     </Expression>
     <Expression success="true" type="REQUIRE" filename="tests/<exe-name>/UsageTests/Approx.tests.cpp" >
@@ -12311,7 +13274,9 @@ A string sent to stderr via clog
         Approx( d ) != 1.22
       </Original>
       <Expanded>
-        Approx( 1.23 ) != 1.22
+        Approx( 1.22999999999999998 )
+!=
+1.21999999999999997
       </Expanded>
     </Expression>
     <Expression success="true" type="REQUIRE" filename="tests/<exe-name>/UsageTests/Approx.tests.cpp" >
@@ -12319,7 +13284,9 @@ A string sent to stderr via clog
         Approx( d ) != 1.24
       </Original>
       <Expanded>
-        Approx( 1.23 ) != 1.24
+        Approx( 1.22999999999999998 )
+!=
+1.23999999999999999
       </Expanded>
     </Expression>
     <OverallResult success="true" skips="0"/>
@@ -13146,10 +14113,10 @@ Message from section two
   <TestCase name="Template test case with test types specified inside non-copyable and non-movable std::tuple - NonCopyableAndNonMovableTypes - 0" tags="[list][template]" filename="tests/<exe-name>/UsageTests/Misc.tests.cpp" >
     <Expression success="true" type="REQUIRE" filename="tests/<exe-name>/UsageTests/Misc.tests.cpp" >
       <Original>
-        sizeof(TestType) > 0
+        std::is_default_constructible&lt;TestType>::value
       </Original>
       <Expanded>
-        1 > 0
+        true
       </Expanded>
     </Expression>
     <OverallResult success="true" skips="0"/>
@@ -13157,10 +14124,10 @@ Message from section two
   <TestCase name="Template test case with test types specified inside non-copyable and non-movable std::tuple - NonCopyableAndNonMovableTypes - 1" tags="[list][template]" filename="tests/<exe-name>/UsageTests/Misc.tests.cpp" >
     <Expression success="true" type="REQUIRE" filename="tests/<exe-name>/UsageTests/Misc.tests.cpp" >
       <Original>
-        sizeof(TestType) > 0
+        std::is_default_constructible&lt;TestType>::value
       </Original>
       <Expanded>
-        4 > 0
+        true
       </Expanded>
     </Expression>
     <OverallResult success="true" skips="0"/>
@@ -13168,10 +14135,10 @@ Message from section two
   <TestCase name="Template test case with test types specified inside non-default-constructible std::tuple - MyNonDefaultConstructibleTypes - 0" tags="[list][template]" filename="tests/<exe-name>/UsageTests/Misc.tests.cpp" >
     <Expression success="true" type="REQUIRE" filename="tests/<exe-name>/UsageTests/Misc.tests.cpp" >
       <Original>
-        sizeof(TestType) > 0
+        std::is_trivially_copyable&lt;TestType>::value
       </Original>
       <Expanded>
-        1 > 0
+        true
       </Expanded>
     </Expression>
     <OverallResult success="true" skips="0"/>
@@ -13179,10 +14146,10 @@ Message from section two
   <TestCase name="Template test case with test types specified inside non-default-constructible std::tuple - MyNonDefaultConstructibleTypes - 1" tags="[list][template]" filename="tests/<exe-name>/UsageTests/Misc.tests.cpp" >
     <Expression success="true" type="REQUIRE" filename="tests/<exe-name>/UsageTests/Misc.tests.cpp" >
       <Original>
-        sizeof(TestType) > 0
+        std::is_trivially_copyable&lt;TestType>::value
       </Original>
       <Expanded>
-        4 > 0
+        true
       </Expanded>
     </Expression>
     <OverallResult success="true" skips="0"/>
@@ -13190,10 +14157,10 @@ Message from section two
   <TestCase name="Template test case with test types specified inside std::tuple - MyTypes - 0" tags="[list][template]" filename="tests/<exe-name>/UsageTests/Misc.tests.cpp" >
     <Expression success="true" type="REQUIRE" filename="tests/<exe-name>/UsageTests/Misc.tests.cpp" >
       <Original>
-        sizeof(TestType) > 0
+        std::is_arithmetic&lt;TestType>::value
       </Original>
       <Expanded>
-        4 > 0
+        true
       </Expanded>
     </Expression>
     <OverallResult success="true" skips="0"/>
@@ -13201,10 +14168,10 @@ Message from section two
   <TestCase name="Template test case with test types specified inside std::tuple - MyTypes - 1" tags="[list][template]" filename="tests/<exe-name>/UsageTests/Misc.tests.cpp" >
     <Expression success="true" type="REQUIRE" filename="tests/<exe-name>/UsageTests/Misc.tests.cpp" >
       <Original>
-        sizeof(TestType) > 0
+        std::is_arithmetic&lt;TestType>::value
       </Original>
       <Expanded>
-        1 > 0
+        true
       </Expanded>
     </Expression>
     <OverallResult success="true" skips="0"/>
@@ -13212,10 +14179,10 @@ Message from section two
   <TestCase name="Template test case with test types specified inside std::tuple - MyTypes - 2" tags="[list][template]" filename="tests/<exe-name>/UsageTests/Misc.tests.cpp" >
     <Expression success="true" type="REQUIRE" filename="tests/<exe-name>/UsageTests/Misc.tests.cpp" >
       <Original>
-        sizeof(TestType) > 0
+        std::is_arithmetic&lt;TestType>::value
       </Original>
       <Expanded>
-        4 > 0
+        true
       </Expanded>
     </Expression>
     <OverallResult success="true" skips="0"/>
@@ -13835,6 +14802,18 @@ Message from section two
       <OverallResults successes="2" failures="0" expectedFailures="0" skipped="false"/>
     </Section>
     <OverallResult success="true" skips="0"/>
+  </TestCase>
+  <TestCase name="TemplateTestSig: compiles with a single int parameter - 1" tags="[singleint][template]" filename="tests/<exe-name>/UsageTests/Misc.tests.cpp" >
+    <OverallResult success="false" skips="0"/>
+  </TestCase>
+  <TestCase name="TemplateTestSig: compiles with a single int parameter - 3" tags="[singleint][template]" filename="tests/<exe-name>/UsageTests/Misc.tests.cpp" >
+    <OverallResult success="false" skips="0"/>
+  </TestCase>
+  <TestCase name="TemplateTestSig: compiles with a single int parameter - 6" tags="[singleint][template]" filename="tests/<exe-name>/UsageTests/Misc.tests.cpp" >
+    <OverallResult success="false" skips="0"/>
+  </TestCase>
+  <TestCase name="TemplateTestSig: compiles with two type parameters - int,int" tags="[onlytypes][template]" filename="tests/<exe-name>/UsageTests/Misc.tests.cpp" >
+    <OverallResult success="false" skips="0"/>
   </TestCase>
   <TestCase name="TemplateTestSig: vectors can be sized and resized - (std::tuple&lt;int, float>), 6" tags="[nttp][template][vector]" filename="tests/<exe-name>/UsageTests/Misc.tests.cpp" >
     <Expression success="true" type="REQUIRE" filename="tests/<exe-name>/UsageTests/Misc.tests.cpp" >
@@ -14545,6 +15524,50 @@ Message from section two
       </Expanded>
     </Expression>
     <Failure filename="tests/<exe-name>/UsageTests/Misc.tests.cpp" />
+    <OverallResult success="true" skips="0"/>
+  </TestCase>
+  <TestCase name="Testing checked-if 4" tags="[!shouldfail][checked-if]" filename="tests/<exe-name>/UsageTests/Misc.tests.cpp" >
+    <Expression success="true" type="CHECKED_ELSE" filename="tests/<exe-name>/UsageTests/Misc.tests.cpp" >
+      <Original>
+        true
+      </Original>
+      <Expanded>
+        true
+      </Expanded>
+    </Expression>
+    <Expression success="false" filename="tests/<exe-name>/UsageTests/Misc.tests.cpp" >
+      <Original>
+        {Unknown expression after the reported line}
+      </Original>
+      <Expanded>
+        {Unknown expression after the reported line}
+      </Expanded>
+      <Exception filename="tests/<exe-name>/UsageTests/Misc.tests.cpp" >
+        Uncaught exception should fail!
+      </Exception>
+    </Expression>
+    <OverallResult success="true" skips="0"/>
+  </TestCase>
+  <TestCase name="Testing checked-if 5" tags="[!shouldfail][checked-if]" filename="tests/<exe-name>/UsageTests/Misc.tests.cpp" >
+    <Expression success="false" type="CHECKED_ELSE" filename="tests/<exe-name>/UsageTests/Misc.tests.cpp" >
+      <Original>
+        false
+      </Original>
+      <Expanded>
+        false
+      </Expanded>
+    </Expression>
+    <Expression success="false" filename="tests/<exe-name>/UsageTests/Misc.tests.cpp" >
+      <Original>
+        {Unknown expression after the reported line}
+      </Original>
+      <Expanded>
+        {Unknown expression after the reported line}
+      </Expanded>
+      <Exception filename="tests/<exe-name>/UsageTests/Misc.tests.cpp" >
+        Uncaught exception should fail!
+      </Exception>
+    </Expression>
     <OverallResult success="true" skips="0"/>
   </TestCase>
   <TestCase name="The NO_FAIL macro reports a failure but does not fail the test" tags="[messages]" filename="tests/<exe-name>/UsageTests/Message.tests.cpp" >
@@ -15465,7 +16488,7 @@ There is no extra whitespace here
   </TestCase>
   <TestCase name="Unexpected exceptions can be translated" tags="[!throws][.][failing]" filename="tests/<exe-name>/UsageTests/Exception.tests.cpp" >
     <Exception filename="tests/<exe-name>/UsageTests/Exception.tests.cpp" >
-      3.14
+      3.14000000000000012
     </Exception>
     <OverallResult success="false" skips="0"/>
   </TestCase>
@@ -16692,6 +17715,25 @@ There is no extra whitespace here
       </Expression>
       <OverallResults successes="2" failures="0" expectedFailures="0" skipped="false"/>
     </Section>
+    <Section name="Compare against std::initializer_list" filename="tests/<exe-name>/UsageTests/MatchersRanges.tests.cpp" >
+      <Expression success="true" type="REQUIRE_THAT" filename="tests/<exe-name>/UsageTests/MatchersRanges.tests.cpp" >
+        <Original>
+          array_a, RangeEquals( { 1, 2, 3 } )
+        </Original>
+        <Expanded>
+          { 1, 2, 3 } elements are { 1, 2, 3 }
+        </Expanded>
+      </Expression>
+      <Expression success="true" type="REQUIRE_THAT" filename="tests/<exe-name>/UsageTests/MatchersRanges.tests.cpp" >
+        <Original>
+          array_a, RangeEquals( { 2, 4, 6 }, []( int l, int r ) { return l * 2 == r; } )
+        </Original>
+        <Expanded>
+          { 1, 2, 3 } elements are { 2, 4, 6 }
+        </Expanded>
+      </Expression>
+      <OverallResults successes="2" failures="0" expectedFailures="0" skipped="false"/>
+    </Section>
     <Section name="Check short-circuiting behaviour" filename="tests/<exe-name>/UsageTests/MatchersRanges.tests.cpp" >
       <Section name="Check short-circuits on failure" filename="tests/<exe-name>/UsageTests/MatchersRanges.tests.cpp" >
         <Expression success="true" type="REQUIRE_THAT" filename="tests/<exe-name>/UsageTests/MatchersRanges.tests.cpp" >
@@ -16918,6 +17960,25 @@ There is no extra whitespace here
       </Expression>
       <OverallResults successes="1" failures="0" expectedFailures="0" skipped="false"/>
     </Section>
+    <Section name="Compare against std::initializer_list" filename="tests/<exe-name>/UsageTests/MatchersRanges.tests.cpp" >
+      <Expression success="true" type="REQUIRE_THAT" filename="tests/<exe-name>/UsageTests/MatchersRanges.tests.cpp" >
+        <Original>
+          array_a, UnorderedRangeEquals( { 10, 20, 1 } )
+        </Original>
+        <Expanded>
+          { 1, 10, 20 } unordered elements are { 10, 20, 1 }
+        </Expanded>
+      </Expression>
+      <Expression success="true" type="REQUIRE_THAT" filename="tests/<exe-name>/UsageTests/MatchersRanges.tests.cpp" >
+        <Original>
+          array_a, UnorderedRangeEquals( { 11, 21, 2 }, []( int l, int r ) { return std::abs( l - r ) &lt;= 1; } )
+        </Original>
+        <Expanded>
+          { 1, 10, 20 } unordered elements are { 11, 21, 2 }
+        </Expanded>
+      </Expression>
+      <OverallResults successes="2" failures="0" expectedFailures="0" skipped="false"/>
+    </Section>
     <OverallResult success="true" skips="0"/>
   </TestCase>
   <TestCase name="Usage of the SizeIs range matcher" tags="[matchers][size][templated]" filename="tests/<exe-name>/UsageTests/MatchersRanges.tests.cpp" >
@@ -17010,7 +18071,9 @@ There is no extra whitespace here
         d == approx( 1.23 )
       </Original>
       <Expanded>
-        1.23 == Approx( 1.23 )
+        1.22999999999999998
+==
+Approx( 1.22999999999999998 )
       </Expanded>
     </Expression>
     <Expression success="true" type="REQUIRE" filename="tests/<exe-name>/UsageTests/Approx.tests.cpp" >
@@ -17018,7 +18081,9 @@ There is no extra whitespace here
         d == approx( 1.22 )
       </Original>
       <Expanded>
-        1.23 == Approx( 1.22 )
+        1.22999999999999998
+==
+Approx( 1.21999999999999997 )
       </Expanded>
     </Expression>
     <Expression success="true" type="REQUIRE" filename="tests/<exe-name>/UsageTests/Approx.tests.cpp" >
@@ -17026,7 +18091,9 @@ There is no extra whitespace here
         d == approx( 1.24 )
       </Original>
       <Expanded>
-        1.23 == Approx( 1.24 )
+        1.22999999999999998
+==
+Approx( 1.23999999999999999 )
       </Expanded>
     </Expression>
     <Expression success="true" type="REQUIRE" filename="tests/<exe-name>/UsageTests/Approx.tests.cpp" >
@@ -17034,7 +18101,7 @@ There is no extra whitespace here
         d != approx( 1.25 )
       </Original>
       <Expanded>
-        1.23 != Approx( 1.25 )
+        1.22999999999999998 != Approx( 1.25 )
       </Expanded>
     </Expression>
     <Expression success="true" type="REQUIRE" filename="tests/<exe-name>/UsageTests/Approx.tests.cpp" >
@@ -17042,7 +18109,9 @@ There is no extra whitespace here
         approx( d ) == 1.23
       </Original>
       <Expanded>
-        Approx( 1.23 ) == 1.23
+        Approx( 1.22999999999999998 )
+==
+1.22999999999999998
       </Expanded>
     </Expression>
     <Expression success="true" type="REQUIRE" filename="tests/<exe-name>/UsageTests/Approx.tests.cpp" >
@@ -17050,7 +18119,9 @@ There is no extra whitespace here
         approx( d ) == 1.22
       </Original>
       <Expanded>
-        Approx( 1.23 ) == 1.22
+        Approx( 1.22999999999999998 )
+==
+1.21999999999999997
       </Expanded>
     </Expression>
     <Expression success="true" type="REQUIRE" filename="tests/<exe-name>/UsageTests/Approx.tests.cpp" >
@@ -17058,7 +18129,9 @@ There is no extra whitespace here
         approx( d ) == 1.24
       </Original>
       <Expanded>
-        Approx( 1.23 ) == 1.24
+        Approx( 1.22999999999999998 )
+==
+1.23999999999999999
       </Expanded>
     </Expression>
     <Expression success="true" type="REQUIRE" filename="tests/<exe-name>/UsageTests/Approx.tests.cpp" >
@@ -17066,7 +18139,7 @@ There is no extra whitespace here
         approx( d ) != 1.25
       </Original>
       <Expanded>
-        Approx( 1.23 ) != 1.25
+        Approx( 1.22999999999999998 ) != 1.25
       </Expanded>
     </Expression>
     <OverallResult success="true" skips="0"/>
@@ -17596,9 +18669,17 @@ There is no extra whitespace here
   </TestCase>
   <TestCase name="When unchecked exceptions are thrown from sections they are always failures" tags="[!throws][.][failing]" filename="tests/<exe-name>/UsageTests/Exception.tests.cpp" >
     <Section name="section name" filename="tests/<exe-name>/UsageTests/Exception.tests.cpp" >
-      <Exception filename="tests/<exe-name>/UsageTests/Exception.tests.cpp" >
-        unexpected exception
-      </Exception>
+      <Expression success="false" filename="tests/<exe-name>/UsageTests/Exception.tests.cpp" >
+        <Original>
+          {Unknown expression after the reported line}
+        </Original>
+        <Expanded>
+          {Unknown expression after the reported line}
+        </Expanded>
+        <Exception filename="tests/<exe-name>/UsageTests/Exception.tests.cpp" >
+          unexpected exception
+        </Exception>
+      </Expression>
       <OverallResults successes="0" failures="1" expectedFailures="0" skipped="false"/>
     </Section>
     <OverallResult success="false" skips="0"/>
@@ -18518,7 +19599,9 @@ There is no extra whitespace here
         erfc_inv(1.103560) == Approx(-0.09203687623843015)
       </Original>
       <Expanded>
-        -0.0920368762 == Approx( -0.0920368762 )
+        -0.09203687623843014
+==
+Approx( -0.09203687623843015 )
       </Expanded>
     </Expression>
     <Expression success="true" type="CHECK" filename="tests/<exe-name>/IntrospectiveTests/InternalBenchmark.tests.cpp" >
@@ -18526,7 +19609,9 @@ There is no extra whitespace here
         erfc_inv(1.067400) == Approx(-0.05980291115763361)
       </Original>
       <Expanded>
-        -0.0598029112 == Approx( -0.0598029112 )
+        -0.05980291115763361
+==
+Approx( -0.05980291115763361 )
       </Expanded>
     </Expression>
     <Expression success="true" type="CHECK" filename="tests/<exe-name>/IntrospectiveTests/InternalBenchmark.tests.cpp" >
@@ -18534,7 +19619,9 @@ There is no extra whitespace here
         erfc_inv(0.050000) == Approx(1.38590382434967796)
       </Original>
       <Expanded>
-        1.3859038243 == Approx( 1.3859038243 )
+        1.38590382434967774
+==
+Approx( 1.38590382434967796 )
       </Expanded>
     </Expression>
     <OverallResult success="true" skips="0"/>
@@ -19124,56 +20211,15 @@ b1!
     </Expression>
     <OverallResult success="true" skips="0"/>
   </TestCase>
-  <TestCase name="normal_cdf" tags="[benchmark]" filename="tests/<exe-name>/IntrospectiveTests/InternalBenchmark.tests.cpp" >
-    <Expression success="true" type="CHECK" filename="tests/<exe-name>/IntrospectiveTests/InternalBenchmark.tests.cpp" >
-      <Original>
-        normal_cdf(0.000000) == Approx(0.50000000000000000)
-      </Original>
-      <Expanded>
-        0.5 == Approx( 0.5 )
-      </Expanded>
-    </Expression>
-    <Expression success="true" type="CHECK" filename="tests/<exe-name>/IntrospectiveTests/InternalBenchmark.tests.cpp" >
-      <Original>
-        normal_cdf(1.000000) == Approx(0.84134474606854293)
-      </Original>
-      <Expanded>
-        0.8413447461 == Approx( 0.8413447461 )
-      </Expanded>
-    </Expression>
-    <Expression success="true" type="CHECK" filename="tests/<exe-name>/IntrospectiveTests/InternalBenchmark.tests.cpp" >
-      <Original>
-        normal_cdf(-1.000000) == Approx(0.15865525393145705)
-      </Original>
-      <Expanded>
-        0.1586552539 == Approx( 0.1586552539 )
-      </Expanded>
-    </Expression>
-    <Expression success="true" type="CHECK" filename="tests/<exe-name>/IntrospectiveTests/InternalBenchmark.tests.cpp" >
-      <Original>
-        normal_cdf(2.809729) == Approx(0.99752083845315409)
-      </Original>
-      <Expanded>
-        0.9975208385 == Approx( 0.9975208385 )
-      </Expanded>
-    </Expression>
-    <Expression success="true" type="CHECK" filename="tests/<exe-name>/IntrospectiveTests/InternalBenchmark.tests.cpp" >
-      <Original>
-        normal_cdf(-1.352570) == Approx(0.08809652095066035)
-      </Original>
-      <Expanded>
-        0.088096521 == Approx( 0.088096521 )
-      </Expanded>
-    </Expression>
-    <OverallResult success="true" skips="0"/>
-  </TestCase>
   <TestCase name="normal_quantile" tags="[benchmark]" filename="tests/<exe-name>/IntrospectiveTests/InternalBenchmark.tests.cpp" >
     <Expression success="true" type="CHECK" filename="tests/<exe-name>/IntrospectiveTests/InternalBenchmark.tests.cpp" >
       <Original>
         normal_quantile(0.551780) == Approx(0.13015979861484198)
       </Original>
       <Expanded>
-        0.1301597986 == Approx( 0.1301597986 )
+        0.13015979861484195
+==
+Approx( 0.13015979861484198 )
       </Expanded>
     </Expression>
     <Expression success="true" type="CHECK" filename="tests/<exe-name>/IntrospectiveTests/InternalBenchmark.tests.cpp" >
@@ -19181,7 +20227,9 @@ b1!
         normal_quantile(0.533700) == Approx(0.08457408802851875)
       </Original>
       <Expanded>
-        0.084574088 == Approx( 0.084574088 )
+        0.08457408802851875
+==
+Approx( 0.08457408802851875 )
       </Expanded>
     </Expression>
     <Expression success="true" type="CHECK" filename="tests/<exe-name>/IntrospectiveTests/InternalBenchmark.tests.cpp" >
@@ -19189,7 +20237,9 @@ b1!
         normal_quantile(0.025000) == Approx(-1.95996398454005449)
       </Original>
       <Expanded>
-        -1.9599639845 == Approx( -1.9599639845 )
+        -1.95996398454005405
+==
+Approx( -1.95996398454005449 )
       </Expanded>
     </Expression>
     <OverallResult success="true" skips="0"/>
@@ -19573,6 +20623,50 @@ b1!
           "abcdefcg" == "abcdefcg"
         </Expanded>
       </Expression>
+      <OverallResults successes="2" failures="0" expectedFailures="0" skipped="false"/>
+    </Section>
+    <Section name="no replace in already-replaced string" filename="tests/<exe-name>/IntrospectiveTests/StringManip.tests.cpp" >
+      <Section name="lengthening" filename="tests/<exe-name>/IntrospectiveTests/StringManip.tests.cpp" >
+        <Expression success="true" type="CHECK" filename="tests/<exe-name>/IntrospectiveTests/StringManip.tests.cpp" >
+          <Original>
+            Catch::replaceInPlace(letters, "c", "cc")
+          </Original>
+          <Expanded>
+            true
+          </Expanded>
+        </Expression>
+        <Expression success="true" type="CHECK" filename="tests/<exe-name>/IntrospectiveTests/StringManip.tests.cpp" >
+          <Original>
+            letters == "abccdefccg"
+          </Original>
+          <Expanded>
+            "abccdefccg" == "abccdefccg"
+          </Expanded>
+        </Expression>
+        <OverallResults successes="2" failures="0" expectedFailures="0" skipped="false"/>
+      </Section>
+      <OverallResults successes="2" failures="0" expectedFailures="0" skipped="false"/>
+    </Section>
+    <Section name="no replace in already-replaced string" filename="tests/<exe-name>/IntrospectiveTests/StringManip.tests.cpp" >
+      <Section name="shortening" filename="tests/<exe-name>/IntrospectiveTests/StringManip.tests.cpp" >
+        <Expression success="true" type="CHECK" filename="tests/<exe-name>/IntrospectiveTests/StringManip.tests.cpp" >
+          <Original>
+            Catch::replaceInPlace(s, "--", "-")
+          </Original>
+          <Expanded>
+            true
+          </Expanded>
+        </Expression>
+        <Expression success="true" type="CHECK" filename="tests/<exe-name>/IntrospectiveTests/StringManip.tests.cpp" >
+          <Original>
+            s == "--"
+          </Original>
+          <Expanded>
+            "--" == "--"
+          </Expanded>
+        </Expression>
+        <OverallResults successes="2" failures="0" expectedFailures="0" skipped="false"/>
+      </Section>
       <OverallResults successes="2" failures="0" expectedFailures="0" skipped="false"/>
     </Section>
     <Section name="escape '" filename="tests/<exe-name>/IntrospectiveTests/StringManip.tests.cpp" >
@@ -20339,6 +21433,19 @@ b1!
     </Expression>
     <OverallResult success="true" skips="0"/>
   </TestCase>
+  <TestCase name="system_clock timepoint with non-default duration" tags="[chrono][toString]" filename="tests/<exe-name>/UsageTests/ToStringChrono.tests.cpp" >
+    <Expression success="true" type="CHECK" filename="tests/<exe-name>/UsageTests/ToStringChrono.tests.cpp" >
+      <Original>
+        tp1 == tp2
+      </Original>
+      <Expanded>
+        {iso8601-timestamp}
+==
+{iso8601-timestamp}
+      </Expanded>
+    </Expression>
+    <OverallResult success="true" skips="0"/>
+  </TestCase>
   <TestCase name="tables" tags="[generators]" filename="tests/<exe-name>/UsageTests/Generators.tests.cpp" >
     <Expression success="true" type="REQUIRE" filename="tests/<exe-name>/UsageTests/Generators.tests.cpp" >
       <Original>
@@ -20555,18 +21662,18 @@ b1!
   <TestCase name="tuple&lt;float,int>" tags="[toString][tuple]" filename="tests/<exe-name>/UsageTests/ToStringTuple.tests.cpp" >
     <Expression success="true" type="CHECK" filename="tests/<exe-name>/UsageTests/ToStringTuple.tests.cpp" >
       <Original>
-        "1.2f" == ::Catch::Detail::stringify(float(1.2))
+        "1.5f" == ::Catch::Detail::stringify(float(1.5))
       </Original>
       <Expanded>
-        "1.2f" == "1.2f"
+        "1.5f" == "1.5f"
       </Expanded>
     </Expression>
     <Expression success="true" type="CHECK" filename="tests/<exe-name>/UsageTests/ToStringTuple.tests.cpp" >
       <Original>
-        "{ 1.2f, 0 }" == ::Catch::Detail::stringify(type{1.2f,0})
+        "{ 1.5f, 0 }" == ::Catch::Detail::stringify(type{1.5f,0})
       </Original>
       <Expanded>
-        "{ 1.2f, 0 }" == "{ 1.2f, 0 }"
+        "{ 1.5f, 0 }" == "{ 1.5f, 0 }"
       </Expanded>
     </Expression>
     <OverallResult success="true" skips="0"/>
@@ -20598,12 +21705,12 @@ b1!
   <TestCase name="tuple&lt;tuple&lt;int>,tuple&lt;>,float>" tags="[toString][tuple]" filename="tests/<exe-name>/UsageTests/ToStringTuple.tests.cpp" >
     <Expression success="true" type="CHECK" filename="tests/<exe-name>/UsageTests/ToStringTuple.tests.cpp" >
       <Original>
-        "{ { 42 }, { }, 1.2f }" == ::Catch::Detail::stringify(value)
+        "{ { 42 }, { }, 1.5f }" == ::Catch::Detail::stringify(value)
       </Original>
       <Expanded>
-        "{ { 42 }, { }, 1.2f }"
+        "{ { 42 }, { }, 1.5f }"
 ==
-"{ { 42 }, { }, 1.2f }"
+"{ { 42 }, { }, 1.5f }"
       </Expanded>
     </Expression>
     <OverallResult success="true" skips="0"/>
@@ -20638,7 +21745,26 @@ b1!
         e.confidence_interval == 0.95
       </Original>
       <Expanded>
-        0.95 == 0.95
+        0.94999999999999996 == 0.94999999999999996
+      </Expanded>
+    </Expression>
+    <OverallResult success="true" skips="0"/>
+  </TestCase>
+  <TestCase name="uniform_integer_distribution can return the bounds" tags="[distribution][rng]" filename="tests/<exe-name>/IntrospectiveTests/RandomNumberGeneration.tests.cpp" >
+    <Expression success="true" type="REQUIRE" filename="tests/<exe-name>/IntrospectiveTests/RandomNumberGeneration.tests.cpp" >
+      <Original>
+        dist.a() == -10
+      </Original>
+      <Expanded>
+        -10 == -10
+      </Expanded>
+    </Expression>
+    <Expression success="true" type="REQUIRE" filename="tests/<exe-name>/IntrospectiveTests/RandomNumberGeneration.tests.cpp" >
+      <Original>
+        dist.b() == 10
+      </Original>
+      <Expanded>
+        10 == 10
       </Expanded>
     </Expression>
     <OverallResult success="true" skips="0"/>
@@ -21197,6 +22323,6 @@ b1!
     </Section>
     <OverallResult success="true" skips="0"/>
   </TestCase>
-  <OverallResults successes="2048" failures="145" expectedFailures="32" skips="12"/>
-  <OverallResultsCases successes="308" failures="84" expectedFailures="11" skips="6"/>
+  <OverallResults successes="2105" failures="157" expectedFailures="41" skips="12"/>
+  <OverallResultsCases successes="317" failures="95" expectedFailures="17" skips="6"/>
 </Catch2TestRun>
