@@ -15,7 +15,7 @@ ObjectPtr<MResource> MImageDefinition::create() const
 	res->m_surface.reset(IMG_Load(fullpath.string().c_str()));
 	if (!res->m_surface)
 	{
-		CZ_LOG(Error, "Failed to load image {} from file{}. ec={}", name, narrow(file.native()), SDL_GetError());
+		CZ_LOG(Main, Error, "Failed to load image {} from file{}. ec={}", name, narrow(file.native()), SDL_GetError());
 		return nullptr;
 	}
 

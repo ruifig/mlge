@@ -14,13 +14,13 @@ mlge::Class* Class::find(const char* name)
 		}
 	}
 
-	CZ_LOG(Error, "Class '{}' not found", name);
+	CZ_LOG(Main, Error, "Class '{}' not found", name);
 	return nullptr;
 }
 
  MObject::~MObject()
 {
-	CZ_LOG(VeryVerbose, "{}:{}", __FUNCTION__, m_objectName);
+	CZ_LOG(Main, VeryVerbose, "{}:{}", __FUNCTION__, m_objectName);
 }
 
 } // namespace mlge

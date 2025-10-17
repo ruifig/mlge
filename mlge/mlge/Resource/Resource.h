@@ -322,13 +322,13 @@ class BaseStaticResourceRef : public DoublyLinked<BaseStaticResourceRef>
 	 */
 	static bool resolveAll(bool testLoadResource = false)
 	{
-		CZ_LOG(Log, "Resolving all StaticResourceRef instance...");
+		CZ_LOG(Main, Log, "Resolving all StaticResourceRef instance...");
 		int errorCount = 0;
 		int count = 0;
 		for(auto&& ref : ms_all)
 		{
 			count++;
-			CZ_LOG(Verbose, "Resolving '{}'", ref->m_resourceName);
+			CZ_LOG(Main, Verbose, "Resolving '{}'", ref->m_resourceName);
 
 			ref->m_def = ResourceManager::get().findDefinition(ref->m_resourceName);
 
@@ -350,11 +350,11 @@ class BaseStaticResourceRef : public DoublyLinked<BaseStaticResourceRef>
 
 		if (errorCount == 0)
 		{
-			CZ_LOG(Log, "Resolved {} references", count);
+			CZ_LOG(Main, Log, "Resolved {} references", count);
 		}
 		else
 		{
-			CZ_LOG(Error, "Failed to resolve {} references", errorCount);
+			CZ_LOG(Main, Error, "Failed to resolve {} references", errorCount);
 		}
 
 		return errorCount == 0 ? true : false;
@@ -409,7 +409,7 @@ class StaticResourceRef : public BaseStaticResourceRef
 			}
 			else
 			{
-				CZ_LOG(Error, "Resource '{}' is of unexpected type. Expected a {} but is a {}.", m_resourceName, Class::get<T>().getName(), m_def->getTypeName());
+				CZ_LOG(Main, Error, "Resource '{}' is of unexpected type. Expected a {} but is a {}.", m_resourceName, Class::get<T>().getName(), m_def->getTypeName());
 				return nullptr;
 			}
 		}

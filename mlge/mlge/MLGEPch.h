@@ -2,6 +2,9 @@
 
 #include "mlge/PreSetup.h"
 
+#include "crazygaze/core/CorePch.h"
+#include "crazygaze/core/Logging.h"
+
 MLGE_THIRD_PARTY_INCLUDES_START
 
 #include <assert.h>

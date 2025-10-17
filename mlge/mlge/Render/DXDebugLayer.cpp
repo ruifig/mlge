@@ -33,7 +33,7 @@ bool DXDebugLayer::init()
 		}
 		else
 		{
-			CZ_LOG(Error, "Could not setup d3d debug layer");
+			CZ_LOG(Main, Error, "Could not setup d3d debug layer");
 			return false;
 		}
 	}
@@ -46,7 +46,7 @@ bool DXDebugLayer::init()
 		HRESULT res = D3D12GetDebugInterface(IID_PPV_ARGS(&m_d3d12Debug));
 		if (!SUCCEEDED(res))
 		{
-			CZ_LOG(Error, "Could not get D3D12Debug interface. Error={}.", _com_error(res).ErrorMessage());
+			CZ_LOG(Main, Error, "Could not get D3D12Debug interface. Error={}.", _com_error(res).ErrorMessage());
 			return false;
 		}
 
@@ -72,7 +72,7 @@ void DXDebugLayer::setD3DDebug(SDL_Renderer& renderer)
 
 			if (!SUCCEEDED(res))
 			{
-				CZ_LOG(Warning, "Could not get D3D11Debug interface. Error={}.", _com_error(res).ErrorMessage());
+				CZ_LOG(Main, Warning, "Could not get D3D11Debug interface. Error={}.", _com_error(res).ErrorMessage());
 			}
 
 			return;
@@ -87,14 +87,14 @@ void DXDebugLayer::setD3DDebug(SDL_Renderer& renderer)
 
 			if (!SUCCEEDED(res))
 			{
-				CZ_LOG(Warning, "Could not get D3D12Debug interface. Error={}.", _com_error(res).ErrorMessage());
+				CZ_LOG(Main, Warning, "Could not get D3D12Debug interface. Error={}.", _com_error(res).ErrorMessage());
 			}
 
 			return;
 		}
 	}
 
-	CZ_LOG(Warning, "No compatible SDL_Renderer found for the DXDebugLayer");
+	CZ_LOG(Main, Warning, "No compatible SDL_Renderer found for the DXDebugLayer");
 }
 
 void DXDebugLayer::shutdown()

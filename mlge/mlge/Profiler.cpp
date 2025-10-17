@@ -37,7 +37,7 @@ bool Profiler::init()
 	rmtError error = rmt_CreateGlobalInstance(&ptr);
 	if (error != RMT_ERROR_NONE)
 	{
-		CZ_LOG(Error, "Error launching profiler (Remotery). Error={}", static_cast<int>(error));
+		CZ_LOG(Main, Error, "Error launching profiler (Remotery). Error={}", static_cast<int>(error));
 		return false;
 	}
 	rmt = ptr;

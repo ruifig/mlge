@@ -40,7 +40,7 @@ namespace mlge
 			int count = getRefCount(obj);                                                                      \
 			if (count != expectedCount)                                                                        \
 			{                                                                                                  \
-				CZ_LOG(Fatal, "{}: Expected a ref count of {} but was {}", m_debugName, expectedCount, count); \
+				CZ_LOG(Main, Fatal, "{}: Expected a ref count of {} but was {}", m_debugName, expectedCount, count); \
 			}                                                                                                  \
 		}
 #endif

@@ -15,6 +15,8 @@
 	#include "mlge/Editor/Editor.h"
 #endif
 
+CZ_DEFINE_LOG_CATEGORY(Editor)
+
 namespace mlge
 {
 
@@ -53,7 +55,7 @@ bool Engine::initSDL()
 
 	if (SDL_Init(SDL_INIT_VIDEO | SDL_INIT_GAMECONTROLLER) < 0)
 	{
-		CZ_LOG(Fatal, "Could not initialize SDL. ec={}", SDL_GetError());
+		CZ_LOG(Main, Fatal, "Could not initialize SDL. ec={}", SDL_GetError());
 		return false;
 	}
 
@@ -64,7 +66,7 @@ bool Engine::initSDL()
 
 	if (TTF_Init() < 0)
 	{
-		CZ_LOG(Fatal, "Could not initialize SDL TTF. ec={}", TTF_GetError());
+		CZ_LOG(Main, Fatal, "Could not initialize SDL TTF. ec={}", TTF_GetError());
 		return false;
 	}
 
@@ -168,7 +170,8 @@ namespace details
 	void applyLogLevels()
 	{
 		std::string levelStr = Config::get().getValueOrDefault<std::string>("Engine", "loglevel", to_string(compileTimeMaxLogLevel));
-		currMaxLogLevel = logLevelFromString(levelStr);
+		LogLevel level = logLevelFromString(levelStr);
+		setLogLevel(level);
 	}
 }
 
@@ -188,7 +191,7 @@ Engine::GameInfo* Engine::createNewGame()
 	// No free game slot found
 	if (!info)
 	{
-		CZ_LOG(Error, "No available game slot.");
+		CZ_LOG(Main, Error, "No available game slot.");
 		return nullptr;
 	}
 
@@ -218,7 +221,7 @@ bool Engine::init(int argc, char* argv[])
 	// This needs to be initialized before Root, so the other singletons can query the command line
 	if (!CommandLine::get().init(argc, argv))
 	{
-		CZ_LOG(Error, "Unexpected things in the command line.");
+		CZ_LOG(Main, Error, "Unexpected things in the command line.");
 	}
 
 	if (!initSDL())
@@ -402,7 +405,7 @@ bool Engine::run()
 
 	} while(shuttingDown == false);
 
-	CZ_LOG(Log, "Starting shutdown...");
+	CZ_LOG(Main, Log, "Starting shutdown...");
 
 
 	// #MULTIPLE_INSTANCES: Remove this:
@@ -423,7 +426,7 @@ bool Engine::run()
 
 			if (currentTime >= shutdownTime)
 			{
-				CZ_LOG(Warning, "Shutdown deadline expired. Forcing shutdown.")
+				CZ_LOG(Main, Warning, "Shutdown deadline expired. Forcing shutdown.")
 				break;
 			}
 

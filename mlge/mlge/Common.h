@@ -54,3 +54,6 @@ using SDLUniquePtr = std::unique_ptr<SDLType, SDLDeleter>;
 	#define MLGE_ANONYMOUS_VARIABLE(str) \
 		MLGE_CONCATENATE(str,__LINE__)
 #endif
+
+CZ_DECLARE_LOG_CATEGORY(Editor, VeryVerbose, VeryVerbose)
+

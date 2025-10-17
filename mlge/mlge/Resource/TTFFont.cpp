@@ -265,7 +265,7 @@ bool MTTFFont::Instance::loadGlyphs(const MTTFFontDefinition& def, std::string_v
 
 	if (!font)
 	{
-		CZ_LOG(
+		CZ_LOG(Main,
 			Error, "Failed to load point size {} for font '{}', from file '{}'. ec={}", ptsize, def.name, narrow(def.file.native()),
 			SDL_GetError());
 		return false;
@@ -349,7 +349,7 @@ bool MTTFFont::Instance::loadGlyphs(const MTTFFontDefinition& def, std::string_v
 
 		if (!glyphSurface)
 		{
-			CZ_LOG(Error, "Failed to load codepoint {} for font {}", codepoint, def.name);
+			CZ_LOG(Main, Error, "Failed to load codepoint {} for font {}", codepoint, def.name);
 			continue;
 		}
 
@@ -373,7 +373,7 @@ bool MTTFFont::Instance::loadGlyphs(const MTTFFontDefinition& def, std::string_v
 					}
 
 					#if LOG_LOADED_GLYPH
-					CZ_LOG(
+					CZ_LOG(Main,
 						VeryVerbose, "ch '{}' : minx={}, maxx={}, miny={}, maxy={}, advance={}", char(codepoint),
 						glyph.minx, glyph.maxx, glyph.miny, glyph.maxy, glyph.advance);
 					#endif

@@ -214,7 +214,7 @@ void GameWindow::show()
 
 			if (ImGui::ImageButton(tex, size, ImVec2(0,0), ImVec2(1,1), 0))
 			{
-				CZ_LOG(Log, "Switching focus to game window");
+				CZ_LOG(Editor, Log, "Switching focus to game window");
 				Editor::get().setGameFocus(m_game, true);
 			}
 

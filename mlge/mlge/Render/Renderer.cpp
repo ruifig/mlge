@@ -57,7 +57,7 @@ bool Renderer::init()
 			getGameFolderName().data(), SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, windowSize.w, windowSize.h, windowFlags));
 		if (!m_sdlWindow)
 		{
-			CZ_LOG(Fatal, "Could not create SDL window. ec={}", SDL_GetError());
+			CZ_LOG(Main, Fatal, "Could not create SDL window. ec={}", SDL_GetError());
 			return false;
 		}
 	}
@@ -67,7 +67,7 @@ bool Renderer::init()
 	int rendererIndex = -1;
 
 	auto renderApi = Config::get().getValueOrDefault<std::string>("Engine", "renderapi", "direct3d11");
-	CZ_LOG(Log, "SDL available renderers:")
+	CZ_LOG(Main, Log, "SDL available renderers:")
 	for(int i=0; i<SDL_GetNumRenderDrivers(); i++)
 	{
 		SDL_RendererInfo info{};
@@ -76,7 +76,7 @@ bool Renderer::init()
 		{
 			rendererIndex = i;
 		}
-		CZ_LOG(Log, "    {}", info.name);
+		CZ_LOG(Main, Log, "    {}", info.name);
 	}
 
 	uint32_t rendererFlags = SDL_RENDERER_ACCELERATED;
@@ -91,7 +91,7 @@ bool Renderer::init()
 	m_sdlRenderer.reset(SDL_CreateRenderer(m_sdlWindow.get(), rendererIndex, rendererFlags));
 	if (!m_sdlRenderer)
 	{
-		CZ_LOG(Fatal, "Could not create SDL renderer. ec={}", SDL_GetError());
+		CZ_LOG(Main, Fatal, "Could not create SDL renderer. ec={}", SDL_GetError());
 		return false;
 	}
 
@@ -99,7 +99,7 @@ bool Renderer::init()
 	{
 		SDL_RendererInfo info{};
 		SDL_GetRendererInfo(m_sdlRenderer.get(), &info);
-		CZ_LOG(Log, "RendererInfo: Name={}, flags={}", info.name, info.flags);
+		CZ_LOG(Main, Log, "RendererInfo: Name={}, flags={}", info.name, info.flags);
 		m_renderingAPIName = info.name;
 	}
 

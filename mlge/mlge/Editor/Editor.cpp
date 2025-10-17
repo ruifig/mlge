@@ -107,7 +107,7 @@ void Editor::onProcessEvent(SDL_Event& evt)
 			{
 				if (anyGameHasFocus())
 				{
-					CZ_LOG(Log, "Removing focus from game windows");
+					CZ_LOG(Editor, Log, "Removing focus from game windows");
 					setGameFocus(nullptr, false);
 				}
 			}
@@ -123,7 +123,7 @@ void Editor::onProcessEvent(SDL_Event& evt)
 			if (m_editorRenderTarget->getSize() != s)
 			{
 				m_editorRenderTarget->setSize(s);
-				CZ_LOG(Log, "Window resized to {}x{}", s.w, s.h);
+				CZ_LOG(Editor, Log, "Window resized to {}x{}", s.w, s.h);
 				Config::get().setGameValue("Editor", "resx", s.w);
 				Config::get().setGameValue("Editor", "resy", s.h);
 				Config::get().save();

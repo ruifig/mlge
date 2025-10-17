@@ -26,12 +26,10 @@ Console::Console(bool& p_open)
 
 	addLog("Welcome to mlge (My Little Game Engine)");
 
-	LogOutputs::get().add(this, [this](LogLevel level, const char* category, const char* timestamp, const char* msg)
+	LogOutputs::get().add(this, [this](LogMessage& msg)
 	{
-		auto str = std::string(timestamp) + ":" + category + ":" + to_string(level) + ": " + msg;
-		m_lines.push_back(std::make_pair(level, std::move(str)));
+		m_lines.push_back(std::make_pair(msg.level, msg.formattedMsg));
 	});
-
 }
 
 Console::~Console()
@@ -79,15 +77,15 @@ void Console::show()
 	{
 		for (int i = static_cast<int>(LogLevel::Fatal); i <= static_cast<int>(LogLevel::VeryVerbose); i++)
 		{
-			bool selected = LogLevel(i) == details::currMaxLogLevel; 
+			bool selected = LogLevel(i) == LogLevel::VeryVerbose; 
 			if (ImGui::MenuItem(to_string(LogLevel(i)), "", &selected))
 			{
-				details::currMaxLogLevel = LogLevel(i);
-				CZ_LOG(Error, "Hello world");
-				CZ_LOG(Warning, "Hello world");
-				CZ_LOG(Log, "Hello world");
-				CZ_LOG(Verbose, "Hello world");
-				CZ_LOG(VeryVerbose, "Hello world");
+				setLogLevel(LogLevel(i));
+				CZ_LOG(Editor, Error, "Hello world");
+				CZ_LOG(Editor, Warning, "Hello world");
+				CZ_LOG(Editor, Log, "Hello world");
+				CZ_LOG(Editor, Verbose, "Hello world");
+				CZ_LOG(Editor, VeryVerbose, "Hello world");
 			}
 		}
 

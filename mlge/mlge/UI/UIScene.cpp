@@ -211,7 +211,7 @@ void MUIMouseCursor::updateRenderQueue()
 
 void MUIMouseCursor::render(RenderGroup /*group*/)
 {
-	//CZ_LOG(Log, "Mouse render");
+	//CZ_LOG(Main, Log, "Mouse render");
 	renderSprite(m_spriteSheet->getSprite(0), m_pos);
 }
 
@@ -289,7 +289,7 @@ void UIManager::activateScene(std::string_view name)
 			// Nothing to do
 			if (scene->m_state == MUIScene::State::Active)
 			{
-				CZ_LOG(Verbose, "Scene '{}' already active.", name);
+				CZ_LOG(Main, Verbose, "Scene '{}' already active.", name);
 				return;
 			}
 		}
@@ -298,11 +298,11 @@ void UIManager::activateScene(std::string_view name)
 		if (m_activeScene)
 		{
 			CZ_CHECK(m_activeScene->m_state == MUIScene::State::Active);
-			CZ_LOG(Log, "Deactivating scene '{}'.", m_activeScene->m_name);
+			CZ_LOG(Main, Log, "Deactivating scene '{}'.", m_activeScene->m_name);
 			m_activeScene->setState(m_activeScene->m_canEnable ? MUIScene::State::Enabled : MUIScene::State::Disabled);
 		}
 
-		CZ_LOG(Log, "Activating scene '{}'.", scene->m_name);
+		CZ_LOG(Main, Log, "Activating scene '{}'.", scene->m_name);
 		scene->setState(MUIScene::State::Active);
 		m_activeScene = scene.get();
 	}
@@ -369,10 +369,10 @@ void UIManager::onProcessEvent(SDL_Event& evt)
 			e.pos = pos;
 
 			#if 0
-			CZ_LOG(VeryVerbose, "EventStack:{}", m_eventStack.size());
+			CZ_LOG(Main, VeryVerbose, "EventStack:{}", m_eventStack.size());
 			for (auto w : m_eventStack)
 			{
-				CZ_LOG(VeryVerbose, "    {}", w->getObjectName());
+				CZ_LOG(Main, VeryVerbose, "    {}", w->getObjectName());
 			}
 			#endif
 
@@ -386,7 +386,7 @@ void UIManager::onProcessEvent(SDL_Event& evt)
 			}
 		};
 
-		//CZ_LOG(Log, "Mouse: button {}, state {}, numclicks {}", evt.button.button, evt.button.state, evt.button.clicks);
+		//CZ_LOG(Main, Log, "Mouse: button {}, state {}, numclicks {}", evt.button.button, evt.button.state, evt.button.clicks);
 		if (evt.button.button == 1 && m_eventStack.size())
 		{
 			UIInternalEvent::Type type =
