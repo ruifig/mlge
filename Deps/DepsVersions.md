@@ -1,23 +1,32 @@
+# Catch2
 
-SDL https://github.com/libsdl-org/SDL/releases
-	Version 2.30.1
+* https://github.com/catchorg/Catch2
+* Version 3.11.0
 
-https://github.com/nemtrif/utfcpp
-	Version 3.2.4, Commit f23474118c5c544c1403883976d78128d17125f9 
+# cmake_timesatmp
 
-https://github.com/Celtoys/Remotery
-	Commit 616fdf222a6b98f09de5e7fab167099dd92bef39
+* https://github.com/kraiskil/cmake_timestamp
+* Commit cd58ac42dee3ec856df88462f1e0f29be9e6a6d6 , Oct 30, 2022
+* It contains some custom changes. Search for LUDEO in the entire folder
 
-https://github.com/ocornut/imgui
-	https://github.com/ocornut/imgui/tree/v1.90-docking
+# imgui
 
-https://github.com/aiekick/ImGuiFileDialog
-	v0.6.6.1
+* https://github.com/ocornut/imgui
+* https://github.com/ocornut/imgui/tree/v1.90-docking
 
-https://github.com/catchorg/Catch2
-	Version 3.4.0, Commit 6e79e682b726f524310d55dec8ddac4e9c52fb5f
+# ImGuiFileDialog
 
-https://github.com/kraiskil/cmake_timestamp
-	Commit cd58ac42dee3ec856df88462f1e0f29be9e6a6d6
-	It contains some custom changes. See dependency's CMakeLists.txt for notes.
+* https://github.com/aiekick/ImGuiFileDialog
+* v0.6.6.1
+
+# SDL
+* https://github.com/libsdl-org/SDL/releases
+* Version 2.30.7
+
+
+# utfcpp
+
+* https://github.com/nemtrif/utfcpp
+* v4.0.8, Sep 15, 2025
+
 
