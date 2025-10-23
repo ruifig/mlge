@@ -1,0 +1,3 @@
+[submodule "Deps/czcore"]
+	path = Deps/czcore
+	url = https://github.com/ruifig/czcore.git

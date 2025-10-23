@@ -144,7 +144,7 @@ void MUIWidget::propagateEnabled()
 	}
 
 
-	//CZ_LOG(Verbose, "{}:{}: {}", m_objectName, __FUNCTION__, isEnabled());
+	//CZ_LOG(Main, Verbose, "{}:{}: {}", m_objectName, __FUNCTION__, isEnabled());
 	m_styleRenderer->setEnabled(isEnabled());
 
 	for (auto child : m_children)
@@ -155,7 +155,7 @@ void MUIWidget::propagateEnabled()
 
 void MUIWidget::onMouseEnter()
 {
-	//CZ_LOG(Verbose, "{}:{}", m_objectName, __FUNCTION__);
+	//CZ_LOG(Main, Verbose, "{}:{}", m_objectName, __FUNCTION__);
 	CZ_CHECK(m_mouseHover == false);
 	m_mouseHover = true;
 	m_styleRenderer->setHover(true);
@@ -163,7 +163,7 @@ void MUIWidget::onMouseEnter()
 
 void MUIWidget::onMouseLeave()
 {
-	//CZ_LOG(Verbose, "{}:{}", m_objectName, __FUNCTION__);
+	//CZ_LOG(Main, Verbose, "{}:{}", m_objectName, __FUNCTION__);
 	CZ_CHECK(m_mouseHover);
 
 	m_mouseHover = false;
@@ -228,7 +228,7 @@ void MUIWidget::render(RenderGroup group)
 
 void MUIWidget::onUIInternalEvent(UIInternalEvent& evt)
 {
-	//CZ_LOG(Verbose, "{}:{}", m_objectName, __FUNCTION__);
+	//CZ_LOG(Main, Verbose, "{}:{}", m_objectName, __FUNCTION__);
 
 	if (evt.type == UIInternalEvent::Type::Pressed)
 	{

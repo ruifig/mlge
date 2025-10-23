@@ -66,6 +66,6 @@ mlge_setupBinaryTarget(YourGame)
 
 ## Available CMake options
 
-* `MLGE_SAMPLES` - ON/OFF (`OFF` by default). If set to `ON`, it will generate targets for the mlge samples
-* `MLGE_TESTS` - ON/OFF (`OFF` by default). If set to `ON`, it will generate targets for the mlge unit tests
+* `MLGE_ENABLE_SAMPLES` - ON/OFF (`OFF` by default). If set to `ON`, it will generate targets for the mlge samples
+* `MLGE_ENABLE_TESTS` - ON/OFF (`OFF` by default). If set to `ON`, it will generate targets for the mlge unit tests
 

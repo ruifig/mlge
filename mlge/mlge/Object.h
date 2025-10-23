@@ -349,7 +349,7 @@ inline void sharedPtrDeleter(MObject* obj)
 			}                                                                                                         \
 			else                                                                                                      \
 			{                                                                                                         \
-				CZ_LOG(Fatal, "Can't instantiate abstract object");                                                   \
+				CZ_LOG(Main, Fatal, "Can't instantiate abstract object");                                                   \
 				return nullptr;                                                                                       \
 			}                                                                                                         \
 		}
@@ -427,7 +427,7 @@ ObjectPtr<T> createObject(Args&& ... args)
 	}
 	else
 	{
-		CZ_LOG(Error, "Failed to initialize object {}.", obj->getObjectName());
+		CZ_LOG(Main, Error, "Failed to initialize object {}.", obj->getObjectName());
 		return nullptr;
 	}
 }

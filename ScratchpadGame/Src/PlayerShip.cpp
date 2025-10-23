@@ -40,7 +40,7 @@ void MShipMoveComponent::onProcessEvent(SDL_Event& evt)
 	if (evt.type == SDL_MOUSEMOTION)
 	{
 		#if 0
-		CZ_LOG(Log, "mousemotion: timestamp={}, state={}, x={}, y={}, xrel={}, yrel={}",
+		CZ_LOG(Main, Log, "mousemotion: timestamp={}, state={}, x={}, y={}, xrel={}, yrel={}",
 			evt.motion.timestamp,
 			evt.motion.state,
 			evt.motion.x, evt.motion.y,

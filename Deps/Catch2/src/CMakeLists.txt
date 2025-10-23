@@ -33,12 +33,12 @@ set(BENCHMARK_HEADERS
 )
 set(BENCHMARK_SOURCES
   ${SOURCES_DIR}/benchmark/catch_chronometer.cpp
+  ${SOURCES_DIR}/benchmark/detail/catch_analyse.cpp
   ${SOURCES_DIR}/benchmark/detail/catch_benchmark_function.cpp
   ${SOURCES_DIR}/benchmark/detail/catch_run_for_at_least.cpp
   ${SOURCES_DIR}/benchmark/detail/catch_stats.cpp
 )
 set(BENCHMARK_FILES ${BENCHMARK_HEADERS} ${BENCHMARK_SOURCES})
-
 
 set(IMPL_HEADERS
  "${PROJECT_BINARY_DIR}/generated-includes/catch2/catch_user_config.hpp"
@@ -47,6 +47,7 @@ set(IMPL_HEADERS
   ${SOURCES_DIR}/catch_approx.hpp
   ${SOURCES_DIR}/catch_assertion_info.hpp
   ${SOURCES_DIR}/catch_assertion_result.hpp
+  ${SOURCES_DIR}/catch_case_sensitive.hpp
   ${SOURCES_DIR}/catch_config.hpp
   ${SOURCES_DIR}/catch_get_random_seed.hpp
   ${SOURCES_DIR}/catch_message.hpp
@@ -57,6 +58,7 @@ set(IMPL_HEADERS
   ${SOURCES_DIR}/catch_template_test_macros.hpp
   ${SOURCES_DIR}/catch_test_case_info.hpp
   ${SOURCES_DIR}/catch_test_macros.hpp
+  ${SOURCES_DIR}/catch_test_run_info.hpp
   ${SOURCES_DIR}/catch_test_spec.hpp
   ${SOURCES_DIR}/catch_timer.hpp
   ${SOURCES_DIR}/catch_tostring.hpp
@@ -66,13 +68,13 @@ set(IMPL_HEADERS
   ${SOURCES_DIR}/catch_version_macros.hpp
   ${SOURCES_DIR}/internal/catch_assertion_handler.hpp
   ${SOURCES_DIR}/internal/catch_case_insensitive_comparisons.hpp
-  ${SOURCES_DIR}/internal/catch_case_sensitive.hpp
   ${SOURCES_DIR}/internal/catch_clara.hpp
   ${SOURCES_DIR}/internal/catch_commandline.hpp
   ${SOURCES_DIR}/internal/catch_compare_traits.hpp
   ${SOURCES_DIR}/internal/catch_compiler_capabilities.hpp
   ${SOURCES_DIR}/internal/catch_config_android_logwrite.hpp
   ${SOURCES_DIR}/internal/catch_config_counter.hpp
+  ${SOURCES_DIR}/internal/catch_config_prefix_messages.hpp
   ${SOURCES_DIR}/internal/catch_config_static_analysis_support.hpp
   ${SOURCES_DIR}/internal/catch_config_uncaught_exceptions.hpp
   ${SOURCES_DIR}/internal/catch_config_wchar.hpp
@@ -83,6 +85,7 @@ set(IMPL_HEADERS
   ${SOURCES_DIR}/internal/catch_debug_console.hpp
   ${SOURCES_DIR}/internal/catch_debugger.hpp
   ${SOURCES_DIR}/internal/catch_decomposer.hpp
+  ${SOURCES_DIR}/internal/catch_deprecation_macro.hpp
   ${SOURCES_DIR}/internal/catch_enforce.hpp
   ${SOURCES_DIR}/internal/catch_enum_values_registry.hpp
   ${SOURCES_DIR}/internal/catch_errno_guard.hpp
@@ -92,6 +95,7 @@ set(IMPL_HEADERS
   ${SOURCES_DIR}/internal/catch_getenv.hpp
   ${SOURCES_DIR}/internal/catch_istream.hpp
   ${SOURCES_DIR}/internal/catch_is_permutation.hpp
+  ${SOURCES_DIR}/internal/catch_jsonwriter.hpp
   ${SOURCES_DIR}/internal/catch_lazy_expr.hpp
   ${SOURCES_DIR}/internal/catch_leak_detector.hpp
   ${SOURCES_DIR}/internal/catch_list.hpp
@@ -107,6 +111,8 @@ set(IMPL_HEADERS
   ${SOURCES_DIR}/internal/catch_polyfills.hpp
   ${SOURCES_DIR}/internal/catch_preprocessor.hpp
   ${SOURCES_DIR}/internal/catch_preprocessor_remove_parens.hpp
+  ${SOURCES_DIR}/internal/catch_random_floating_point_helpers.hpp
+  ${SOURCES_DIR}/internal/catch_random_integer_helpers.hpp
   ${SOURCES_DIR}/internal/catch_random_number_generator.hpp
   ${SOURCES_DIR}/internal/catch_random_seed_generation.hpp
   ${SOURCES_DIR}/internal/catch_reporter_registry.hpp
@@ -131,13 +137,16 @@ set(IMPL_HEADERS
   ${SOURCES_DIR}/internal/catch_test_failure_exception.hpp
   ${SOURCES_DIR}/internal/catch_test_macro_impl.hpp
   ${SOURCES_DIR}/internal/catch_test_registry.hpp
-  ${SOURCES_DIR}/internal/catch_test_run_info.hpp
   ${SOURCES_DIR}/internal/catch_test_spec_parser.hpp
   ${SOURCES_DIR}/internal/catch_textflow.hpp
+  ${SOURCES_DIR}/internal/catch_thread_support.hpp
   ${SOURCES_DIR}/internal/catch_to_string.hpp
   ${SOURCES_DIR}/internal/catch_uncaught_exceptions.hpp
+  ${SOURCES_DIR}/internal/catch_uniform_floating_point_distribution.hpp
+  ${SOURCES_DIR}/internal/catch_uniform_integer_distribution.hpp
   ${SOURCES_DIR}/internal/catch_unique_name.hpp
   ${SOURCES_DIR}/internal/catch_unique_ptr.hpp
+  ${SOURCES_DIR}/internal/catch_unreachable.hpp
   ${SOURCES_DIR}/internal/catch_void_type.hpp
   ${SOURCES_DIR}/internal/catch_wildcard_pattern.hpp
   ${SOURCES_DIR}/internal/catch_windows_h_proxy.hpp
@@ -176,6 +185,7 @@ set(IMPL_SOURCES
   ${SOURCES_DIR}/internal/catch_floating_point_helpers.cpp
   ${SOURCES_DIR}/internal/catch_getenv.cpp
   ${SOURCES_DIR}/internal/catch_istream.cpp
+  ${SOURCES_DIR}/internal/catch_jsonwriter.cpp
   ${SOURCES_DIR}/internal/catch_lazy_expr.cpp
   ${SOURCES_DIR}/internal/catch_leak_detector.cpp
   ${SOURCES_DIR}/internal/catch_list.cpp
@@ -187,7 +197,6 @@ set(IMPL_SOURCES
   ${SOURCES_DIR}/internal/catch_random_seed_generation.cpp
   ${SOURCES_DIR}/internal/catch_reporter_registry.cpp
   ${SOURCES_DIR}/internal/catch_reporter_spec_parser.cpp
-  ${SOURCES_DIR}/internal/catch_result_type.cpp
   ${SOURCES_DIR}/internal/catch_reusable_string_stream.cpp
   ${SOURCES_DIR}/internal/catch_run_context.cpp
   ${SOURCES_DIR}/internal/catch_section.cpp
@@ -288,6 +297,7 @@ set(REPORTER_HEADERS
   ${SOURCES_DIR}/reporters/catch_reporter_cumulative_base.hpp
   ${SOURCES_DIR}/reporters/catch_reporter_event_listener.hpp
   ${SOURCES_DIR}/reporters/catch_reporter_helpers.hpp
+  ${SOURCES_DIR}/reporters/catch_reporter_json.hpp
   ${SOURCES_DIR}/reporters/catch_reporter_junit.hpp
   ${SOURCES_DIR}/reporters/catch_reporter_multi.hpp
   ${SOURCES_DIR}/reporters/catch_reporter_registrars.hpp
@@ -306,6 +316,7 @@ set(REPORTER_SOURCES
   ${SOURCES_DIR}/reporters/catch_reporter_cumulative_base.cpp
   ${SOURCES_DIR}/reporters/catch_reporter_event_listener.cpp
   ${SOURCES_DIR}/reporters/catch_reporter_helpers.cpp
+  ${SOURCES_DIR}/reporters/catch_reporter_json.cpp
   ${SOURCES_DIR}/reporters/catch_reporter_junit.cpp
   ${SOURCES_DIR}/reporters/catch_reporter_multi.cpp
   ${SOURCES_DIR}/reporters/catch_reporter_registrars.cpp
@@ -339,42 +350,23 @@ source_group("generated headers"
 )
 
 add_library(Catch2 ${ALL_FILES})
-add_build_reproducibility_settings(Catch2)
+if(CATCH_ENABLE_REPRODUCIBLE_BUILD)
+  add_build_reproducibility_settings(Catch2)
+endif()
 add_library(Catch2::Catch2 ALIAS Catch2)
 
-if (ANDROID)
-    target_link_libraries(Catch2 INTERFACE log)
+if(ANDROID)
+  target_link_libraries(Catch2 PRIVATE log)
 endif()
 
 set_target_properties(Catch2 PROPERTIES
-                          DEBUG_POSTFIX "d"
-                                VERSION ${PROJECT_VERSION}
-                              SOVERSION ${PROJECT_VERSION})
-
-# depend on bunch of C++11 and C++14 features to have C++14 enabled by default
-target_compile_features(Catch2
-  PUBLIC
-    cxx_alignas
-    cxx_alignof
-    cxx_attributes
-    cxx_auto_type
-    cxx_constexpr
-    cxx_defaulted_functions
-    cxx_deleted_functions
-    cxx_final
-    cxx_lambdas
-    cxx_noexcept
-    cxx_override
-    cxx_range_for
-    cxx_rvalue_references
-    cxx_static_assert
-    cxx_strong_enums
-    cxx_trailing_return_types
-    cxx_unicode_literals
-    cxx_user_literals
-    cxx_variable_templates
-    cxx_variadic_macros
+  DEBUG_POSTFIX "d"
+  VERSION ${PROJECT_VERSION}
+  SOVERSION ${PROJECT_VERSION}
 )
+
+# require C++14
+target_compile_features(Catch2 PUBLIC cxx_std_14)
 
 configure_file(
   "${SOURCES_DIR}/catch_user_config.hpp.in"
@@ -390,122 +382,97 @@ target_include_directories(Catch2
 
 
 add_library(Catch2WithMain
-    ${SOURCES_DIR}/internal/catch_main.cpp
+  ${SOURCES_DIR}/internal/catch_main.cpp
 )
-add_build_reproducibility_settings(Catch2WithMain)
+if(CATCH_ENABLE_REPRODUCIBLE_BUILD)
+  add_build_reproducibility_settings(Catch2WithMain)
+endif()
 add_library(Catch2::Catch2WithMain ALIAS Catch2WithMain)
 target_link_libraries(Catch2WithMain PUBLIC Catch2)
 set_target_properties(Catch2WithMain
   PROPERTIES
     OUTPUT_NAME "Catch2Main"
-        VERSION ${PROJECT_VERSION}
-      SOVERSION ${PROJECT_VERSION}
+    VERSION ${PROJECT_VERSION}
+    SOVERSION ${PROJECT_VERSION}
 )
 set_target_properties(Catch2WithMain PROPERTIES DEBUG_POSTFIX "d")
 
-if (NOT_SUBPROJECT)
-    # create and install an export set for catch target as Catch2::Catch
-    install(
-      TARGETS
-        Catch2
-        Catch2WithMain
-      EXPORT
-        Catch2Targets
-      LIBRARY DESTINATION
-        ${CMAKE_INSTALL_LIBDIR}
-      ARCHIVE DESTINATION
-        ${CMAKE_INSTALL_LIBDIR}
-      RUNTIME DESTINATION
-        ${CMAKE_INSTALL_BINDIR}
-    )
+if(NOT_SUBPROJECT)
+  # create and install an export set for catch target as Catch2::Catch
+  install(
+    TARGETS
+      Catch2
+      Catch2WithMain
+    EXPORT
+      Catch2Targets
+    LIBRARY DESTINATION
+      ${CMAKE_INSTALL_LIBDIR}
+    ARCHIVE DESTINATION
+      ${CMAKE_INSTALL_LIBDIR}
+    RUNTIME DESTINATION
+      ${CMAKE_INSTALL_BINDIR}
+  )
 
-
-    install(
-      EXPORT
-        Catch2Targets
-      NAMESPACE
-        Catch2::
-      DESTINATION
-        ${CATCH_CMAKE_CONFIG_DESTINATION}
-    )
-    # Install the headers
-    install(
-      DIRECTORY
-        "${SOURCES_DIR}"
-        "${PROJECT_BINARY_DIR}/generated-includes/catch2" # Also install the generated header
-      DESTINATION
-        "${CMAKE_INSTALL_INCLUDEDIR}"
-      FILES_MATCHING
-        PATTERN "*.hpp"
-    )
+  install(
+    EXPORT
+      Catch2Targets
+    NAMESPACE
+      Catch2::
+    DESTINATION
+      ${CATCH_CMAKE_CONFIG_DESTINATION}
+  )
+  # Install the headers
+  install(
+    DIRECTORY
+      "${SOURCES_DIR}"
+      "${PROJECT_BINARY_DIR}/generated-includes/catch2" # Also install the generated header
+    DESTINATION
+      "${CMAKE_INSTALL_INCLUDEDIR}"
+    FILES_MATCHING
+      PATTERN "*.hpp"
+  )
 endif()
 
 # Some tests require a full recompilation of Catch2 lib with different
 # compilation flags. They can link against this target to recompile all
 # the sources into the binary.
-if (CATCH_BUILD_EXAMPLES OR CATCH_BUILD_EXTRA_TESTS)
-    add_library(Catch2_buildall_interface INTERFACE)
-    target_sources(Catch2_buildall_interface INTERFACE
-      ${ALL_FILES}
-      # Also include main entry point
-      ${SOURCES_DIR}/internal/catch_main.cpp
-    )
-    target_include_directories(Catch2_buildall_interface
-      INTERFACE
-        $<BUILD_INTERFACE:${SOURCES_DIR}/..>
-        $<BUILD_INTERFACE:${PROJECT_BINARY_DIR}/generated-includes>
-        $<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}>
-    )
-    target_compile_definitions(Catch2_buildall_interface
-      INTERFACE
-        CATCH_CONFIG_STATIC
-    )
-    target_compile_features(Catch2_buildall_interface
-      INTERFACE
-        cxx_alignas
-        cxx_alignof
-        cxx_attributes
-        cxx_auto_type
-        cxx_constexpr
-        cxx_defaulted_functions
-        cxx_deleted_functions
-        cxx_final
-        cxx_lambdas
-        cxx_noexcept
-        cxx_override
-        cxx_range_for
-        cxx_rvalue_references
-        cxx_static_assert
-        cxx_strong_enums
-        cxx_trailing_return_types
-        cxx_unicode_literals
-        cxx_user_literals
-        cxx_variable_templates
-        cxx_variadic_macros
-    )
+if(CATCH_BUILD_EXAMPLES OR CATCH_BUILD_EXTRA_TESTS)
+  add_library(Catch2_buildall_interface INTERFACE)
+  target_sources(Catch2_buildall_interface INTERFACE
+    ${ALL_FILES}
+    # Also include main entry point
+    ${SOURCES_DIR}/internal/catch_main.cpp
+  )
+  target_include_directories(Catch2_buildall_interface
+    INTERFACE
+      $<BUILD_INTERFACE:${SOURCES_DIR}/..>
+      $<BUILD_INTERFACE:${PROJECT_BINARY_DIR}/generated-includes>
+      $<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}>
+  )
+  target_compile_definitions(Catch2_buildall_interface INTERFACE CATCH_CONFIG_STATIC)
+  target_compile_features(Catch2_buildall_interface INTERFACE cxx_std_14)
 endif()
 
-list(APPEND CATCH_WARNING_TARGETS Catch2 Catch2WithMain)
-set(CATCH_WARNING_TARGETS ${CATCH_WARNING_TARGETS} PARENT_SCOPE)
-
+list(APPEND CATCH_IMPL_TARGETS Catch2 Catch2WithMain)
+set(CATCH_IMPL_TARGETS ${CATCH_IMPL_TARGETS} PARENT_SCOPE)
 
 # We still do not support building dynamic library with hidden visibility
 # so we want to check & warn users if they do this. However, we won't abort
 # the configuration step so that we don't have to also provide an override.
-if (BUILD_SHARED_LIBS)
+if(BUILD_SHARED_LIBS)
+  set_target_properties(Catch2 Catch2WithMain
+    PROPERTIES
+      WINDOWS_EXPORT_ALL_SYMBOLS ON
+  )
+
+  get_target_property(_VisPreset Catch2 CXX_VISIBILITY_PRESET)
+  if(NOT MSVC AND _VisPreset STREQUAL "hidden")
     set_target_properties(Catch2 Catch2WithMain
       PROPERTIES
-        WINDOWS_EXPORT_ALL_SYMBOLS ON
+        CXX_VISIBILITY_PRESET "default"
+        VISIBILITY_INLINES_HIDDEN OFF
     )
-
-    get_target_property(_VisPreset Catch2 CXX_VISIBILITY_PRESET)
-    if (NOT MSVC AND _VisPreset STREQUAL "hidden")
-        set_target_properties(Catch2 Catch2WithMain
-          PROPERTIES
-            CXX_VISIBILITY_PRESET "default"
-            VISIBILITY_INLINES_HIDDEN OFF
-        )
-        message(WARNING "Setting Catch2's visibility to default."
-                        " Hidden visibility is not supported.")
-    endif()
+    message(WARNING "Setting Catch2's visibility to default."
+                    " Hidden visibility is not supported.")
+  endif()
 endif()

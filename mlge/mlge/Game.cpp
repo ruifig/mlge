@@ -36,12 +36,21 @@ Game::Game(std::string_view name)
 	m_buildInfo = std::format("{} v{}, GitHash:{}, Build type:{}, Build timestamp:{} UTC",
 		m_name, "0.0.0", git_short_hash_str, buildType, build_time_str);
 
-	CZ_LOG(Log, "{}", m_buildInfo);
+	CZ_LOG(Main, Log, "{}", m_buildInfo);
+
+	ms_currentInstance = this;
 }
 
 Game::~Game()
 {
-	CZ_LOG(Log, "Game destroyed");
+	CZ_LOG(Main, Log, "Game destroyed");
+
+	// Delete these manually, because they will try to access the game
+	m_performanceStats.reset();
+	m_ui.reset();
+	m_renderQueue.reset();
+
+	ms_currentInstance = nullptr;
 }
 
 const std::string& Game::getBuildInfo() const
@@ -95,27 +104,27 @@ void Game::onEndFrame()
 
 void Game::onWindowEnter(bool entered)
 {
-	CZ_LOG(VeryVerbose, "Window {}", entered ? "Enter" : "Leave");
+	CZ_LOG(Main, VeryVerbose, "Window {}", entered ? "Enter" : "Leave");
 	Game::get().windowEnterDelegate.broadcast(entered);
 }
 
 void Game::onWindowResized(const Size& size)
 {
-	CZ_LOG(VeryVerbose, "Window resized to {}*{}", size.w, size.h);
+	CZ_LOG(Main, VeryVerbose, "Window resized to {}*{}", size.w, size.h);
 	getRenderTarget().setSize(size);
 	windowResizedDelegate.broadcast(size);
 }
 
 void Game::onWindowFocus(bool focus)
 {
-	CZ_LOG(VeryVerbose, "Window {} focus", focus ? "gained" : "lost");
+	CZ_LOG(Main, VeryVerbose, "Window {} focus", focus ? "gained" : "lost");
 	m_hasFocus = focus;
 	windowFocus.broadcast(focus);
 }
 
 void Game::onMouseMotion(const MouseMotionEvent& evt)
 {
-	//CZ_LOG(VeryVerbose, "MouseMotionEvent: Pos=({},{}) , Rel=({},{})", evt.pos.x, evt.pos.y, evt.rel.x, evt.rel.y);
+	//CZ_LOG(Main, VeryVerbose, "MouseMotionEvent: Pos=({},{}) , Rel=({},{})", evt.pos.x, evt.pos.y, evt.rel.x, evt.rel.y);
 	mouseMotionDelegate.broadcast(evt);
 }
 

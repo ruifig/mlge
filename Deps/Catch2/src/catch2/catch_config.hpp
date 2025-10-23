@@ -69,14 +69,14 @@ namespace Catch {
         bool benchmarkNoAnalysis = false;
         unsigned int benchmarkSamples = 100;
         double benchmarkConfidenceInterval = 0.95;
-        unsigned int benchmarkResamples = 100000;
+        unsigned int benchmarkResamples = 100'000;
         std::chrono::milliseconds::rep benchmarkWarmupTime = 100;
 
         Verbosity verbosity = Verbosity::Normal;
         WarnAbout::What warnings = WarnAbout::Nothing;
         ShowDurations showDurations = ShowDurations::DefaultForReporter;
         double minDuration = -1;
-        TestRunOrder runOrder = TestRunOrder::Declared;
+        TestRunOrder runOrder = TestRunOrder::Randomized;
         ColourMode defaultColourMode = ColourMode::PlatformDefault;
         WaitForKeypress::When waitForKeypress = WaitForKeypress::Never;
 
@@ -87,6 +87,8 @@ namespace Catch {
 
         std::vector<std::string> testsOrTags;
         std::vector<std::string> sectionsToRun;
+
+        std::string prematureExitGuardFilePath;
     };
 
 
@@ -113,6 +115,8 @@ namespace Catch {
         bool hasTestFilters() const override;
 
         bool showHelp() const;
+
+        std::string const& getExitGuardFilePath() const;
 
         // IConfig interface
         bool allowThrows() const override;

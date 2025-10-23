@@ -32,7 +32,6 @@ set(ALL_FILES
 	"mlge/PerformanceStats.cpp"
 	"mlge/PerformanceStats.h"
 	"mlge/PreSetup.h"
-	"mlge/Profiler.cpp"
 	"mlge/Profiler.h"
 	"mlge/RenderComponent.cpp"
 	"mlge/RenderComponent.h"
@@ -125,7 +124,6 @@ target_link_libraries(mlge PUBLIC
 	dxguid
 	d3d12
 
-	$<$<OR:$<CONFIG:Debug>,$<CONFIG:Development>>:Remotery>
 	$<$<OR:$<CONFIG:Debug>,$<CONFIG:Development>>:imgui>
 
 	timestamp

@@ -11,26 +11,17 @@
 namespace mlge::editor
 {
 
-GameWindow::GameWindow(Game* game, uint32_t id)
-	: m_game(game)
-	, m_id(id)
+GameWindow::GameWindow()
 {
-	m_resolutions.push_back("320x240");
-	m_resolutions.push_back("640x480");
-	m_resolutions.push_back("1024x768");
-	m_resolutions.push_back("1280x720");
-
 	m_onProcessEventHandle = Engine::get().processEventDelegate.bind(this, &GameWindow::onProcessEvent);
 }
 
 void GameWindow::onProcessEvent(SDL_Event& evt)
 {
-	if (!m_game)
+	if (!Game::tryGet())
 	{
 		return;
 	}
-
-	MLGE_SET_CURRENT_GAME_INSTANCE(m_game);
 
 	// Simulate a mouse motion event.
 	// This takes into account where the game is being rendered, so the event the game receives looks like it's running
@@ -46,70 +37,11 @@ void GameWindow::onProcessEvent(SDL_Event& evt)
 			//CZ_LOG("Pos {},{}")
 			gameEvt.rel = {evt.motion.xrel, evt.motion.yrel};
 
-			Size renderTargetSize = m_game->getRenderTarget().getSize();
+			Size renderTargetSize = Game::get().getRenderTarget().getSize();
 			gameEvt.pos.x = cz::clip(gameEvt.pos.x, 0, renderTargetSize.w - 1);
 			gameEvt.pos.y = cz::clip(gameEvt.pos.y, 0, renderTargetSize.h - 1);
 
-			m_game->onMouseMotion(gameEvt);
-		}
-	}
-}
-
-void GameWindow::showResolution(const char* resolutionStr)
-{
-	auto getSize = [](const std::string& str)
-	{
-		return Size{
-			atoi(std::string(str, 0, str.find('x')).c_str()),
-			atoi(std::string(str, str.find('x')+1).c_str())};
-	};
-
-	// Figure out if the game's resolution is one of the entries in the list
-	int resolutionIdx = -1;
-	for(size_t n = 0; n < m_resolutions.size(); n++)
-	{
-		if (m_resolutions[n] == resolutionStr)
-		{
-			resolutionIdx = static_cast<int>(n);
-			break;
-		}
-	}
-
-	if (ImGui::BeginCombo("Resolution", resolutionIdx == -1 ? nullptr : resolutionStr, ImGuiComboFlags_WidthFitPreview))
-	{
-		for (size_t n = 0; n < m_resolutions.size(); n++)
-		{
-			const bool isSelected = (resolutionIdx == static_cast<int>(n));
-			if (ImGui::Selectable(m_resolutions[n].c_str(), isSelected))
-			{
-				Size newResolution = getSize(m_resolutions[n]);
-
-				RenderTarget& renderTarget = m_game->getRenderTarget();
-				if (renderTarget.getSize() != newResolution)
-				{
-					m_game->onWindowResized(newResolution);
-				}
-			}
-		}
-
-		ImGui::EndCombo();
-	}
-}
-
-void GameWindow::showStopAndPause()
-{
-	if (m_game->isGameClockPaused())
-	{
-		if (ImGui::Button("Resume"))
-		{
-			m_game->resumeGameClock();
-		}
-	}
-	else
-	{
-		if (ImGui::Button("Pause"))
-		{
-			m_game->pauseGameClock();
+			Game::get().onMouseMotion(gameEvt);
 		}
 	}
 }
@@ -117,11 +49,9 @@ void GameWindow::showStopAndPause()
 void GameWindow::show()
 {
 	// If this window is alive, then we must have a game running
-	CZ_CHECK(m_game);
+	CZ_CHECK(Game::tryGet());
 
-	MLGE_SET_CURRENT_GAME_INSTANCE(m_game);
-
-	RenderTarget& renderTarget = m_game->getRenderTarget();
+	RenderTarget& renderTarget = Game::get().getRenderTarget();
 
 	int resX = renderTarget.getWidth();
 	int resY = renderTarget.getHeight();
@@ -143,22 +73,20 @@ void GameWindow::show()
 	char buf[256];
 	sprintf(
 		buf,
-		"Game %u - (%s) %s , WallTime: %s, GameTime: %s ###GameWindow_%u",
-		m_id,
-		m_game->hasFocus() ? "FOCUS" : "NO FOCUS",
+		"(%s) %s , WallTime: %s, GameTime: %s ###GameWindow",
+		Game::get().hasFocus() ? "FOCUS" : "NO FOCUS",
 		resStr,
-		getTimestamp(m_game->getWallTimeSecs()).c_str(),
-		getTimestamp(m_game->getGameTimeSecs()).c_str(),
-		m_id);
+		getTimestamp(Game::get().getWallTimeSecs()).c_str(),
+		getTimestamp(Game::get().getGameTimeSecs()).c_str());
 
-	ImGuiWindowFlags noInputs = m_game->hasFocus() ? ImGuiWindowFlags_NoInputs : 0;
+	ImGuiWindowFlags noInputs = Game::get().hasFocus() ? ImGuiWindowFlags_NoInputs : 0;
 	ImGuiWindowFlags defaultFlags =  ImGuiWindowFlags_NoCollapse;
 	if (!m_resizable)
 	{
 		defaultFlags |= ImGuiWindowFlags_NoResize | ImGuiWindowFlags_AlwaysAutoResize;
 	}
 	
-	if (m_game->hasFocus())
+	if (Game::get().hasFocus())
 	{
 		ImGui::SetMouseCursor(ImGuiMouseCursor_None);
 	}
@@ -167,10 +95,6 @@ void GameWindow::show()
 	ImGui::Begin(buf, nullptr, defaultFlags | noInputs);
 	{
 		ImGui::Checkbox("Resizable", &m_resizable);
-		ImGui::SameLine();
-		showResolution(resStr);
-		ImGui::SameLine();
-		showStopAndPause();
 
 
 		//
@@ -184,14 +108,14 @@ void GameWindow::show()
 				size  = ImGui::GetContentRegionAvail();
 				size.x -= ImGui::GetCursorPosX();
 				size.y -= ImGui::GetCursorPosY();
-				double now = m_game->getWallTimeSecs();
+				double now = Game::get().getWallTimeSecs();
 
 				if (Size::fromFloat(size.x, size.y) == m_resizeCountdown.newSize)
 				{
 					if (m_resizeCountdown.applyTime <= now && renderTarget.getSize() != m_resizeCountdown.newSize)
 					{
 						Size renderTargetSize = Size::fromFloat(size.x, size.y);
-						m_game->onWindowResized(renderTargetSize);
+						Game::get().onWindowResized(renderTargetSize);
 					}
 				}
 				else
@@ -214,20 +138,20 @@ void GameWindow::show()
 
 			if (ImGui::ImageButton(tex, size, ImVec2(0,0), ImVec2(1,1), 0))
 			{
-				CZ_LOG(Log, "Switching focus to game window");
-				Editor::get().setGameFocus(m_game, true);
+				CZ_LOG(Editor, Log, "Switching focus to game window");
+				Editor::get().setGameFocus(true);
 			}
 
 			// If we gave focus to the game, then by definition we are hovering, therefore don't process this because it will
 			// end up sending "window leave" events to the game by mistake
-			if (!m_game->hasFocus())
+			if (!Game::get().hasFocus())
 			{
 				bool hovered = ImGui::IsItemHovered(ImGuiHoveredFlags_None);
 				// Simulate the Window Enter/Leave event while in Editor mode
 				if (hovered != m_hovered)
 				{
 					m_hovered = hovered;
-					m_game->onWindowEnter(m_hovered);
+					Game::get().onWindowEnter(m_hovered);
 				}
 
 				if (m_hovered)

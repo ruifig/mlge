@@ -15,7 +15,7 @@ ObjectPtr<MResource> MSpriteSheetDefinition::create() const
 	SDLUniquePtr<SDL_Surface> surface(IMG_Load(fullpath.string().c_str()));
 	if (!surface)
 	{
-		CZ_LOG(Error, "Failed to load surface {} from file '{}'. ec={}", name, narrow(file.native()), SDL_GetError());
+		CZ_LOG(Main, Error, "Failed to load surface {} from file '{}'. ec={}", name, narrow(file.native()), SDL_GetError());
 		return nullptr;
 	}
 
@@ -27,7 +27,7 @@ ObjectPtr<MResource> MSpriteSheetDefinition::create() const
 	res->m_texture.reset(SDL_CreateTextureFromSurface(Renderer::get().getSDLRenderer(), surface.get()));
 	if (!res->m_texture)
 	{
-		CZ_LOG(Error, "Failed to create texture {} from surface loaded from file '{}'. ec={}", name, narrow(file.native()), SDL_GetError());
+		CZ_LOG(Main, Error, "Failed to create texture {} from surface loaded from file '{}'. ec={}", name, narrow(file.native()), SDL_GetError());
 		return nullptr;
 	}
 
@@ -35,7 +35,7 @@ ObjectPtr<MResource> MSpriteSheetDefinition::create() const
 
 	if ((sheetSize.w % m_cellWidth) || (sheetSize.h % m_cellHeight))
 	{
-		CZ_LOG(Error, "Sheet size is not divisible by cell width and/or cell height.")
+		CZ_LOG(Main, Error, "Sheet size is not divisible by cell width and/or cell height.")
 		return nullptr;
 	}
 

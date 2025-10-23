@@ -98,12 +98,12 @@ bool MUIButton::onClicked(const Point& pos)
 		e.name = m_eventId.id;
 		e.hash = m_eventId.hash;
 		e.source = this;
-		CZ_LOG(Verbose, "{}: Clicked", m_objectName);
+		CZ_LOG(Main, Verbose, "{}: Clicked", m_objectName);
 		m_scene->getManager().uiEventDelegate.broadcast(e);
 	}
 	else
 	{
-		CZ_LOG(Warning, "{}: Clicked but no event ID set", m_objectName);
+		CZ_LOG(Main, Warning, "{}: Clicked but no event ID set", m_objectName);
 	}
 
 	return true;

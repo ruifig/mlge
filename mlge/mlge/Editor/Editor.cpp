@@ -57,12 +57,14 @@ bool Editor::init()
 
 void Editor::requestShutdown()
 {
-	m_shuttingDown = true;
-
-	Engine::get().visitGames([](Game& game)
+	if (!m_shuttingDown)
 	{
-		game.requestExpectedShutdown();
-	});
+		m_shuttingDown = true;
+		if (Game::tryGet())
+		{
+			Game::get().requestExpectedShutdown();
+		}
+	}
 }
 
 void Editor::onBeginFrame()
@@ -103,13 +105,10 @@ void Editor::onProcessEvent(SDL_Event& evt)
 	{
 		if (evt.key.keysym.scancode == SDL_SCANCODE_LALT)
 		{
-			if (evt.type == SDL_KEYUP)
+			if (evt.type == SDL_KEYUP && gameHasFocus())
 			{
-				if (anyGameHasFocus())
-				{
-					CZ_LOG(Log, "Removing focus from game windows");
-					setGameFocus(nullptr, false);
-				}
+				CZ_LOG(Editor, Log, "Removing focus from game windows");
+				setGameFocus(false);
 			}
 		}
 	}
@@ -123,7 +122,7 @@ void Editor::onProcessEvent(SDL_Event& evt)
 			if (m_editorRenderTarget->getSize() != s)
 			{
 				m_editorRenderTarget->setSize(s);
-				CZ_LOG(Log, "Window resized to {}x{}", s.w, s.h);
+				CZ_LOG(Editor, Log, "Window resized to {}x{}", s.w, s.h);
 				Config::get().setGameValue("Editor", "resx", s.w);
 				Config::get().setGameValue("Editor", "resy", s.h);
 				Config::get().save();
@@ -153,23 +152,15 @@ void Editor::tick()
 	}
 
 
-	// #MULTIPLE_INSTANCES : Move game shutdown check to Engine
+	if (m_stopDeadline.has_value())
 	{
-		Engine::get().visitGamesInfo([](Engine::GameInfo& info)
+		// If the game finished shutting down, or we reached the deadline, then run the final shutdown step
+		if (m_game->isShutdownFinished() || std::chrono::high_resolution_clock::now() > m_stopDeadline.value())
 		{
-			Game* game = static_cast<Game*>(info.game.get());
-
-			if (info.stopDeadline.has_value())
-			{
-				// If the game finished shutting down, or we reached the deadline, then run the final shutdown step
-				if (game->isShutdownFinished() || std::chrono::high_resolution_clock::now() > info.stopDeadline.value())
-				{
-					game->shutdown();
-					info.game.reset();
-					info.stopDeadline.reset();
-				}
-			}
-		});
+			m_game->shutdown();
+			m_game.reset();
+			m_stopDeadline.reset();
+		}
 	}
 
 }
@@ -272,87 +263,77 @@ void Editor::showMenu()
 
 }
 
-void Editor::startGames(uint32_t count)
+bool Editor::startGame()
 {
-	if (Engine::get().getGamesCount())
+	if (m_game)
 	{
-		return;
+		return false;
 	}
 
-	while(count--)
+	auto game = createGame();
+	if (game->init())
 	{
-		if (Engine::GameInfo* info = Engine::get().createNewGame())
-		{
-			auto gameWindow = std::make_unique<GameWindow>(static_cast<Game*>(info->game.get()), info->id);
-			info->editorWindow = gameWindow.get();
-			m_windows.emplace(std::move(gameWindow));
-		}
-		else
-		{
-			break;
-		}
+		m_game = std::move(game);
+		auto gameWindow = std::make_unique<GameWindow>();
+		m_gameWindow = gameWindow.get();
+		m_windows.emplace(std::move(gameWindow));
+		return true;
+	}
+	else
+	{
+		return false;
 	}
 }
 
-// #MULTIPLE_INSTANCES : Refactor this to have the option to stop one or all games.
-void Editor::stopGame()
+bool Editor::stopGame()
 {
-	Engine::get().visitGamesInfo([this](Engine::GameInfo& info)
+	if (m_gameWindow)
 	{
-		Game* game = static_cast<Game*>(info.game.get());
-
+		// #MULTIPLE_INSTANCES : Delete these comments?
 		// #RVF : We should probably only destroy the window once the game is confirmed shutdown (so we simulate what happens in non-editor builds)
 		//  Delete the Editor window controlling the game
-		auto it = m_windows.find(info.editorWindow);
+		auto it = m_windows.find(m_gameWindow);
 		if (it != m_windows.end())
 		{
 			m_windows.erase(it);
 		}
-		info.editorWindow = nullptr;
-
-		// Request the game instance to shutdown
-		game->requestExpectedShutdown();
-		int maxShutdownDurationMs = static_cast<int>(game->startShutdown() * 1000.0f);
-		// Tick the game until shutdown finishes or the deadline expires
-		info.stopDeadline = std::chrono::high_resolution_clock::now() + std::chrono::milliseconds(maxShutdownDurationMs);
-	});
-}
-
-// #MULTIPLE_INSTANCES : Refactor/remove this
-bool Editor::anyGameHasFocus() const
-{
-	bool hasFocus = false;
-	Engine::get().visitGames([&](const Game& game)
-	{
-		if (game.hasFocus())
-		{
-			hasFocus = true;
-		}
-	});
-
-	return hasFocus;
-}
-
-// #MULTIPLE_INSTANCES : Refactor/remove this
-void Editor::setGameFocus(Game* game, bool state)
-{
-	Engine::get().visitGames([&](Game& game_)
-	{
-		if (game == nullptr || &game_ == game)
-		{
-			if (state != game_.hasFocus())	
-			{
-				game_.onWindowFocus(state);
-			}
-		}
-	});
-	
-	if (!state)
-	{
-		SDL_ShowCursor(true);
+		m_gameWindow = nullptr;
 	}
 
-	//SDL_SetWindowGrab(Renderer::get().getSDLWindow(), state ? SDL_TRUE : SDL_FALSE);
+	if (m_game)
+	{
+		// Request the game instance to shutdown
+		m_game->requestExpectedShutdown();
+		int maxShutdownDurationMs = static_cast<int>(m_game->startShutdown() * 1000.0f);
+		// Tick the game until shutdown finishes or the deadline expires
+		m_stopDeadline = std::chrono::high_resolution_clock::now() + std::chrono::milliseconds(maxShutdownDurationMs);
+		return true;
+	}
+
+	return false;
+}
+
+bool Editor::gameHasFocus() const
+{
+	return Game::tryGet() && Game::get().hasFocus();
+}
+
+void Editor::setGameFocus(bool state)
+{
+	if (!m_game)
+	{
+		return;
+	}
+
+	if (state != m_game->hasFocus())
+	{
+		m_game->onWindowFocus(state);
+
+		if (!state)
+		{
+			SDL_ShowCursor(true);
+		}
+	}
 }
 
 void Editor::addWindow(std::unique_ptr<Window> window)
