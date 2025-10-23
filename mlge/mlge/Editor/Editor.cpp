@@ -57,10 +57,13 @@ bool Editor::init()
 
 void Editor::requestShutdown()
 {
-	m_shuttingDown = true;
-	if (Game::tryGet())
+	if (!m_shuttingDown)
 	{
-		Game::get().requestExpectedShutdown();
+		m_shuttingDown = true;
+		if (Game::tryGet())
+		{
+			Game::get().requestExpectedShutdown();
+		}
 	}
 }
 

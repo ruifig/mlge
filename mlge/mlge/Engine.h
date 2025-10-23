@@ -69,7 +69,7 @@ protected:
 	// #MULTIPLE_INSTANCES : Test if this needs to be a unique_ptr. As-in, check if it's destroyed when:
 	// Debug/Development, both in editor or -game mode
 	// Release 
-	Game* m_game;
+	Game* m_game = nullptr;
 
 	/**
 	 * When requesting the game to stop, we set this to shutdown deadline.

@@ -274,8 +274,7 @@ class Game
 
   protected:
 
-	// The order is important, because we need a specific destruction order (the C++ standards guarantees the objects are
-	// destroyed in the reverse order)
+	// NOTE: The order is important of creation and destruction is important, because of dependencies
 	std::unique_ptr<RenderQueue> m_renderQueue;
 	std::unique_ptr<UIManager> m_ui;
 	std::unique_ptr<PerformanceStats> m_performanceStats;

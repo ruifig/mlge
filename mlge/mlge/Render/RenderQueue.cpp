@@ -17,6 +17,10 @@ RenderQueue::RenderQueue()
 	m_groups[static_cast<int>(RenderGroup::OverlayDebug)].active = overlayDebug;
 }
 
+RenderQueue::~RenderQueue()
+{
+}
+
 RenderQueue& RenderQueue::get()
 {
 	return Game::get().getRenderQueue();

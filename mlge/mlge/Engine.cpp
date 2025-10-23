@@ -318,7 +318,10 @@ bool Engine::run()
 		Renderer::get().render();
 
 		// We initiate shutdown if both the game and editor want to shutdown
-		shuttingDown &= Game::tryGet() && Game::get().isShuttingDown();
+		if (Game::tryGet())
+		{
+			shuttingDown &= Game::get().isShuttingDown();
+		}
 
 	#if MLGE_EDITOR
 		if (editor::Editor::tryGet())
@@ -368,7 +371,7 @@ bool Engine::run()
 		Game::get().shutdown();
 	}
 
-	return Game::get().getShutdownValue();
+	return Game::tryGet() ? Game::get().getShutdownValue() : true;
 }
 
 } // namespace mlge

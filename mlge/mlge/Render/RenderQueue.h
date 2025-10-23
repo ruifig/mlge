@@ -42,6 +42,7 @@ class RenderQueue
   public:
 
 	RenderQueue();
+	~RenderQueue();
 
 	/**
 	 * Adds a renderable to the list of objects that wish to render.
