@@ -46,6 +46,7 @@ Game::~Game()
 	CZ_LOG(Main, Log, "Game destroyed");
 
 	// Delete these manually, because they will try to access the game
+	m_level.reset();
 	m_performanceStats.reset();
 	m_ui.reset();
 	m_renderQueue.reset();

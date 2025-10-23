@@ -278,6 +278,7 @@ class Game
 	std::unique_ptr<RenderQueue> m_renderQueue;
 	std::unique_ptr<UIManager> m_ui;
 	std::unique_ptr<PerformanceStats> m_performanceStats;
+	ObjectPtr<MLevel> m_level;
 
 	/**
 	 * How long the game loop will wait for the shutdown before forcing a close
@@ -306,7 +307,6 @@ class Game
 	// If set, then a shutdown was request, and the value specifies if its expected (true), or because of some error (false)
 	std::optional<bool> m_shuttingDown;
 
-	ObjectPtr<MLevel> m_level;
 
 	GameClock m_clock;
 	bool m_hasFocus = false;

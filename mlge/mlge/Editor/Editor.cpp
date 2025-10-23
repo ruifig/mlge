@@ -138,6 +138,11 @@ void Editor::tick()
 
 	checkExistingWindows();
 
+	if (!m_stopDeadline.has_value() && Game::tryGet() && Game::get().isShuttingDown())
+	{
+		stopGame();
+	}
+
 	float deltaSeconds = m_clock.calcDeltaSeconds();
 	for(auto it = m_windows.begin(); it != m_windows.end(); )
 	{
@@ -289,9 +294,6 @@ bool Editor::stopGame()
 {
 	if (m_gameWindow)
 	{
-		// #MULTIPLE_INSTANCES : Delete these comments?
-		// #RVF : We should probably only destroy the window once the game is confirmed shutdown (so we simulate what happens in non-editor builds)
-		//  Delete the Editor window controlling the game
 		auto it = m_windows.find(m_gameWindow);
 		if (it != m_windows.end())
 		{
