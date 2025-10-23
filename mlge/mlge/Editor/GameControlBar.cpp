@@ -51,32 +51,6 @@ void GameControlBar::show()
 
 	float spacing = ImGui::GetStyle().ItemInnerSpacing.x;
 
-	// Game count
-	{
-		ImGui::Text("Game count:");
-		ImGui::SameLine();
-		if (ImGui::ArrowButton("##left", ImGuiDir_Left))
-		{
-			if (m_numGames > 1)
-			{
-				m_numGames--;
-			}
-		}
-		ImGui::SameLine(0.0f, spacing);
-		ImGui::Text("%u", m_numGames);
-		ImGui::SameLine(0.0f, spacing);
-		if (ImGui::ArrowButton("##right", ImGuiDir_Right))
-		{
-			if (m_numGames < 10)
-			{
-				m_numGames++;
-			}
-		}
-
-	}
-
-	uint32_t gamesCount = Engine::get().getGamesCount();
-
 	// Resolution selection
 	{
 		ImGui::SameLine(0.0f, spacing);
@@ -98,18 +72,16 @@ void GameControlBar::show()
 					Config::get().setGameValue("Engine", "resy", newResolution.h);
 					Config::get().save();
 
-					if (gamesCount)
+
+					if (Game::tryGet())
 					{
-						Engine::get().visitGames([&](Game& game)
+						RenderTarget& renderTarget = Game::get().getRenderTarget();
+						if (renderTarget.getSize() != newResolution)
 						{
-							RenderTarget& renderTarget = game.getRenderTarget();
-							if (renderTarget.getSize() != newResolution)
-							{
-								m_resolution = newResolution;
-								m_resolutionIdx = newIdx;
-								game.onWindowResized(newResolution);
-							}
-						});
+							m_resolution = newResolution;
+							m_resolutionIdx = newIdx;
+							Game::get().onWindowResized(newResolution);
+						}
 					}
 					else
 					{
@@ -130,7 +102,9 @@ void GameControlBar::show()
 
 	// Play stop buttons
 	{
-		if (gamesCount)
+		bool hasGame = Game::tryGet() ? true : false;
+
+		if (hasGame)
 		{
 			ImGui::SameLine();
 			if (ImGui::Button("Stop"))
@@ -138,19 +112,35 @@ void GameControlBar::show()
 				Editor::get().stopGame();
 			}
 
+			// #MULTIPLE_INSTANCES : Test this
+			ImGui::SameLine();
+			if (Game::get().isGameClockPaused())
+			{
+				if (ImGui::Button("Resume"))
+				{
+					Game::get().resumeGameClock();
+				}
+			}
+			else
+			{
+				if (ImGui::Button("Pause"))
+				{
+					Game::get().pauseGameClock();
+				}
+			}
 		}
 		else
 		{
 			ImGui::SameLine();
 			if (ImGui::Button("Play"))
 			{
-				Editor::get().startGames(m_numGames);
+				Editor::get().startGame();
 			}
 		}
 	}
 
 	// Tip about how to get out of game focus
-	if (Editor::get().anyGameHasFocus())
+	if (Editor::get().gameHasFocus())
 	{
 		ImGui::SameLine();
 		ImGui::Text("Press ALT to release focus from game");

@@ -9,8 +9,6 @@
 namespace mlge
 {
 
-class Game;
-
 namespace editor
 {
 
@@ -19,18 +17,12 @@ class GameWindow : public Window
   public:
 
 	using Super = Window;
-	GameWindow(Game* game, uint32_t id);
+	GameWindow();
 	using Super = Window;
 
   protected:
 	virtual bool tick(float elapsedSeconds) override;
 	virtual void show();
-
-	// Game instance this window will be controlling.
-	Game* m_game = nullptr;
-
-	// Id we use to create the imgui id that allows imgui to find the window internally
-	uint32_t m_id;
 
 	bool m_resizable = false;
 	bool m_hovered = false;
@@ -50,11 +42,6 @@ class GameWindow : public Window
 
 	DelegateHandle m_onProcessEventHandle;
 	void onProcessEvent(SDL_Event& evt);
-
-	std::vector<std::string> m_resolutions;
-	void showResolution(const char* resolutionStr);
-
-	void showStopAndPause();
 };
 
 } // namespace editor

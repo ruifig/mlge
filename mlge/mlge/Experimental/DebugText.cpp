@@ -11,10 +11,6 @@ namespace
 // I need to verify that and think about what to do.
 void addDebugTextImpl(const Color& color, const std::string& str)
 {
-	// #MULTIPLE_INSTANCES: Remove this:
-	BaseGame* game = Game::tryGet() ? Game::tryGet() : Engine::get().tryGetFirstGame();
-	MLGE_SET_CURRENT_GAME_INSTANCE(game);
-
 	if (gDebugText)
 	{
 		gDebugText->addEntry(color, str);

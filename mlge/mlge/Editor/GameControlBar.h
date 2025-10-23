@@ -22,7 +22,6 @@ class GameControlBar : public Window
 
 	int m_resolutionIdx = -1;
 	Size m_resolution;
-	uint32_t m_numGames = 1;
 
 	std::vector<std::string> m_resolutions;
 };

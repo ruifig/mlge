@@ -29,11 +29,11 @@ class Editor : public Singleton<Editor>
 		return m_shuttingDown;
 	}
 
-	void startGames(uint32_t count);
-	void stopGame();
+	bool startGame();
+	bool stopGame();
 
-	bool anyGameHasFocus() const;
-	void setGameFocus(Game* game, bool state);
+	bool gameHasFocus() const;
+	void setGameFocus(bool state);
 
 	void addWindow(std::unique_ptr<Window> window);
 
@@ -67,8 +67,17 @@ class Editor : public Singleton<Editor>
 	bool m_shuttingDown = false;
 	GameClock m_clock;
 
+	std::unique_ptr<Game> m_game;
+	Window* m_gameWindow = nullptr;
+
 	bool m_showConsole = true;
 	bool m_showAssetBrowser = true;
+
+	/**
+	 * When requesting the game to stop, we set this to shutdown deadline.
+	 * If the game doesn't fully stop by then, we kill it.
+	 */
+	std::optional<std::chrono::high_resolution_clock::time_point> m_stopDeadline;
 
 	ImGuiLayer m_imGuiLayer;
 	std::unique_ptr<RenderTarget> m_editorRenderTarget;

@@ -138,12 +138,12 @@ void Renderer::draw()
 		PerformanceStats::get().stat_Draw_Start();
 	}
 
-	endFrameDelegate.broadcast();
+	endFrameDelegate.broadcast(); 
 
-	Engine::get().visitGames([](Game& game)
+	if (Game::tryGet())
 	{
-		game.getRenderQueue().render();
-	});
+		Game::get().getRenderQueue().render();
+	}
 
 	gameRenderFinishedDelegate.broadcast();
 

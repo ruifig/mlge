@@ -70,16 +70,17 @@ void deferTask(TaskFunc&& task)
 namespace editor
 {
 	class Editor;
-	class GameWindow;
 }
 #endif
 
-class Game : public BaseGame
+class Game
 {
   public:
 
 	Game(std::string_view name);
 	virtual ~Game();
+
+	CZ_DELETE_COPY_AND_MOVE(Game);
 
 	/**
 	 * Gets the game instance currently being processed.
@@ -89,7 +90,7 @@ class Game : public BaseGame
 	static Game& get()
 	{
 		CZ_CHECK(ms_currentInstance);
-		return *static_cast<Game*>(ms_currentInstance);
+		return *ms_currentInstance;
 	}
 
 	/**
@@ -97,7 +98,7 @@ class Game : public BaseGame
 	 */
 	static Game* tryGet()
 	{
-		return static_cast<Game*>(ms_currentInstance);
+		return ms_currentInstance;
 	}
 
 	/**
@@ -284,6 +285,8 @@ class Game : public BaseGame
 	 */
 	inline static constexpr float ms_maxShutdownTimeSec = 5.0f;
 
+	inline static Game* ms_currentInstance = nullptr;
+
 	Color m_bkgColour = Color::Black;
 
   private:
@@ -292,7 +295,6 @@ class Game : public BaseGame
 
 	#if MLGE_EDITOR
 	friend class mlge::editor::Editor;
-	friend class mlge::editor::GameWindow;
 	#endif
 
 	/**

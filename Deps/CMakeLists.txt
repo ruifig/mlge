@@ -19,7 +19,7 @@ add_custom_target(utfcpp_ SOURCES
 )
 
 # Set in what folder it shows up in the IDE
-set_target_properties(utfcpp_ PROPERTIES FOLDER "czge/Dependencies/")
+set_target_properties(utfcpp_ PROPERTIES FOLDER "mlge/Dependencies/")
 
 
 #
@@ -41,13 +41,13 @@ FetchContent_Declare(czcore
 	SOURCE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/czcore
 )
 FetchContent_MakeAvailable(czcore)
-set_target_properties(czcore PROPERTIES FOLDER "czge/Dependencies/")
+set_target_properties(czcore PROPERTIES FOLDER "mlge/Dependencies/")
 if (TARGET czcore_UnitTests)
-	set_target_properties(czcore_UnitTests PROPERTIES FOLDER "czge/Dependencies/")
+	set_target_properties(czcore_UnitTests PROPERTIES FOLDER "mlge/Dependencies/")
 endif()
 if (TARGET Catch2)
-	set_target_properties(Catch2 PROPERTIES FOLDER "czge/Dependencies/")
-	set_target_properties(Catch2WithMain PROPERTIES FOLDER "czge/Dependencies/")
+	set_target_properties(Catch2 PROPERTIES FOLDER "mlge/Dependencies/")
+	set_target_properties(Catch2WithMain PROPERTIES FOLDER "mlge/Dependencies/")
 endif()
 
 #

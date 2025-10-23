@@ -13,37 +13,16 @@ namespace mlge
 
 class Game;
 
+// #MULTIPLE_INSTANCES : Is this needed ?
 #if MLGE_EDITOR
 namespace editor
 {
-	class Window;
 	class Editor;
 }
 #endif
 
-/**
- * Bare minimum to have in this header, so we can have std::unique_ptr<BaseGame>
- */
-class BaseGame
-{
-  public:
 
-	BaseGame() = default;
-	virtual ~BaseGame() = default;
-
-	CZ_DELETE_COPY_AND_MOVE(BaseGame)
-
-	static BaseGame* setCurrentInstance(BaseGame* instance)
-	{
-		BaseGame* previous = ms_currentInstance;
-		ms_currentInstance = instance;
-		return previous;
-	}
-
-  protected:
-	inline static BaseGame* ms_currentInstance = nullptr;
-};
-
+// #MULTIPLE_INSTANCES : Remove this
 #if MLGE_EDITOR
 	/**
 	 * This should only be used internally by the Editor code.
@@ -67,107 +46,7 @@ public:
 	bool run();
 
 	MultiCastDelegate<SDL_Event&> processEventDelegate;
-
-	struct GameInfo
-	{
-		uint32_t id;
-		std::unique_ptr<BaseGame> game;
-		#if MLGE_EDITOR
-		editor::Window* editorWindow = nullptr;
-		#endif
-
-		/**
-		 * When requesting the game to stop, we set this to shutdown deadline.
-		 * If the game doesn't fully stop by then, we kill it.
-		 */
-		std::optional<std::chrono::high_resolution_clock::time_point> stopDeadline = {};
-	};
-
-#if MLGE_EDITOR
-	uint32_t getGamesCount() const
-	{
-		uint32_t res = 0;
-		for(auto&& info : m_games)
-		{
-			if (info.game)
-			{
-				res++;
-			}
-		}
-
-		return res;
-	}
-
-	BaseGame* tryGetFirstGame()
-	{
-		for(GameInfo& info: m_games)
-		{
-			if (info.game)
-			{
-				return info.game.get();
-			}
-		}
-
-		return nullptr;
-	}
-
-	template<typename Visitor>
-	void visitGames(Visitor&& visitor)
-	{
-		for(GameInfo& info: m_games)
-		{
-			if (info.game)
-			{
-				MLGE_SET_CURRENT_GAME_INSTANCE(info.game.get());
-				Game* game = static_cast<Game*>(info.game.get());
-				visitor(*game);
-			}
-		}
-	}
-
-	template<typename Visitor>
-	void visitGames(Visitor&& visitor) const
-	{
-		for(const GameInfo& info: m_games)
-		{
-			if (info.game)
-			{
-				MLGE_SET_CURRENT_GAME_INSTANCE(info.game.get());
-				Game* game = static_cast<Game*>(info.game.get());
-				visitor(*game);
-			}
-		}
-	}
-
-	template<typename Visitor>
-	void visitGamesInfo(Visitor&& visitor)
-	{
-		for(GameInfo& info: m_games)
-		{
-			if (info.game)
-			{
-				MLGE_SET_CURRENT_GAME_INSTANCE(info.game.get());
-				visitor(info);
-			}
-		}
-	}
-
-	template<typename Visitor>
-	void visitGamesInfo(Visitor&& visitor) const
-	{
-		for(const GameInfo& info: m_games)
-		{
-			if (info.game)
-			{
-				MLGE_SET_CURRENT_GAME_INSTANCE(info.game.get());
-				visitor(info);
-			}
-		}
-	}
-
-	friend editor::Editor;
-#endif
-
+	
 protected:
 
 	bool initSDL();
@@ -187,43 +66,17 @@ protected:
 
 	bool m_sdlTTFInitialized = false;
 
-	std::array<GameInfo, MLGE_EDITOR ? 10 : 1> m_games;
-
-	uint32_t findUnusedGameId() const
-	{
-		uint32_t id = 0;
-		bool used = true;
-		while(used)
-		{
-			used = false;
-			for(const GameInfo& info : m_games)
-			{
-				if (info.game && info.id == id)
-				{
-					used = true;
-					break;
-				}
-			}
-
-			if (used)
-			{
-				id++;
-			}
-			else
-			{
-				break;
-			}
-		}
-
-		return id;
-	}
+	// #MULTIPLE_INSTANCES : Test if this needs to be a unique_ptr. As-in, check if it's destroyed when:
+	// Debug/Development, both in editor or -game mode
+	// Release 
+	Game* m_game;
 
 	/**
-	* Creates a new game and adds it to the games list.
-	* Returns the GameInfo if the game was added, nullptr if it failed.
-	*/
-	GameInfo* createNewGame();
+	 * When requesting the game to stop, we set this to shutdown deadline.
+	 * If the game doesn't fully stop by then, we kill it.
+	 */
+	std::optional<std::chrono::high_resolution_clock::time_point> stopDeadline = {};
 };
 
-
 } // namespace mlge
+

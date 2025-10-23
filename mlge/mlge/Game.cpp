@@ -37,11 +37,14 @@ Game::Game(std::string_view name)
 		m_name, "0.0.0", git_short_hash_str, buildType, build_time_str);
 
 	CZ_LOG(Main, Log, "{}", m_buildInfo);
+
+	ms_currentInstance = this;
 }
 
 Game::~Game()
 {
 	CZ_LOG(Main, Log, "Game destroyed");
+	ms_currentInstance = nullptr;
 }
 
 const std::string& Game::getBuildInfo() const
