@@ -18,7 +18,7 @@ namespace mlge
 			std::chrono::microseconds tickList[MaxSamples] = {};
 			float avgMsPerFrame = 0;
 			uint64_t numTicks = 0;
-			double variance = 0;
+			double variance_ms2 = 0; // Units are ms^2
 			float fps = 0;
 
 			using Clock = std::chrono::high_resolution_clock;
@@ -51,35 +51,32 @@ namespace mlge
 
 			void addPoint(std::chrono::microseconds deltaMicroseconds)
 			{
-				numTicks++;
+				const int count = std::min<int>(numTicks + 1, MaxSamples);
 
 				tickSum -= tickList[tickIndex];			 /* subtract value falling off */
 				tickSum += deltaMicroseconds;			 /* add new value */
 				tickList[tickIndex] = deltaMicroseconds; /* save new value so it can be subtracted later */
-				if (++tickIndex == MaxSamples)			 /* inc buffer index */
-				{
-					tickIndex = 0;
-				}
+				tickIndex = (tickIndex + 1) % MaxSamples; /* inc buffer index */
+				++numTicks;
 
-				avgMsPerFrame = float(static_cast<double>(tickSum.count()) / (MaxSamples * 1000));
+				avgMsPerFrame = float(static_cast<double>(tickSum.count()) / (count * 1000));
 				fps = 1000.0f / avgMsPerFrame;
 
-				calculateVariance();
+				calculateVariance(count);
 			}
 
 			// Calculate Sample Variance : https://www.calculatorsoup.com/calculators/statistics/variance-calculator.php
-			void calculateVariance()
+			void calculateVariance(int count)
 			{
-				double meanMs = static_cast<double>(tickSum.count()) / (MaxSamples * 1000);
-
+				double meanMs = tickSum.count() / (count * 1000.0);
 				double tmp = 0;
-				for (const std::chrono::microseconds& t : tickList)
+				for (int i = 0; i < count; ++i)
 				{
-					double ms = static_cast<double>(t.count()) / 1000;
-					tmp += std::pow(ms - meanMs, 2);
+					double ms = tickList[i].count() / 1000.0;
+					tmp += (ms - meanMs) * (ms - meanMs);
 				}
 
-				variance = tmp / (MaxSamples - 1);
+				variance_ms2 = tmp / (count - 1);
 			}
 
 			bool isValid() const
@@ -115,6 +112,15 @@ class PerformanceStats : public Renderable, public RenderOperation
 	 * Get the instance associated with the game instance currently being processed
 	 */
 	static PerformanceStats& get();
+
+	struct Stats
+	{
+		int fps;
+		float avgFrametimeMs; // frametime in ms
+		float variance_ms2; // Units are ms^2
+	};
+
+	Stats getStats() const;
 
   private:
 

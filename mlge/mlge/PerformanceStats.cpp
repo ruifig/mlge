@@ -55,6 +55,16 @@ void PerformanceStats::updateRenderQueue()
 	RenderQueue::get().addOp(*this, RenderGroup::Stats);
 }
 
+PerformanceStats::Stats PerformanceStats::getStats() const
+{
+	return
+	{
+		.fps = static_cast<int>(m_fpsCalculator.fps + 0.5f),
+		.avgFrametimeMs = m_fpsCalculator.avgMsPerFrame,
+		.variance_ms2 = static_cast<float>(m_fpsCalculator.variance_ms2)
+	};
+}
+
 void PerformanceStats::render(RenderGroup /*group*/)
 {
 	if (Game::tryGet() == nullptr)
@@ -85,7 +95,7 @@ void PerformanceStats::render(RenderGroup /*group*/)
 			"FPS: {:3.0f}, MS: {:4.1f}, Variance: {:3.2f}",
 			m_fpsCalculator.fps,
 			m_fpsCalculator.avgMsPerFrame,
-			m_fpsCalculator.variance));
+			std::sqrt(m_fpsCalculator.variance_ms2)));
 	}
 
 	// These show the time spending updating engine/game logic
@@ -95,7 +105,7 @@ void PerformanceStats::render(RenderGroup /*group*/)
 		textRenderer.render(std::format(
 			"Tick: {:3.2f}, TickVariance: {:3.2f}",
 			m_tickCalculator.avgMsPerFrame,
-			m_tickCalculator.variance));
+			std::sqrt(m_tickCalculator.variance_ms2)));
 	}
 
 	// These show the time spent in engine rendering operations
@@ -105,7 +115,7 @@ void PerformanceStats::render(RenderGroup /*group*/)
 		textRenderer.render(std::format(
 			"Draw: {:3.2f}, DrawVariance: {:3.2f}",
 			m_drawCalculator.avgMsPerFrame,
-			m_drawCalculator.variance));
+			std::sqrt(m_drawCalculator.variance_ms2)));
 	}
 
 	// These show the time blocked int he SDL_RenderPresent
@@ -115,7 +125,7 @@ void PerformanceStats::render(RenderGroup /*group*/)
 		textRenderer.render(std::format(
 			"Present: {:3.2f}, PresentVariance: {:3.2f}",
 			m_presentCalculator.avgMsPerFrame,
-			m_presentCalculator.variance));
+			std::sqrt(m_presentCalculator.variance_ms2)));
 	}
 
 	int buildInfoHeight = m_showBuildInfo ? textRenderer.getFontHeight() : 0;
