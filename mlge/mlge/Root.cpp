@@ -32,7 +32,14 @@ struct RootImpl : public Root
 
 	virtual bool init() override
 	{
-		fileLogOutput.open("", std::string(getGameFolderName()));
+		std::string logFilename(getGameFolderName());
+		int runIdx = CommandLine::get().getValueOrDefault("run", -1);
+		if (runIdx >=0)
+		{
+			logFilename = std::format("{}_{}", logFilename, runIdx);
+		}
+
+		fileLogOutput.open("", logFilename);
 
 		// This needs to be the first one to be initialized, so the other singletons can query the config
 		// NOTE: Commandline is initialized before this, outside of Root
