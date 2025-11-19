@@ -51,7 +51,7 @@ namespace mlge
 
 			void addPoint(std::chrono::microseconds deltaMicroseconds)
 			{
-				const int count = std::min<int>(numTicks + 1, MaxSamples);
+				const int count = static_cast<int>(std::min<uint64_t>(numTicks + 1, MaxSamples));
 
 				tickSum -= tickList[tickIndex];			 /* subtract value falling off */
 				tickSum += deltaMicroseconds;			 /* add new value */
