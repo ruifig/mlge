@@ -78,7 +78,7 @@ void Console::show()
 		for (int i = static_cast<int>(LogLevel::Fatal); i <= static_cast<int>(LogLevel::VeryVerbose); i++)
 		{
 			bool selected = LogLevel(i) == LogLevel::VeryVerbose; 
-			if (ImGui::MenuItem(to_string(LogLevel(i)), "", &selected))
+			if (ImGui::MenuItem(toString(LogLevel(i)).data(), "", &selected))
 			{
 				setLogLevel(LogLevel(i));
 				CZ_LOG(Editor, Error, "Hello world");

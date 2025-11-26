@@ -149,9 +149,8 @@ namespace details
 {
 	void applyLogLevels()
 	{
-		std::string levelStr = Config::get().getValueOrDefault<std::string>("Engine", "loglevel", to_string(compileTimeMaxLogLevel));
-		LogLevel level = logLevelFromString(levelStr);
-		setLogLevel(level);
+		std::string logSettings = Config::get().getValueOrDefault<std::string>("Engine", "logSettings", "");
+		cz::setLogSettings(logSettings);
 	}
 }
 
