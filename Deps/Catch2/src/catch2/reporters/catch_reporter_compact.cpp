@@ -215,7 +215,8 @@ private:
                          << m_config->testSpec()
                          << '\n';
             }
-            m_stream << "RNG seed: " << getSeed() << '\n';
+            m_stream << "RNG seed: " << getSeed() << '\n'
+                     << std::flush;
         }
 
         void CompactReporter::assertionEnded( AssertionStats const& _assertionStats ) {
@@ -249,6 +250,6 @@ private:
             StreamingReporterBase::testRunEnded( _testRunStats );
         }
 
-        CompactReporter::~CompactReporter() {}
+        CompactReporter::~CompactReporter() = default;
 
 } // end namespace Catch

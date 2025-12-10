@@ -2,6 +2,9 @@
 
 #include "mlge/PreSetup.h"
 
+#include "crazygaze/core/CorePch.h"
+#include "crazygaze/core/Logging.h"
+
 MLGE_THIRD_PARTY_INCLUDES_START
 
 #include <assert.h>
@@ -38,4 +41,6 @@ namespace mlge
 using json = nlohmann::json;
 
 } // namespace mlge
+
+using namespace std::literals::chrono_literals;
 

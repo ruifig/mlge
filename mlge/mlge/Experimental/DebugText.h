@@ -5,7 +5,6 @@
 #include "mlge/Text.h"
 
 using namespace mlge;
-using namespace std::literals::chrono_literals;
 
 #define addDebugText(fmtStr, ...)                                          \
 	{                                                                      \
@@ -35,7 +34,7 @@ class ADebugText : public AActor
 
 	void addEntry(const Color& color, const std::string& str);
 
-	virtual bool defaultConstruct() override;
+	virtual bool preConstruct() override;
 
   protected:
 

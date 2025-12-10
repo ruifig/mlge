@@ -2,7 +2,6 @@
 
 #include "mlge/Resource/Resource.h"
 #include "mlge/Render/Renderer.h"
-#include "mlge/Render/RenderQueue.h"
 #include "mlge/Profiler.h"
 #include "mlge/Config.h"
 
@@ -24,10 +23,8 @@ struct RootImpl : public Root
 	CommandLine cmdLine;
 	FileLogOutput fileLogOutput;
 	Config config;
-	Profiler profiler;
 	Renderer renderer;
 	ResourceManager resourceManager;
-	RenderQueue renderQueue;
 #if MLGE_EDITOR
 	// Even for an editor build, we use a unique_ptr, so it only gets initialized if `-game` is not specified in the command line
 	std::unique_ptr<editor::Editor> editor;
@@ -35,7 +32,14 @@ struct RootImpl : public Root
 
 	virtual bool init() override
 	{
-		fileLogOutput.open("", std::string(getGameFolderName()));
+		std::string logFilename(getGameFolderName());
+		int runIdx = CommandLine::get().getValueOrDefault("run", -1);
+		if (runIdx >=0)
+		{
+			logFilename = std::format("{}_{}", logFilename, runIdx);
+		}
+
+		fileLogOutput.open("", logFilename);
 
 		// This needs to be the first one to be initialized, so the other singletons can query the config
 		// NOTE: Commandline is initialized before this, outside of Root
@@ -44,19 +48,12 @@ struct RootImpl : public Root
 			return false;
 		}
 		
-		profiler.init();
-
 		if (!renderer.init())
 		{
 			return false;
 		}
 
 		if (!resourceManager.init())
-		{
-			return false;
-		}
-
-		if (!renderQueue.init())
 		{
 			return false;
 		}

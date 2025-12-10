@@ -5,7 +5,9 @@
 			"name": "SpriteSheet/Fighter_Move",
 			"file": "../../../TestGame/Assets/Ships/Fighter/Move.png",
 			"cellWidth": 192,
-			"cellHeight": 192
+			"cellHeight": 192,
+			"originX": 96,
+			"originY": 96
 		},
 		{
 			"type": "SpriteSheet",

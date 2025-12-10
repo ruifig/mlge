@@ -10,7 +10,20 @@ struct Sprite
 {
 	SDL_Texture* texture;
 	Rect rect;
+
+	/**
+	 * Sprint origin, relative to the texture's top left corner.
+	 *
+	 * This specifies how to align the sprite when rendering it.
+	 *
+	 * E.g:
+	 * Imagine a sprite which size {64, 64}, and an origin {32, 32} (origin is the center).
+	 * An operation to render the sprite at screen position {100,100} renders it so that the sprite's origin is at {100,100}.
+	 */
+	Point origin;
 };
+
+void renderSprite(const Sprite& sprite, const Point& pos, float angleDegrees = 0.0f, float scale = 1.0f);
 
 MLGE_OBJECT_START(MSpriteSheetDefinition, MResourceDefinition, "A sprite sheet is a collection of textures created from a single image")
 class MSpriteSheetDefinition : public MResourceDefinition
@@ -20,19 +33,8 @@ class MSpriteSheetDefinition : public MResourceDefinition
 
   protected:
 
-	virtual void to_json(nlohmann::json& j) const override
-	{
-		Super::to_json(j);
-		j["cellWidth"] = m_cellWidth;
-		j["cellHeight"] = m_cellHeight;
-	}
-
-	virtual void from_json(const nlohmann::json& j) override
-	{
-		Super::from_json(j);
-		j.at("cellWidth").get_to(m_cellWidth);
-		j.at("cellHeight").get_to(m_cellHeight);
-	}
+	virtual void to_json(nlohmann::json& j) const override;
+	virtual void from_json(const nlohmann::json& j) override;
 
 	virtual ObjectPtr<MResource> create() const override;
 
@@ -42,6 +44,8 @@ class MSpriteSheetDefinition : public MResourceDefinition
 
 	int m_cellWidth = 0;
 	int m_cellHeight = 0;
+	int m_originX = 0;
+	int m_originY = 0;
 };
 MLGE_OBJECT_END(MSpriteSheetDefinition)
 

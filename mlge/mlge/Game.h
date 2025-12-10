@@ -5,8 +5,10 @@
 #include "mlge/GameClock.h"
 #include "mlge/Delegates.h"
 #include "mlge/Paths.h"
+#include "mlge/Engine.h"
 
 #include "crazygaze/core/Singleton.h"
+#include "crazygaze/core/ScopeGuard.h"
 
 /**
  * A game should use this macro in a single CPP file
@@ -38,21 +40,66 @@
 	GameClass& getGame();              \
 	fs::path getGameRelativePath();
 
-
 namespace mlge
 {
 
 class MLevel;
 class RenderTarget;
+class UIManager;
+class RenderQueue;
+class PerformanceStats;
 
-class Game : public Singleton<Game>
+/**
+ * Defers a task for execution on the next tick of the current game
+ */
+template<typename TaskFunc>
+void deferTask(TaskFunc&& task)
+{
+	if (Game* game = Game::tryGet())
+	{
+		game->deferToNextTick(std::forward<TaskFunc>(task));
+	}
+	else
+	{
+		CZ_CHECK(false);
+	}
+}
+
+
+#if MLGE_EDITOR
+namespace editor
+{
+	class Editor;
+}
+#endif
+
+class Game
 {
   public:
 
 	Game(std::string_view name);
 	virtual ~Game();
 
-	CZ_DELETE_COPY_AND_MOVE(Game)
+	CZ_DELETE_COPY_AND_MOVE(Game);
+
+	/**
+	 * Gets the game instance currently being processed.
+	 * It asserts if there isn't an instance.
+	 * If the caller code needs to check if an instance exists, it should use tryGet instead.
+	 */
+	static Game& get()
+	{
+		CZ_CHECK(ms_currentInstance);
+		return *ms_currentInstance;
+	}
+
+	/**
+	 * Tries getting the game instance currently being processed
+	 */
+	static Game* tryGet()
+	{
+		return ms_currentInstance;
+	}
 
 	/**
 	 * Returns the game name
@@ -88,7 +135,14 @@ class Game : public Singleton<Game>
 	 * Causes the game to initiate shutdown. 
 	 * Any game system(s) that want to cause the game to shutdown gracefully should call this
 	 */
-	 virtual void requestShutdown();
+	 virtual void requestExpectedShutdown();
+
+	 /**
+	  * Causes the game to initiate a shutdown
+	  * This will cause the process to return an error on error. 
+	  * This is mostly useful for automation, so any process launcher knows the game shutdown because of a problem.
+	  */
+	 virtual void requestShutdownWithError();
 
 	/**
 	 * Called when any systems in the game or engine request a shutdown (by calling requestShutdown())
@@ -117,12 +171,19 @@ class Game : public Singleton<Game>
 	virtual void shutdown();
 
 	/**
-	 * Called by the engine when the game gets or looses focus
+	 * Called when the mouse cursor enters or leaves the window
 	 */
-	virtual void onFocusChanged(bool focus)
-	{
-		m_hasFocus = focus;
-	}
+	virtual void onWindowEnter(bool entered);
+	/**
+	 * Called when the window is resized
+	 */
+	virtual void onWindowResized(const Size& size);
+
+
+	/**
+	 * Called when the window gains or loses focus
+	 */
+	virtual void onWindowFocus(bool focus);
 
 	/**
 	 * Gets the current level
@@ -132,7 +193,12 @@ class Game : public Singleton<Game>
 
 	bool isShuttingDown() const
 	{
-		return m_shuttingDown;
+		return m_shuttingDown.has_value();
+	}
+
+	bool getShutdownValue() const
+	{
+		return m_shuttingDown.value_or(true);
 	}
 
 	double getGameTimeSecs() const
@@ -170,12 +236,56 @@ class Game : public Singleton<Game>
 		return *m_renderTarget;
 	}
 
-	protected:
+	MultiCastDelegate<Size> windowResizedDelegate;
+	// Broadcast when the mouse enters or leaves the window
+	MultiCastDelegate<bool> windowEnterDelegate;
+	MultiCastDelegate<bool> windowFocus;
+
+	struct MouseMotionEvent
+	{
+		// Mouse position within the window
+		Point pos;
+		// Relative mouse movement
+		Point rel;
+	};
+
+	MultiCastDelegate<const MouseMotionEvent&> mouseMotionDelegate;
+
+	/**
+	 * Called when a mouse movement occurs
+	 */
+	virtual void onMouseMotion(const MouseMotionEvent& evt);
+
+	RenderQueue& getRenderQueue()
+	{
+		return *m_renderQueue;
+	}
+
+	PerformanceStats& getPerformanceStats()
+	{
+		return *m_performanceStats;
+	}
+
+	template<typename TaskFunc>
+	void deferToNextTick(TaskFunc&& task)
+	{
+		m_deferedTasks.emplace(std::forward<TaskFunc>(task));
+	}
+
+  protected:
+
+	// NOTE: The order is important of creation and destruction is important, because of dependencies
+	std::unique_ptr<RenderQueue> m_renderQueue;
+	std::unique_ptr<UIManager> m_ui;
+	std::unique_ptr<PerformanceStats> m_performanceStats;
+	ObjectPtr<MLevel> m_level;
 
 	/**
 	 * How long the game loop will wait for the shutdown before forcing a close
 	 */
 	inline static constexpr float ms_maxShutdownTimeSec = 5.0f;
+
+	inline static Game* ms_currentInstance = nullptr;
 
 	Color m_bkgColour = Color::Black;
 
@@ -183,18 +293,20 @@ class Game : public Singleton<Game>
 
 	friend class Engine;
 
+	#if MLGE_EDITOR
+	friend class mlge::editor::Editor;
+	#endif
+
 	/**
 	 * Called by the engine loop to tick the game using the game clock. Ends up calling tick(float deltaSeconds)
 	 */
 	void gameClockTick();
 
-	void processInput(SDL_Event& evt);
-
 	std::string m_name;
 	std::string m_buildInfo;
-	bool m_shuttingDown = false;
+	// If set, then a shutdown was request, and the value specifies if its expected (true), or because of some error (false)
+	std::optional<bool> m_shuttingDown;
 
-	ObjectPtr<MLevel> m_level;
 
 	GameClock m_clock;
 	bool m_hasFocus = false;
@@ -203,6 +315,9 @@ class Game : public Singleton<Game>
 
 	void onEndFrame();
 	DelegateHandle m_onEndFrameHandle;
+
+	cz::SharedQueue<std::function<void()>> m_deferedTasks;
+	std::queue<std::function<void()>> m_swapDeferedTasks;
 };
 
 } // namespace mlge

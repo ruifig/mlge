@@ -93,8 +93,6 @@ class GameClock
 
 	void reset()
 	{
-		using namespace std::literals::chrono_literals;
-
 		m_running = false;
 		m_paused = false;
 		m_scale = 1.0f;

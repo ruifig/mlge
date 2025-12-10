@@ -39,9 +39,7 @@ class Renderer : public Singleton<Renderer>
 	void beginFrame();
 
 	/**
-	 * Starts the rendering operations
-	 * This actually transfers control to the render thread and blocks until the render thread has done all it needs with
-	 * the shared state. This means that from the game's perspective, everything is still single threaded.
+	 * Starts the rendering operations.
 	 */
 	void render();
 
@@ -62,6 +60,11 @@ class Renderer : public Singleton<Renderer>
 		return m_frameNumber;
 	}
 
+	const std::string& getRenderingAPIName() const
+	{
+		return m_renderingAPIName;
+	}
+
 	MultiCastDelegate<> beginFrameDelegate;
 	MultiCastDelegate<> endFrameDelegate;
 	MultiCastDelegate<> gameRenderFinishedDelegate;
@@ -70,6 +73,7 @@ class Renderer : public Singleton<Renderer>
 
 	void draw();
 
+	std::string m_renderingAPIName;
 	SDLUniquePtr<SDL_Window> m_sdlWindow;
 	SDLUniquePtr<SDL_Renderer> m_sdlRenderer;
 	RenderTarget* m_renderTarget = nullptr;

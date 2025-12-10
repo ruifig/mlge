@@ -136,7 +136,7 @@ bool BaseResourceWindow::tick(float elapsedSeconds)
 
 		if (m_target->isLoaded())
 		{
-			CZ_LOG(Warning, "Resource still loaded. Potential bug in {}", m_title);
+			CZ_LOG(Editor, Warning, "Resource still loaded. Potential bug in {}", m_title);
 		}
 
 		reloadResource();

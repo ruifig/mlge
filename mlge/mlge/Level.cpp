@@ -16,6 +16,11 @@ void MLevel::removeActor(AActor* actor)
 	});
 }
 
+void MLevel::removeAllActors()
+{
+	m_actors.clear();
+}
+
 void MLevel::tick(float deltaSeconds)
 {
 	MLGE_PROFILE_SCOPE(mlge_Level_tick);

@@ -53,7 +53,7 @@ bool TextureRenderTarget::setSize(Size size)
 	}
 	else
 	{
-		CZ_LOG(Error, "Failed to create TextureRenderTarget. ec={}", SDL_GetError());
+		CZ_LOG(Main, Error, "Failed to create TextureRenderTarget. ec={}", SDL_GetError());
 		return false;
 	}
 

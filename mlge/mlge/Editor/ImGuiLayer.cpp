@@ -57,13 +57,13 @@ void ImGuiLayer::processEvent(SDL_Event& evt)
 	if (io.WantCaptureMouse != m_wantCaptureMouse || m_firstFrame)
 	{
 		m_wantCaptureMouse = io.WantCaptureMouse;
-		CZ_LOG(VeryVerbose, "ImGui::WantCaptureMouse = {}", m_wantCaptureMouse);
+		CZ_LOG(Editor, VeryVerbose, "ImGui::WantCaptureMouse = {}", m_wantCaptureMouse);
 	}
 
 	if (io.WantCaptureKeyboard != m_wantCaptureKeyboard || m_firstFrame)
 	{
 		m_wantCaptureKeyboard = io.WantCaptureKeyboard;
-		CZ_LOG(VeryVerbose, "ImGui::WantCaptureKeyboard = {}", m_wantCaptureKeyboard);
+		CZ_LOG(Editor, VeryVerbose, "ImGui::WantCaptureKeyboard = {}", m_wantCaptureKeyboard);
 	}
 
 	m_firstFrame = false;

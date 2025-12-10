@@ -30,8 +30,13 @@ MResourceDefinition::~MResourceDefinition()
 
 bool MResourceDefinition::construct(const ResourceRoot& root)
 {
+	if (!Super::preConstruct())
+	{
+		return false;
+	}
+
 	m_root = &root;
-	return Super::defaultConstruct();
+	return true;
 }
 
 const std::string_view MResourceDefinition::getTypeName() const
@@ -48,7 +53,7 @@ ObjectPtr<MResource> MResourceDefinition::getResource() const
 		return resource;
 	}
 
-	CZ_LOG(Log, "Loading resource {} from file \"{}\".", name, narrow(file.native()));
+	CZ_LOG(Main, Log, "Loading resource {} from file \"{}\".", name, narrow(file.native()));
 	ObjectPtr<MResource> resource = create();
 
 	if (resource)
@@ -58,7 +63,7 @@ ObjectPtr<MResource> MResourceDefinition::getResource() const
 	}
 	else
 	{
-		CZ_LOG(Error, "Failed to load resource {}", name);
+		CZ_LOG(Main, Error, "Failed to load resource {}", name);
 		return nullptr;
 	}
 }
@@ -93,8 +98,13 @@ void MResourceDefinition::from_json(const nlohmann::json& j)
 
 bool MResource::construct(const MResourceDefinition& definition)
 {
+	if (!Super::preConstruct())
+	{
+		return false;
+	}
+
 	m_definition = &definition;
-	return Super::defaultConstruct();
+	return true;
 }
 
 
@@ -110,7 +120,7 @@ ResourceManager::~ResourceManager()
 
 bool ResourceManager::loadDefinitions(ResourceRoot& root, Group& group, const json& jdefs) const
 {
-	CZ_LOG(Log, "Loading resource definitions");
+	CZ_LOG(Main, Log, "Loading resource definitions");
 
 	int errorCount = 0;
 
@@ -132,20 +142,20 @@ bool ResourceManager::loadDefinitions(ResourceRoot& root, Group& group, const js
 				def->from_json(j);
 				if (group.definitions.find(def->name) != group.definitions.end())
 				{
-					CZ_LOG(Warning, "Resource '{}' already defined. Being replaced with override.", def->name);
+					CZ_LOG(Main, Warning, "Resource '{}' already defined. Being replaced with override.", def->name);
 				}
 				group.definitions[def->name] = std::move(def);
 			}
 			else
 			{
 				errorCount++;
-				CZ_LOG(Error, "Resource type '{}' not registered.", type);
+				CZ_LOG(Main, Error, "Resource type '{}' not registered.", type);
 			}
 		}
 		catch(json::exception& ex)
 		{
 			errorCount++;
-			CZ_LOG(Error, "Error reading resource definition. ec={}", ex.what());
+			CZ_LOG(Main, Error, "Error reading resource definition. ec={}", ex.what());
 		}
 	}
 
@@ -169,14 +179,14 @@ bool ResourceManager::loadDefinitions(ResourceRoot& root, Group& group, const js
 		if (ref->def == nullptr)
 		{
 			errorCount++;
-			CZ_LOG(Error, "Reference to '{}' could not be resolved.", ref->name);
+			CZ_LOG(Main, Error, "Reference to '{}' could not be resolved.", ref->name);
 		}
 
 		const Class& requiredDefClass = ref->getDefClass();
 		if (!requiredDefClass.isBaseOf(ref->def->getClass()))
 		{
 			errorCount++;
-			CZ_LOG(
+			CZ_LOG(Main,
 				Error, "Reference to '{}' expected a definition of type '{}', but found one of type '{}'", ref->name,
 				requiredDefClass.getName(), ref->def->getClass().getName());
 			ref->def = nullptr;
@@ -185,12 +195,12 @@ bool ResourceManager::loadDefinitions(ResourceRoot& root, Group& group, const js
 
 	if (errorCount == 0)
 	{
-		CZ_LOG(Log, "Finished loading resource definitions");
+		CZ_LOG(Main, Log, "Finished loading resource definitions");
 		return true;
 	}
 	else
 	{
-		CZ_LOG(Error, "{} errors found loading resource definitions. Ignoring entire group.", errorCount);
+		CZ_LOG(Main, Error, "{} errors found loading resource definitions. Ignoring entire group.", errorCount);
 		return false;
 	}
 }
@@ -204,7 +214,7 @@ void ResourceManager::addGroup(Group& group)
 		auto res = m_all.definitions.emplace(def.second->name, std::move(def.second));
 		if (!res.second)
 		{
-			CZ_LOG(
+			CZ_LOG(Main,
 				Warning, "Resource '{}' already exists. Replacing with new one (of type `{}`).", res.first->second->name,
 				res.first->second->getClass().getName());
 		}
@@ -237,7 +247,7 @@ const MResourceDefinition* ResourceManager::Group::find(std::string_view name) c
 	auto it = definitions.find(name);
 	if (it == definitions.end())
 	{
-		CZ_LOG(Error, "Resource '{}' not found", name);
+		CZ_LOG(Main, Error, "Resource '{}' not found", name);
 		return nullptr;
 		
 	}
@@ -264,7 +274,7 @@ bool ResourceManager::loadDefinitions(const fs::path& definitionsFile)
 	}
 	catch(std::exception& ex)
 	{
-		CZ_LOG(Error, "Error reading or parsing resources json. ec={}", ex.what());
+		CZ_LOG(Main, Error, "Error reading or parsing resources json. ec={}", ex.what());
 		return false;
 	}
 

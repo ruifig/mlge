@@ -164,6 +164,7 @@ void TextRendererSettings::renderImpl(std::string_view text, const Size& textSiz
 		dstRect.h = glyph->rect.h;
 
 		SDL_SetTextureColorMod(glyph->texture, color.r, color.g, color.b);
+		SDL_SetTextureAlphaMod(glyph->texture, color.a);
 		SDL_RenderCopy(sdlRenderer, glyph->texture, &glyph->rect, &dstRect);
 		dstRect.x += glyph->advance;
 	}
@@ -183,11 +184,16 @@ void TextRendererSettings::renderImpl(std::string_view text, const Size& textSiz
 // MTextRenderComponent
 //////////////////////////////////////////////////////////////////////////
 
-bool MTextRenderComponent::defaultConstruct()
+bool MTextRenderComponent::preConstruct()
 {
+	if (!Super::preConstruct())
+	{
+		return false;
+	}
+
 	m_textRenderer.setAlign(HAlign::Center, VAlign::Center);
 	m_textRenderer.setColor(Color::White);
-	return Super::defaultConstruct();
+	return true;
 }
 
 bool MTextRenderComponent::construct(std::string text)

@@ -19,6 +19,11 @@ Window::Window(bool& p_open, const std::string& title)
 {
 }
 
+Window::Window(const std::string& title)
+	: m_title(title)
+{
+}
+
 bool Window::tick(float /*elapsedSeconds*/)
 {
 	if (!ImGui::Begin(m_title.c_str(), m_p_open))

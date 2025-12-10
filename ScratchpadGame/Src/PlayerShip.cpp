@@ -19,10 +19,15 @@ FPoint moveWithRotation(const FPoint& pos, float angleDegrees, float speedPixels
 	return newPos;
 }
 
-bool MShipMoveComponent::defaultConstruct()
+bool MShipMoveComponent::preConstruct()
 {
+	if (!Super::preConstruct())
+	{
+		return false;
+	}
+
 	m_onProcessEventHandle = Engine::get().processEventDelegate.bind(this, &MShipMoveComponent::onProcessEvent);
-	return Super::defaultConstruct();
+	return true;
 }
 
 void MShipMoveComponent::onProcessEvent(SDL_Event& evt)
@@ -34,11 +39,13 @@ void MShipMoveComponent::onProcessEvent(SDL_Event& evt)
 
 	if (evt.type == SDL_MOUSEMOTION)
 	{
-		CZ_LOG(Log, "mousemotion: timestamp={}, state={}, x={}, y={}, xrel={}, yrel={}",
+		#if 0
+		CZ_LOG(Main, Log, "mousemotion: timestamp={}, state={}, x={}, y={}, xrel={}, yrel={}",
 			evt.motion.timestamp,
 			evt.motion.state,
 			evt.motion.x, evt.motion.y,
 			evt.motion.xrel, evt.motion.yrel);
+		#endif
 	}
 
 	if (evt.type == SDL_KEYDOWN)
@@ -165,8 +172,13 @@ void APlayerShip::destruct()
 	Super::destruct();
 }
 
-bool APlayerShip::defaultConstruct()
+bool APlayerShip::preConstruct()
 {
+	if (!Super::preConstruct())
+	{
+		return false;
+	}
+
 	m_renderComp = addNewComponent<MFlipbookComponent>().get();
 	m_renderComp->setFlipbook(m_move);
 
@@ -178,9 +190,9 @@ bool APlayerShip::defaultConstruct()
 	m_txt->setText("Hello");
 	m_txt->setFont(m_font);
 	m_txt->setAlignment(HAlign::Center, VAlign::Center);
-	m_txt->setRelativePosition({m_move->getSprite(0).rect.w / 2.0f, m_move->getSprite(0).rect.h / 4.0f});
+	m_txt->setRelativePosition({static_cast<float>(-m_move->getSprite(0).rect.w) / 4.0f, -static_cast<float>(-m_move->getSprite(0).rect.h) / 4.0f});
 
-	return Super::defaultConstruct();
+	return true;
 }
 
 void APlayerShip::tick(float deltaSeconds)

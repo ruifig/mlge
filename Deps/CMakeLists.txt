@@ -1,17 +1,11 @@
-#
-# Add catch2 if tests are enabled, and tweak some things
-#
-if (MLGE_TESTS OR CZCORE_TESTS)
-	add_subdirectory(./Catch2)
-	# Set in what folder it shows up in the IDE
-	set_target_properties(Catch2 PROPERTIES FOLDER "mlge/Dependencies/")
-	set_target_properties(Catch2WithMain PROPERTIES FOLDER "mlge/Dependencies/")
-endif()
+include(FetchContent)
 
 #
 # utfcpp
-#
-add_subdirectory(./utfcpp)
+# This needs to be declared BEFORE czcore, otherwise czcore will download it instead of using what we have in the engine.
+FetchContent_Declare(utfcpp
+	SOURCE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/utfcpp
+)
 # utfcpp is a target of type INTERFACE, so it doesn't show in Visual Studio. To work around this we create a custom target.
 # The custom target doesn't build anything, but allows us to see the utfcpp files in VS
 add_custom_target(utfcpp_ SOURCES
@@ -20,35 +14,52 @@ add_custom_target(utfcpp_ SOURCES
 	"utfcpp/source/utf8/core.h"
 	"utfcpp/source/utf8/cpp11.h"
 	"utfcpp/source/utf8/cpp17.h"
+	"utfcpp/source/utf8/cpp20.h"
 	"utfcpp/source/utf8/unchecked.h"
 )
+
 # Set in what folder it shows up in the IDE
 set_target_properties(utfcpp_ PROPERTIES FOLDER "mlge/Dependencies/")
 
-# Add a custom target for SDL so that we can see the headers in Visual Studio.
-# The custom target doesn't build anything, but allows us to see the utfcpp files in VS
-file(GLOB_RECURSE SDLSOURCES "SDL2/Core/include/*.*" "SDL2/Image/include/*.*" "SDL2/TTF/include/*.*")
-add_custom_target(SDL_ SOURCES ${SDLSOURCES})
-# Set in what folder it shows up in the IDE
-set_target_properties(SDL_ PROPERTIES FOLDER "mlge/Dependencies/")
 
 #
-# Setup the Remotery cmake target
-#
-add_library(Remotery STATIC
-	"Remotery/lib/Remotery.c"
-	"Remotery/lib/Remotery.h"
+# Catch2
+# This needs to be declared BEFORE czcore, otherwise czcore will download it instead of using what we have in the engine.
+FetchContent_Declare(Catch2
+	SOURCE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/Catch2
 )
-target_include_directories(Remotery PUBLIC "Remotery/lib")
-set_target_properties(Remotery PROPERTIES FOLDER "mlge/Dependencies/")
-if(MSVC)
-	target_compile_options(Remotery PRIVATE /wd4114)
+
+#
+# czcore
+#
+# Note to myself: By default, we use the built-in czcore, but if I want to use an external czcore so I can
+# share it with other project while developing czcore, then an override can be provided with a cache variable.
+# See:  https://cmake.org/cmake/help/latest/module/FetchContent.html, specifically the part that mentions
+# FETCH_CONTENT_SOURCE_DIR
+#
+FetchContent_Declare(czcore
+	SOURCE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/czcore
+)
+FetchContent_MakeAvailable(czcore)
+set_target_properties(czcore PROPERTIES FOLDER "mlge/Dependencies/")
+if (TARGET czcore_UnitTests)
+	set_target_properties(czcore_UnitTests PROPERTIES FOLDER "mlge/Dependencies/")
+endif()
+if (TARGET Catch2)
+	set_target_properties(Catch2 PROPERTIES FOLDER "mlge/Dependencies/")
+	set_target_properties(Catch2WithMain PROPERTIES FOLDER "mlge/Dependencies/")
 endif()
 
 #
 # SDL2
 #
 add_subdirectory(./SDL2)
+# Add a custom target for SDL so that we can see the headers in Visual Studio.
+# The custom target doesn't build anything, but allows us to see the utfcpp files in VS
+file(GLOB_RECURSE SDLSOURCES "SDL2/Core/include/*.*" "SDL2/Image/include/*.*" "SDL2/TTF/include/*.*")
+add_custom_target(SDL_ SOURCES ${SDLSOURCES})
+# Set in what folder it shows up in the IDE
+set_target_properties(SDL_ PROPERTIES FOLDER "mlge/Dependencies/")
 
 #
 # Setup imgui
@@ -89,6 +100,9 @@ set_target_properties(imgui PROPERTIES FOLDER "mlge/Dependencies/")
 
 add_subdirectory("./steamworks")
 
+#
+# cmake_timestamp
+#
 add_subdirectory(./cmake_timestamp)
 set_target_properties(timestamp PROPERTIES FOLDER "mlge/Dependencies/cmake_timestamp")
 set_target_properties(clear_cache PROPERTIES FOLDER "mlge/Dependencies/cmake_timestamp")

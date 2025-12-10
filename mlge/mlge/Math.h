@@ -53,6 +53,20 @@ struct Point : public SDL_Point
 	 * Returns a rectangle centered at the point position, and with the specified width and height
 	 */
 	Rect createRect(int width, int height) const;
+
+	Point& operator+=(const Point& other)
+	{
+		x += other.x;
+		y += other.y;
+		return *this;
+	}
+
+	Point& operator-=(const Point& other)
+	{
+		x -= other.x;
+		y -= other.y;
+		return *this;
+	}
 };
 
 constexpr bool operator==(const Point& lhs, const Point& rhs)
@@ -82,6 +96,11 @@ struct FPoint : public SDL_FPoint
 	bool isEqual(const FPoint& other, float epsilon = details::MathTraits<float>::Epsilon) const
 	{
 		return (fabs(x - other.x) < epsilon) && (fabs(y - other.y) < epsilon);
+	}
+
+	bool isExactlyEqual(const FPoint& other) const
+	{
+		return x == other.x && y == other.y;
 	}
 
 	/**
@@ -140,6 +159,14 @@ struct Rect : public SDL_Rect
 		this->y = origin.y;
 		this->w = width;
 		this->h = height;
+	}
+
+	constexpr Rect(const Point& origin, const Size& size)
+	{
+		this->x = origin.x;
+		this->y = origin.y;
+		this->w = size.w;
+		this->h = size.h;
 	}
 
 	constexpr Size size() const
@@ -265,6 +292,22 @@ struct Rect : public SDL_Rect
 		this->y = pos.y;
 	}
 
+	/**
+	 * Expands rectangle by the specified ammount.
+	 */
+	constexpr void expand(int delta)
+	{
+		x -= delta;
+		y -= delta;
+		w += (delta*2);
+		h += (delta*2);
+	}
+
+	constexpr void contract(int delta)
+	{
+		expand(-delta);
+	}
+
 	#if 0
 	/**
 	 * Convert to a SDL_Rect
@@ -331,6 +374,7 @@ struct Color : public SDL_Color
 template<typename T>
 bool isEqual(T a, T b, T epsilon = details::MathTraits<T>::Epsilon)
 {
+	static_assert(std::is_floating_point_v<T>);
 	return (fabs(a - b) < epsilon);
 }
 

@@ -8,13 +8,12 @@ if(NOT MLGE_PRESETUP_DONE)
 	include(CMake/presetup.cmake)
 endif()
 
-option(MLGE_SAMPLES "Generate mlge sample targets" OFF)
-option(MLGE_TESTS "Generate mlge unit tests targets" OFF)
+option(MLGE_ENABLE_SAMPLES "Generate mlge sample targets" OFF)
+option(MLGE_ENABLE_TESTS "Generate mlge unit tests targets" OFF)
 
 set(CZ_BASE_IDE_FOLDER "mlge/")
 
 add_subdirectory(./Deps)
-add_subdirectory(./czcore)
 
 message(STATUS "MLGE : Looking for custom mlgegen library at '${CMAKE_CURRENT_LIST_DIR}/mlgegen_custom'...")
 if(EXISTS "${CMAKE_CURRENT_LIST_DIR}/mlgegen_custom")
@@ -29,10 +28,9 @@ add_subdirectory(./mlgegen)
 add_subdirectory(./mlge)
 
 
-if (MLGE_SAMPLES)
+if (MLGE_ENABLE_SAMPLES)
 	add_subdirectory(./mlgeSample)
 	add_subdirectory(./ScratchpadGame)
 endif()
-
 
 

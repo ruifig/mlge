@@ -4,8 +4,6 @@
 #include "mlge/ActorComponent.h"
 #include "mlge/Math.h"
 
-#include "crazygaze/core/Singleton.h"
-
 namespace mlge
 {
 
@@ -17,6 +15,7 @@ enum class RenderGroup
 	PhysicsDebug = 20,
 	SkiesLate = 21,
 	Overlay = 25,
+	MouseCursor = 29,
 	OverlayDebug = 30,
 	Stats = 31,
 	MAX = 32
@@ -38,11 +37,12 @@ class Renderable
 	virtual void updateRenderQueue() = 0;
 };
 
-class RenderQueue : public Singleton<RenderQueue>
+class RenderQueue
 {
   public:
 
-	bool init();
+	RenderQueue();
+	~RenderQueue();
 
 	/**
 	 * Adds a renderable to the list of objects that wish to render.
@@ -51,7 +51,7 @@ class RenderQueue : public Singleton<RenderQueue>
 	void addRenderable(Renderable& renderable);
 
 	/**
-	 * Removes a renderable from the list of objects that widh to be rendered.
+	 * Removes a renderable from the list of objects that wish to be rendered.
 	 */
 	void removeRenderable(Renderable& renderable);
 
@@ -61,6 +61,11 @@ class RenderQueue : public Singleton<RenderQueue>
 	void addOp(RenderOperation& op, RenderGroup group);
 
 	void render();
+
+	/**
+	 * Get the render queue of the game instance currently being processed
+	 */
+	static RenderQueue& get();
 
   private:
 	std::set<Renderable*> m_renderables;

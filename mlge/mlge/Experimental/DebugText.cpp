@@ -6,6 +6,9 @@ namespace
 	ADebugText* gDebugText = nullptr;
 }
 
+
+// #RVF : I think this can end up being called from the Ludeo SDK's network thread, which is a problem.
+// I need to verify that and think about what to do.
 void addDebugTextImpl(const Color& color, const std::string& str)
 {
 	if (gDebugText)
@@ -35,6 +38,7 @@ void ADebugText::addEntry(const Color& color, const std::string& str)
 		MTextRenderComponent* comp = addNewComponent<MTextRenderComponent>().get();
 		comp->setFont(m_font);
 		comp->setPtSize(m_fontSize);
+		comp->setRenderGroup(RenderGroup::OverlayDebug);
 
 		comp->setAlignment(HAlign::Right, VAlign::Bottom);
 		m_entries.back().comp = comp;
@@ -46,8 +50,13 @@ void ADebugText::addEntry(const Color& color, const std::string& str)
 	m_entries.back().comp->setText(str);
 }
 
-bool ADebugText::defaultConstruct()
+bool ADebugText::preConstruct()
 {
+	if (!Super::preConstruct())
+	{
+		return false;
+	}
+
 	gDebugText = this;
 
 	// Load the font
@@ -59,7 +68,7 @@ bool ADebugText::defaultConstruct()
 
 	m_font->loadASCIIGlyphs(m_fontSize);
 
-	return Super::defaultConstruct();
+	return true;
 }
 
 void ADebugText::tick(float deltaSeconds)

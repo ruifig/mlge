@@ -106,6 +106,30 @@ function(mlge_utils_setBinaryTargetOutput targetName)
 	)
 endfunction()
 
+#
+# Checks if a target (tgt) depends on another one (dep)
+#
+# Usage:
+#	target_has_dependency(MyExe MyLib HAS_MYLIB)
+#	if(HAS_MYLIB)
+#		# Do whatever you need
+#	endif()
+#
+function(mlge_target_has_dependency tgt dep outVar)
+
+  # 1) get both direct and interface link lists
+  get_target_property(_dirs ${tgt} LINK_LIBRARIES)
+  get_target_property(_ifs ${tgt} INTERFACE_LINK_LIBRARIES)
+  # 2) merge and search
+  set(_all ${_dirs} ${_ifs})
+  list(FIND _all "${dep}" _found)
+  if(_found GREATER -1)
+    set(${outVar} TRUE PARENT_SCOPE)
+  else()
+    set(${outVar} FALSE PARENT_SCOPE)
+  endif()
+
+endfunction()
 
 ###############################################################################################################
 #
@@ -121,6 +145,9 @@ endfunction()
 #
 function(mlge_setupBinaryTarget targetName)
 	mlge_utils_setBinaryTargetOutput(${targetName})
-	mlge_utils_copyRuntimeDlls(${targetName})
+	mlge_target_has_dependency(${targetName} mlge HAS_MLGE)
+	if (HAS_MLGE)
+		mlge_utils_copyRuntimeDlls(${targetName})
+	endif()
 endfunction()
 

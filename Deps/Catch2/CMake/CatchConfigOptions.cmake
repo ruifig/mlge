@@ -14,14 +14,15 @@
 #
 # For detailed docs look into docs/configuration.md
 
-
 macro(AddOverridableConfigOption OptionBaseName)
   option(CATCH_CONFIG_${OptionBaseName} "Read docs/configuration.md for details" OFF)
   option(CATCH_CONFIG_NO_${OptionBaseName} "Read docs/configuration.md for details" OFF)
+  mark_as_advanced(CATCH_CONFIG_${OptionBaseName} CATCH_CONFIG_NO_${OptionBaseName})
 endmacro()
 
 macro(AddConfigOption OptionBaseName)
   option(CATCH_CONFIG_${OptionBaseName} "Read docs/configuration.md for details" OFF)
+  mark_as_advanced(CATCH_CONFIG_${OptionBaseName})
 endmacro()
 
 set(_OverridableOptions
@@ -42,6 +43,9 @@ set(_OverridableOptions
   "WINDOWS_SEH"
   "GETENV"
   "EXPERIMENTAL_STATIC_ANALYSIS_SUPPORT"
+  "USE_BUILTIN_CONSTANT_P"
+  "DEPRECATION_ANNOTATIONS"
+  "EXPERIMENTAL_THREAD_SAFE_ASSERTIONS"
 )
 
 foreach(OptionName ${_OverridableOptions})
@@ -62,6 +66,7 @@ set(_OtherConfigOptions
   "FAST_COMPILE"
   "NOSTDOUT"
   "PREFIX_ALL"
+  "PREFIX_MESSAGES"
   "WINDOWS_CRTDBG"
 )
 
@@ -70,13 +75,15 @@ foreach(OptionName ${_OtherConfigOptions})
   AddConfigOption(${OptionName})
 endforeach()
 if(DEFINED BUILD_SHARED_LIBS)
-    set(CATCH_CONFIG_SHARED_LIBRARY ${BUILD_SHARED_LIBS})
+  set(CATCH_CONFIG_SHARED_LIBRARY ${BUILD_SHARED_LIBS})
 else()
-    set(CATCH_CONFIG_SHARED_LIBRARY "")
+  set(CATCH_CONFIG_SHARED_LIBRARY "")
 endif()
 
 set(CATCH_CONFIG_DEFAULT_REPORTER "console" CACHE STRING "Read docs/configuration.md for details. The name of the reporter should be without quotes.")
 set(CATCH_CONFIG_CONSOLE_WIDTH "80" CACHE STRING "Read docs/configuration.md for details. Must form a valid integer literal.")
+
+mark_as_advanced(CATCH_CONFIG_SHARED_LIBRARY CATCH_CONFIG_DEFAULT_REPORTER CATCH_CONFIG_CONSOLE_WIDTH)
 
 # There is no good way to both turn this into a CMake cache variable,
 # and keep reasonable default semantics inside the project. Thus we do

@@ -21,7 +21,10 @@ The "Generators" `TEST_CASE` will be entered 3 times, and the value of
 `i` will be 1, 3, and 5 in turn. `GENERATE`s can also be used multiple
 times at the same scope, in which case the result will be a cartesian
 product of all elements in the generators. This means that in the snippet
-below, the test case will be run 6 (2\*3) times.
+below, the test case will be run 6 (2\*3) times. The `GENERATE` macro
+is defined in the `catch_generators.hpp` header, so compiling
+the code examples below also requires
+`#include <catch2/generators/catch_generators.hpp>`.
 
 ```cpp
 TEST_CASE("Generators") {
@@ -103,7 +106,7 @@ a test case,
 * 2 fundamental generators
   * `SingleValueGenerator<T>` -- contains only single element
   * `FixedValuesGenerator<T>` -- contains multiple elements
-* 5 generic generators that modify other generators
+* 5 generic generators that modify other generators (defined in `catch2/generators/catch_generators_adapters.hpp`)
   * `FilterGenerator<T, Predicate>` -- filters out elements from a generator
   for which the predicate returns "false"
   * `TakeGenerator<T>` -- takes first `n` elements from a generator
@@ -111,9 +114,10 @@ a test case,
   * `MapGenerator<T, U, Func>` -- returns the result of applying `Func`
   on elements from a different generator
   * `ChunkGenerator<T>` -- returns chunks (inside `std::vector`) of n elements from a generator
-* 4 specific purpose generators
+* 2 random generators (defined in `catch2/generators/catch_generators_random.hpp`)
   * `RandomIntegerGenerator<Integral>` -- generates random Integrals from range
   * `RandomFloatGenerator<Float>` -- generates random Floats from range
+* 2 range generators (defined in `catch2/generators/catch_generators_range.hpp`)
   * `RangeGenerator<T>(first, last)` -- generates all values inside a `[first, last)` arithmetic range
   * `IteratorGenerator<T>` -- copies and returns values from an iterator range
 
@@ -188,6 +192,45 @@ TEST_CASE("type conversion", "[generators]") {
     REQUIRE(str.size() > 0);
 }
 ```
+
+
+### Random number generators: details
+
+> This section applies from Catch2 3.5.0. Before that, random generators
+> were a thin wrapper around distributions from `<random>`.
+
+All of the `random(a, b)` generators in Catch2 currently generate uniformly
+distributed number in closed interval \[a; b\]. This  is different from
+`std::uniform_real_distribution`, which should return numbers in interval
+\[a; b) (but due to rounding can end up returning b anyway), but the
+difference is intentional, so that `random(a, a)` makes sense. If there is
+enough interest from users, we can provide API to pick any of CC, CO, OC,
+or OO ranges.
+
+Unlike `std::uniform_int_distribution`, Catch2's generators also support
+various single-byte integral types, such as `char` or `bool`.
+
+
+#### Reproducibility
+
+Given the same seed, the output from the integral generators is fully
+reproducible across different platforms.
+
+For floating point generators, the situation is much more complex.
+Generally Catch2 only promises reproducibility (or even just correctness!)
+on platforms that obey the IEEE-754 standard. Furthermore, reproducibility
+only applies between binaries that perform floating point math in the
+same way, e.g. if you compile a binary targeting the x87 FPU and another
+one targeting SSE2 for floating point math, their results will vary.
+Similarly, binaries compiled with compiler flags that relax the IEEE-754
+adherence, e.g. `-ffast-math`, might provide different results than those
+compiled for strict IEEE-754 adherence.
+
+Finally, we provide zero guarantees on the reproducibility of generating
+`long double`s, as the internals of `long double` varies across different
+platforms.
+
+
 
 ## Generator interface
 

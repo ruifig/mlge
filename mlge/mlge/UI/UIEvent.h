@@ -5,9 +5,9 @@
 namespace mlge
 {
 
-class UIWidget;
+class MUIWidget;
 
-struct UIEvent
+struct UIInternalEvent
 {
 	enum class Type
 	{
@@ -19,7 +19,17 @@ struct UIEvent
 
 	Type type = Type::None;
 	Point pos;
-	UIWidget* source = nullptr;
+	//UIWidget* source = nullptr;
+	bool consumed = false;
+};
+
+struct UIEvent
+{
+	std::string_view name;
+	// Event name, hashed
+	uint64_t hash;
+	MUIWidget* source = nullptr;
 };
 
 }
+

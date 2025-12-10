@@ -5,13 +5,17 @@
 #include "mlge/Render/DXDebugLayer.h"
 #include "mlge/Resource/Resource.h"
 #include "mlge/Config.h"
+#include "mlge/PerformanceStats.h"
 
 #include "crazygaze/core/ScopeGuard.h"
 #include "crazygaze/core/CommandLine.h"
+#include "crazygaze/core/Algorithm.h"
 
 #if MLGE_EDITOR
 	#include "mlge/Editor/Editor.h"
 #endif
+
+CZ_DEFINE_LOG_CATEGORY(Editor)
 
 namespace mlge
 {
@@ -49,7 +53,7 @@ bool Engine::initSDL()
 
 	if (SDL_Init(SDL_INIT_VIDEO | SDL_INIT_GAMECONTROLLER) < 0)
 	{
-		CZ_LOG(Fatal, "Could not initialize SDL. ec={}", SDL_GetError());
+		CZ_LOG(Main, Fatal, "Could not initialize SDL. ec={}", SDL_GetError());
 		return false;
 	}
 
@@ -60,7 +64,7 @@ bool Engine::initSDL()
 
 	if (TTF_Init() < 0)
 	{
-		CZ_LOG(Fatal, "Could not initialize SDL TTF. ec={}", TTF_GetError());
+		CZ_LOG(Main, Fatal, "Could not initialize SDL TTF. ec={}", TTF_GetError());
 		return false;
 	}
 
@@ -75,31 +79,68 @@ void Engine::processEvents()
 
 	SDL_Event evt;
 
+	// Note that gIsGame will be get in Editor builds when we pass -game
+	// The point of this bool
+	// - If true, then we are in a situation that we are an actual game (eithe Release build, or running with -game)
+	// - If false, then we are runnig in editor mode
+	//		- Even if the game is running inside the editor, this is still false (intentional), so that this functio can skip
+	//		  things that are the Editor's responsability
+	bool hasGame = gIsGame && Game::tryGet();
+
 	while(SDL_PollEvent(&evt))
 	{
 		processEventDelegate.broadcast(evt);
 
-		if (Game::tryGet())
-		{
-			Game::get().processInput(evt);
-		}
-
 		if (evt.type == SDL_QUIT)
 		{
-			if (Game::tryGet())
+			if (hasGame)
 			{
-				Game::get().requestShutdown();
+				Game::get().requestExpectedShutdown();
 			}
 		}
-		else if (
-			evt.type == SDL_WINDOWEVENT && evt.window.event == SDL_WINDOWEVENT_CLOSE &&
-			evt.window.windowID == SDL_GetWindowID(Renderer::get().getSDLWindow()))
+		else if (evt.type == SDL_WINDOWEVENT)
 		{
-			if (Game::tryGet())
+			if (evt.window.event == SDL_WINDOWEVENT_CLOSE && evt.window.windowID == SDL_GetWindowID(Renderer::get().getSDLWindow()))
 			{
-				Game::get().requestShutdown();
+				if (hasGame)
+				{
+					Game::get().requestExpectedShutdown();
+				}
+			}
+
+			if (hasGame)
+			{
+				if (evt.window.event == SDL_WINDOWEVENT_ENTER)
+				{
+					Game::get().onWindowEnter(true);
+				}
+				if (evt.window.event == SDL_WINDOWEVENT_LEAVE)
+				{
+					Game::get().onWindowEnter(false);
+				}
+				else if (evt.window.event == SDL_WINDOWEVENT_RESIZED)
+				{
+					Game::get().onWindowResized({evt.window.data1, evt.window.data2});
+				}
+			}
+
+			if (hasGame && evt.window.event == SDL_WINDOWEVENT_FOCUS_GAINED)
+			{
+				Game::get().onWindowFocus(true);
+			}
+			else if (hasGame && evt.window.event == SDL_WINDOWEVENT_FOCUS_LOST)
+			{
+				Game::get().onWindowFocus(false);
 			}
 		}
+		else if (hasGame && evt.type == SDL_MOUSEMOTION)
+		{
+			Game::MouseMotionEvent gameEvt;
+			gameEvt.pos = {evt.motion.x, evt.motion.y};
+			gameEvt.rel = {evt.motion.xrel, evt.motion.yrel};
+			Game::get().onMouseMotion(gameEvt);
+		}
+
 	}
 
 }
@@ -108,19 +149,21 @@ namespace details
 {
 	void applyLogLevels()
 	{
-		std::string levelStr = Config::get().getValueOrDefault<std::string>("Engine", "loglevel", to_string(compileTimeMaxLogLevel));
-		currMaxLogLevel = logLevelFromString(levelStr);
+		std::string logSettings = Config::get().getValueOrDefault<std::string>("Engine", "logSettings", "");
+		cz::setLogSettings(logSettings);
 	}
 }
 
 bool Engine::init(int argc, char* argv[])
 {
+	// Set the working directory to the executable's folder
+	fs::current_path(getProcessPath());
 	m_root = Root::create();
 
 	// This needs to be initialized before Root, so the other singletons can query the command line
 	if (!CommandLine::get().init(argc, argv))
 	{
-		CZ_LOG(Error, "Unexpected things in the command line.");
+		CZ_LOG(Main, Error, "Unexpected things in the command line.");
 	}
 
 	if (!initSDL())
@@ -154,24 +197,18 @@ bool Engine::init(int argc, char* argv[])
 
 void Engine::tick()
 {
-	if (m_deferedTasks.popAll(m_swapDeferedTasks))
-	{
-		while(m_swapDeferedTasks.size())
+	#if MLGE_EDITOR
+		if (!gIsGame)
 		{
-			// Note the double ()(). Intentional.
-			m_swapDeferedTasks.front()();
-			m_swapDeferedTasks.pop();
+			editor::Editor::get().tick();
 		}
-	}
-
-	tickDelegate.broadcast();
+	#endif
 
 	if (Game::tryGet())
 	{
 		Game::get().gameClockTick();
-	}
+	};
 }
-
 
 namespace
 {
@@ -205,28 +242,34 @@ namespace
 
 		void tick()
 		{
-			if (m_maxFps == 0)
-			{
-				return;
-			}
-
 			m_tsA = Clock::now();
-			std::chrono::duration<double, std::milli> workTime = m_tsA - m_tsB;
+			m_lastWorkTime = m_tsA - m_tsB;
 
-			if (workTime.count() < m_msPerFrame)
+			if (m_maxFps != 0)
 			{
-				std::chrono::duration<double, std::milli> delta_ms(m_msPerFrame - workTime.count());
-				auto delta_ms_duration = std::chrono::duration_cast<std::chrono::milliseconds>(delta_ms);
-				std::this_thread::sleep_for(delta_ms_duration);
+				if (m_lastWorkTime.count() < m_msPerFrame)
+				{
+					std::chrono::duration<double, std::milli> delta_ms(m_msPerFrame - m_lastWorkTime.count());
+					auto delta_ms_duration = std::chrono::duration_cast<std::chrono::milliseconds>(delta_ms);
+					std::this_thread::sleep_for(delta_ms_duration);
+				}
 			}
 
 			m_tsB = Clock::now();
+		}
+
+		float getLastWorkTimeMs() const
+		{
+			return static_cast<float>(m_lastWorkTime.count());
 		}
 
 	  private:
 
 		Clock::time_point m_tsA;
 		Clock::time_point m_tsB;
+
+		// Time spent over the last frame, excluding the frame limting
+		std::chrono::duration<double, std::milli> m_lastWorkTime = {};
 
 		int m_maxFps;
 		float m_msPerFrame;
@@ -255,15 +298,28 @@ bool Engine::run()
 
 		fpsLimiter.tick();
 
-		Renderer::get().beginFrame();
-		processEvents();
-		tick();
+		{
+			if (Game::tryGet())
+			{
+				PerformanceStats::get().stat_Tick_Start();
+			}
+
+			Renderer::get().beginFrame();
+			processEvents();
+			tick();
+
+			if (Game::tryGet())
+			{
+				PerformanceStats::get().stat_Tick_End();
+			}
+		}
+
 		Renderer::get().render();
 
 		// We initiate shutdown if both the game and editor want to shutdown
 		if (Game::tryGet())
 		{
-			shuttingDown = Game::get().isShuttingDown();
+			shuttingDown &= Game::get().isShuttingDown();
 		}
 
 	#if MLGE_EDITOR
@@ -273,9 +329,15 @@ bool Engine::run()
 		}
 	#endif
 
+		if (Game::tryGet())
+		{
+			PerformanceStats::get().tick();
+		}
+
 	} while(shuttingDown == false);
 
-	CZ_LOG(Log, "Starting shutdown...");
+	CZ_LOG(Main, Log, "Starting shutdown...");
+
 
 	// Start the shutdown.
 	if (Game::tryGet())
@@ -291,7 +353,7 @@ bool Engine::run()
 
 			if (currentTime >= shutdownTime)
 			{
-				CZ_LOG(Warning, "Shutdown deadline expired. Forcing shutdown.")
+				CZ_LOG(Main, Warning, "Shutdown deadline expired. Forcing shutdown.")
 				break;
 			}
 
@@ -308,8 +370,7 @@ bool Engine::run()
 		Game::get().shutdown();
 	}
 
-
-	return true;
+	return Game::tryGet() ? Game::get().getShutdownValue() : true;
 }
 
 } // namespace mlge

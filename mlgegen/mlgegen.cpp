@@ -18,7 +18,7 @@ Context gCtx;
 
 void processFile(fs::path file)
 {
-	CZ_LOG(Log, "Processing file '{}'", narrow(file.c_str()));
+	CZ_LOG(Main, Log, "Processing file '{}'", narrow(file.c_str()));
 
 
 }
@@ -30,14 +30,14 @@ int mainImpl()
 	fs::path outputFolder;
 	if (!CommandLine::get().getValue("i", inputFolder) || !CommandLine::get().getValue("o", outputFolder))
 	{
-		CZ_LOG(Error, "Invalid or missing parameters.");
+		CZ_LOG(Main, Error, "Invalid or missing parameters.");
 		printf("%s\n", gHelp);
 		return EXIT_FAILURE;
 	}
 
 	if (!fs::exists(inputFolder) || !fs::is_directory(inputFolder))
 	{
-		CZ_LOG(Error, "Specified input folder ('{}') doesn't exist or is not a directory.", narrow(inputFolder.c_str()));
+		CZ_LOG(Main, Error, "Specified input folder ('{}') doesn't exist or is not a directory.", narrow(inputFolder.c_str()));
 		return EXIT_FAILURE;
 	}
 
@@ -66,7 +66,7 @@ int mainImpl()
 			continue;
 		}
 
-		//CZ_LOG(Log, "{}, is_directory={}", narrow(entry.path().c_str()), entry.is_directory())
+		//CZ_LOG(Main, Log, "{}, is_directory={}", narrow(entry.path().c_str()), entry.is_directory())
 		processFile(entry.path());
 	}
 
@@ -88,7 +88,7 @@ int main(int argc, char *argv[])
 	}
 	catch(std::exception& ex)
 	{
-		CZ_LOG(Fatal, "Exception: {}", ex.what());
+		CZ_LOG(Main, Fatal, "Exception: {}", ex.what());
 		return EXIT_FAILURE;
 	}
 }

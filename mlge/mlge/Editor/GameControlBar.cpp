@@ -49,8 +49,12 @@ void GameControlBar::show()
 			atoi(std::string(str, str.find('x')+1).c_str())};
 	};
 
+	float spacing = ImGui::GetStyle().ItemInnerSpacing.x;
+
 	// Resolution selection
 	{
+		ImGui::SameLine(0.0f, spacing);
+
 		const char* combo_preview_value =
 			m_resolutions[static_cast<size_t>(m_resolutionIdx)].c_str();  // Pass in the preview value visible before opening the combo (it could be anything)
 
@@ -68,13 +72,15 @@ void GameControlBar::show()
 					Config::get().setGameValue("Engine", "resy", newResolution.h);
 					Config::get().save();
 
+
 					if (Game::tryGet())
 					{
 						RenderTarget& renderTarget = Game::get().getRenderTarget();
-						if (renderTarget.getSize() != newResolution && renderTarget.setSize(newResolution))
+						if (renderTarget.getSize() != newResolution)
 						{
 							m_resolution = newResolution;
 							m_resolutionIdx = newIdx;
+							Game::get().onWindowResized(newResolution);
 						}
 					}
 					else
@@ -96,7 +102,7 @@ void GameControlBar::show()
 
 	// Play stop buttons
 	{
-		bool hasGame = Game::tryGet()==nullptr ? false : true;
+		bool hasGame = Game::tryGet() ? true : false;
 
 		if (hasGame)
 		{
@@ -106,9 +112,10 @@ void GameControlBar::show()
 				Editor::get().stopGame();
 			}
 
+			// #MULTIPLE_INSTANCES : Test this
+			ImGui::SameLine();
 			if (Game::get().isGameClockPaused())
 			{
-				ImGui::SameLine();
 				if (ImGui::Button("Resume"))
 				{
 					Game::get().resumeGameClock();
@@ -116,7 +123,6 @@ void GameControlBar::show()
 			}
 			else
 			{
-				ImGui::SameLine();
 				if (ImGui::Button("Pause"))
 				{
 					Game::get().pauseGameClock();

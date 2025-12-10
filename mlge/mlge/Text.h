@@ -265,7 +265,7 @@ class MTextRenderComponent : public MRenderComponent,  public RenderOperation
 
   public:
 
-	virtual bool defaultConstruct() override;
+	virtual bool preConstruct() override;
 	bool construct(std::string text);
 
 	/**
@@ -300,6 +300,14 @@ class MTextRenderComponent : public MRenderComponent,  public RenderOperation
 	 * Set the text to render
 	 */
 	void setText(std::string_view text);
+
+	/**
+	 * Returns the text
+	 */
+	const std::string& getText() const
+	{
+		return m_textRenderer.getText();
+	}
 
 	/**
 	 * Sets the text alignment

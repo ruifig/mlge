@@ -8,7 +8,6 @@
 #include "mlge/FlipbookComponent.h"
 
 using namespace mlge;
-using namespace std::literals::chrono_literals;
 
 /**
  * Component that moves the ships.
@@ -25,7 +24,7 @@ public:
 	{
 	}
 
-	virtual bool defaultConstruct() override;
+	virtual bool preConstruct() override;
 	virtual void tick(float deltaSeconds) override;
 	void saveLudeoData(const char* compName);
 
@@ -65,7 +64,7 @@ class APlayerShip : public AActor
 
 	virtual void destruct() override;
 
-	virtual bool defaultConstruct() override;
+	virtual bool preConstruct() override;
 
 	virtual void tick(float deltaSeconds) override;
 

@@ -22,14 +22,7 @@ class Editor : public Singleton<Editor>
 	~Editor();
 
 	bool init();
-	void requestShutdown()
-	{
-		m_shuttingDown = true;
-		if (m_game)
-		{
-			m_game->requestShutdown();
-		}
-	}
+	void requestShutdown();
 
 	bool isShuttingDown() const
 	{
@@ -39,22 +32,7 @@ class Editor : public Singleton<Editor>
 	bool startGame();
 	bool stopGame();
 
-	/**
-	 * Returns true if the game is running and has input focus
-	 */
-	bool gameHasFocus() const
-	{
-		return m_game && m_game->hasFocus();
-	}
-
-	/**
-	 * Returns true if the game is running (with focus or not)
-	 */
-	bool gameIsRunning() const
-	{
-		return m_game.get() ? true : false;
-	}
-
+	bool gameHasFocus() const;
 	void setGameFocus(bool state);
 
 	void addWindow(std::unique_ptr<Window> window);
@@ -62,6 +40,8 @@ class Editor : public Singleton<Editor>
 	Window* findWindowByTag(void* tag);
 
   protected:
+
+	friend Engine;
 
 	void showMenu();
 	void showMenuWindow();
@@ -80,8 +60,8 @@ class Editor : public Singleton<Editor>
 	DelegateHandle m_onGameRenderFinishedHandle;
 	void onProcessEvent(SDL_Event& evt);
 	DelegateHandle m_onProcessEventHandle;
-	void onTick();
-	DelegateHandle m_onTickHandle;
+
+	void tick();
 
 	std::set<std::unique_ptr<Window>, details::pointer_comp<Window>> m_windows;
 	bool m_shuttingDown = false;
